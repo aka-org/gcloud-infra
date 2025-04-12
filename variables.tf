@@ -44,11 +44,6 @@ variable "subnets" {
 }
 
 # Firewall Rules
-variable "firewall_no_ports_protocols" {
-  description = "Lists of protocols that do not need ports specified"
-  type        = list(string)
-  default     = ["icmp", "esp", "ah"]
-}
 variable "firewall_rules" {
   description = "List of firewall rules to create"
   type = list(object({
