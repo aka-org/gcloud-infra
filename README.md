@@ -21,14 +21,14 @@ You can define variables in:
 
 See terraform.tfvars.example for reference.
 
-'''hcl
+```hcl
 project_id         = "your-project-id"
 billing_account_id = "XXXX-XXXXXX-XXXX"
 gcp_region         = "us-central1"
 gcp_zone           = "us-central1-c"
 network_name       = "k8s-vpc"
 ...
-'''
+```
 ## 🔧 Terraform Variable Reference
 
 ---
