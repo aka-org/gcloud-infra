@@ -43,27 +43,3 @@ vm_worker_tags         = ["k8s-worker", "managed-server"]
 
 vm_image_family  = "debian-12"
 vm_image_project = "debian-cloud"
-gcp_region = "us-east1"
-gcp_zone   = "us-east1-b"
-
-project_name            = "akanetworktest"
-project_id              = "akanetworktest1234"
-project_deletion_policy = "DELETE"
-billing_account_id      = "0153D8-D953A1-6B9892"
-admin_ssh_keys = [
-  "aka:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXCS1q9tidu+NWd4JCu+vOozjefnxTAa1hwkdizf/0M 06042025"
-]
-
-vm_master_count        = 1
-vm_worker_count        = 0
-vm_master_machine_type = "e2-micro"
-vm_worker_machine_type = "e2-micro"
-vm_master_disk_size    = 10
-vm_worker_disk_size    = 10
-vm_master_disk_type    = "pd-standard"
-vm_worker_disk_type    = "pd-standard"
-vm_master_tags         = ["k8s-master", "managed-server"]
-vm_worker_tags         = ["k8s-worker", "managed-server"]
-
-vm_image_family  = "debian-12"
-vm_image_project = "debian-cloud"
