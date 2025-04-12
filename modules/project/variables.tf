@@ -5,18 +5,15 @@ variable "project_id" {
 }
 variable "project_name" {
   description = "A human-readable name for the project"
+  type        = string
 }
 variable "project_deletion_policy" {
   description = "Project deletion policy (e.g. PREVENT or DELETE)"
+  type        = string
   default     = "PREVENT"
 }
 variable "billing_account_id" {
   description = "Billing account ID to associate with the project"
   type        = string
   sensitive   = true
-}
-
-# SSH & Access
-variable "admin_ssh_keys" {
-  description = "SSH keys to be added to the instances"
 }

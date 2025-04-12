@@ -19,7 +19,6 @@ module "project" {
   project_name            = var.project_name
   project_deletion_policy = var.project_deletion_policy
   billing_account_id      = var.billing_account_id
-  admin_ssh_keys          = var.admin_ssh_keys
 }
 
 module "network" {
@@ -31,7 +30,8 @@ module "network" {
 }
 
 module "compute" {
-  source     = "./modules/compute"
-  vms        = var.vms
-  depends_on = [module.project, module.network]
+  source         = "./modules/compute"
+  vms            = var.vms
+  admin_ssh_keys = var.admin_ssh_keys
+  depends_on     = [module.project, module.network]
 }

@@ -13,3 +13,9 @@ variable "vms" {
     tags = list(string)
   }))
 }
+
+# SSH & Access
+variable "admin_ssh_keys" {
+  description = "SSH keys to be added to the instances"
+  type = list(string)
+}

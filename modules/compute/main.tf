@@ -19,4 +19,8 @@ resource "google_compute_instance" "vms" {
   }
 
   tags = each.value.tags
+
+  metadata = {
+    ssh-keys = join("\n", var.admin_ssh_keys)
+  }
 }
