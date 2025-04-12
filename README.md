@@ -38,6 +38,7 @@ network_name       = "k8s-vpc"
 | `project_name`               | A human-readable name for the project                        | `string`    | –             | No        |
 | `project_deletion_policy`   | Project deletion policy (e.g. PREVENT or DELETE)             | `string`    | `"PREVENT"`   | No        |
 | `billing_account_id`        | Billing account ID to associate with the project             | `string`    | –             | ✅ Yes    |
+| `buckets`                   | List of buckets to create                                    | `list(object)` | –          | No        |
 | `network_name`              | VPC network name                                              | `string`    | –             | No        |
 | `subnets`                   | List of subnets to create (name & CIDR range)                | `list(object)` | –          | No        |
 | `firewall_rules`            | List of firewall rules with protocol, ports, sources, tags   | `list(object)` | –          | No        |
