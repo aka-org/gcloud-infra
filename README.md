@@ -1,4 +1,4 @@
-# GCP Kubernetes Cluster Terraform Modules
+# GCP Computing Resources Terraform Modules
 
 This repository used modular Terraform code to provision various resources on Google Cloud Platform (GCP). 
 
