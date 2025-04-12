@@ -1,4 +1,4 @@
-resource "google_compute_instance" "vm" {
+resource "google_compute_instance" "vms" {
   for_each = { for vm in var.vms : vm.name => vm}
 
   name         = each.value.name 

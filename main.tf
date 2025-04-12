@@ -30,8 +30,8 @@ module "network" {
   depends_on     = [module.project]
 }
 
-module "kubernetes_cluster" {
-  source     = "./modules/computing"
+module "compute" {
+  source     = "./modules/compute"
   vms        = var.vms
   depends_on = [module.project, module.network]
 }
