@@ -23,31 +23,15 @@ module "project" {
 }
 
 module "network" {
-  source                      = "./modules/network"
-  network_name                = var.network_name
-  subnets                     = var.subnets
-  firewall_no_ports_protocols = var.firewall_no_ports_protocols
-  firewall_rules              = var.firewall_rules
-  depends_on                  = [module.project]
+  source         = "./modules/network"
+  network_name   = var.network_name
+  subnets        = var.subnets
+  firewall_rules = var.firewall_rules
+  depends_on     = [module.project]
 }
 
-/*
 module "kubernetes_cluster" {
-  source                 = "./modules/kubernetes_cluster"
-  vm_master_count        = var.vm_master_count
-  vm_worker_count        = var.vm_worker_count
-  vm_master_machine_type = var.vm_master_machine_type
-  vm_worker_machine_type = var.vm_worker_machine_type
-  vm_image_family        = var.vm_image_family
-  vm_image_project       = var.vm_image_project
-  vm_master_disk_size    = var.vm_master_disk_size
-  vm_master_disk_type    = var.vm_master_disk_type
-  vm_worker_disk_size    = var.vm_worker_disk_size
-  vm_worker_disk_type    = var.vm_worker_disk_type
-  vm_master_tags         = var.vm_master_tags
-  vm_worker_tags         = var.vm_worker_tags
-  network_name           = var.network_name
-  k8s_subnet_name        = var.k8s_subnet_name
-  depends_on             = [module.project, module.network]
+  source     = "./modules/computing"
+  vms        = var.vms
+  depends_on = [module.project, module.network]
 }
-*/

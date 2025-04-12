@@ -31,16 +31,27 @@ firewall_rules = [
   }
 ]
 
-vm_master_count        = 1
-vm_worker_count        = 0
-vm_master_machine_type = "e2-micro"
-vm_worker_machine_type = "e2-micro"
-vm_master_disk_size    = 10
-vm_worker_disk_size    = 10
-vm_master_disk_type    = "pd-standard"
-vm_worker_disk_type    = "pd-standard"
-vm_master_tags         = ["k8s-master", "managed-server"]
-vm_worker_tags         = ["k8s-worker", "managed-server"]
-
-vm_image_family  = "debian-12"
-vm_image_project = "debian-cloud"
+vms = [
+  {
+    name          = "k8s-master-1"
+    machine_type  = "e2-micro"
+    image_project = "debian-cloud"
+    image_family  = "debian-12"
+    disk_size     = 10
+    disk_type     = "pd-standard"
+    network_name  = "k8s-network-test"
+    subnet_name   = "k8s-subnet-test"
+    tags          = ["k8s-master", "ssh", "icmp"]
+  },
+  {
+    name          = "k8s-worker-1"
+    machine_type  = "e2-micro"
+    image_project = "debian-cloud"
+    image_family  = "debian-12"
+    disk_size     = 10
+    disk_type     = "pd-standard"
+    network_name  = "k8s-network-test"
+    subnet_name   = "k8s-subnet-test"
+    tags          = ["k8s-worker", "ssh", "icmp"]
+  }
+]
