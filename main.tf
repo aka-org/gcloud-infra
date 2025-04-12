@@ -21,6 +21,12 @@ module "project" {
   billing_account_id      = var.billing_account_id
 }
 
+module "gcs_backend" {
+  source     = "./modules/gcs_backend"
+  buckets    = var.buckets
+  depends_on = [module.project]
+}
+/*
 module "network" {
   source         = "./modules/network"
   network_name   = var.network_name
@@ -35,3 +41,4 @@ module "compute" {
   admin_ssh_keys = var.admin_ssh_keys
   depends_on     = [module.project, module.network]
 }
+*/
