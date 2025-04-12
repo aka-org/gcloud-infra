@@ -38,8 +38,8 @@ network_name       = "k8s-vpc"
 | `project_name`               | A human-readable name for the project                        | `string`    | –             | No        |
 | `project_deletion_policy`   | Project deletion policy (e.g. PREVENT or DELETE)             | `string`    | `"PREVENT"`   | No        |
 | `billing_account_id`        | Billing account ID to associate with the project             | `string`    | –             | ✅ Yes    |
-| `admin_ssh_keys`            | SSH keys to be added to the instances                        | `string`    | –             | No        |
 | `network_name`              | VPC network name                                              | `string`    | –             | No        |
 | `subnets`                   | List of subnets to create (name & CIDR range)                | `list(object)` | –          | No        |
 | `firewall_rules`            | List of firewall rules with protocol, ports, sources, tags   | `list(object)` | –          | No        |
 | `vms`                       | List of virtual machines with config and metadata             | `list(object)` | –          | No        |
+| `admin_ssh_keys`            | SSH keys to be added to the instances                        | `string`    | –             | No        |

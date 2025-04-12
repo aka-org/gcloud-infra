@@ -1,11 +1,12 @@
 # General project settings
 variable "gcp_region" {
   description = "The GCP region to deploy resources in"
+  type        = string
 }
 variable "gcp_zone" {
   description = "The GCP zone to deploy resources in"
+  type        = string
 }
-
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
@@ -13,9 +14,11 @@ variable "project_id" {
 }
 variable "project_name" {
   description = "A human-readable name for the project"
+  type        = string
 }
 variable "project_deletion_policy" {
   description = "Project deletion policy (e.g. PREVENT or DELETE)"
+  type        = string
   default     = "PREVENT"
 }
 variable "billing_account_id" {
@@ -24,14 +27,10 @@ variable "billing_account_id" {
   sensitive   = true
 }
 
-# SSH & Access
-variable "admin_ssh_keys" {
-  description = "SSH keys to be added to the instances"
-}
-
 # Network
 variable "network_name" {
   description = "VPC network name"
+  type        = string
 }
 
 # Subnets
@@ -69,4 +68,10 @@ variable "vms" {
     subnet_name   = string
     tags          = list(string)
   }))
+}
+
+# SSH & Access
+variable "admin_ssh_keys" {
+  description = "SSH keys to be added to the instances"
+  type        = list(string)
 }

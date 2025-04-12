@@ -9,13 +9,3 @@ resource "google_project_service" "compute_api" {
   project = google_project.project.project_id
   service = "compute.googleapis.com"
 }
-
-resource "google_compute_project_metadata" "default" {
-  project = google_project.project.project_id 
-
-  metadata = {
-    ssh-keys = join("\n", var.admin_ssh_keys)
-  }
-
-  depends_on = [google_project_service.compute_api]
-}
