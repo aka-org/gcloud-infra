@@ -12,7 +12,7 @@ It includes:
 - 🧱 Compute Engine VMs
 - 📦 Modular structure for scalability and reuse
 
-Initial Steps and Bootstrap run:
+### Initial Steps and Bootstrap run:
 
 Clone the repo
 ```bash
@@ -68,7 +68,7 @@ and run the above command without setting the -backend-config value.
 Type yes when prompted, finish the re-initialization and the state
 will be stored remotely.
 
-Provisioning resources to evnironments:
+### Provisioning resources to evnironments:
 
 Environments should be placed under gcloud_infra/environments, for
 reference checkout environments/testing/
@@ -94,6 +94,7 @@ Move to the environment directory and run the following to provision
 the resources described in main.tf and configured in terraform.tfvars
 ```bash
 cd gcloud_infra/environments/testing
+terraform init
 terraform fmt
 terraform validate
 terraform plan -out=tfplan
