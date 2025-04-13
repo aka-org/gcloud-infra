@@ -1,17 +1,6 @@
 gcp_region = "us-east1"
 gcp_zone   = "us-east1-b"
-project_name            = "projectname"
 project_id              = "myprojectit"
-project_deletion_policy = "DELETE"
-billing_account_id      = "mybillingaccountid"
-buckets = [
-  {
-    name               = "test-bucket-aka-1234"
-    location           = "us-east1"
-    force_destroy      = true
-    versioning_enabled = false
-  }
-]
 network_name = "k8s-network-test"
 subnets = [
   {

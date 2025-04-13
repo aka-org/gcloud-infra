@@ -7,3 +7,17 @@ resource "google_storage_bucket" "bucket" {
     enabled = each.value.versioning_enabled
   }
 }
+
+
+resource "local_file" "default" {
+  count = var.create_gcs_backend ? 1 : 0
+  file_permission = "0644"
+  filename        = "${path.cwd}/backend.tf"
+
+  content = <<-EOT
+  terraform {
+    backend "gcs" {
+    }
+  }
+  EOT
+}

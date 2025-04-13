@@ -4,8 +4,3 @@ resource "google_project" "project" {
   billing_account = var.billing_account_id
   deletion_policy = var.project_deletion_policy
 }
-
-resource "google_project_service" "compute_api" {
-  project = google_project.project.project_id
-  service = "compute.googleapis.com"
-}
