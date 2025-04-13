@@ -8,3 +8,8 @@ variable "buckets" {
     versioning_enabled = bool
   }))
 }
+variable "create_gcs_backend" {
+  description = "Specify whether a google cloud storage backend will be created"
+  type        = bool
+  default     = false
+}

@@ -8,12 +8,12 @@
 # Crash logs
 crash.log
 
-# Sensitive variable files
-*.tfvars
-*.tfvars.json
-
 # Terraform plan files
 *.tfplan
+tfplan
+
+# Terraform backend
+backend.tf
 
 # .terraformrc and .terraform.d directories
 .terraformrc
