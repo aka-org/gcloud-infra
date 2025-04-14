@@ -1,4 +1,4 @@
-name: Apply Terraform
+name: Apply Terraform Testing
 
 on:
   pull_request:
