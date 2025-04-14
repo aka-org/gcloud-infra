@@ -24,7 +24,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
     environment: ${{ inputs.environment }}
     env:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS }}
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
 
     steps:
