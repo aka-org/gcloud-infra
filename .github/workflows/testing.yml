@@ -10,7 +10,7 @@ on:
 
 jobs:
   apply:
-    uses: ./.github/workflows/includes/terraform-apply.yml
+    uses: ./.github/workflows/terraform-apply.yml
     if: github.event_name == 'pull_request'
     with:
       environment: testing
