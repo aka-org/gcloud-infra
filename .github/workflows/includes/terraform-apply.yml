@@ -1,0 +1,53 @@
+name: Terraform Apply
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      working-directory:
+        required: true
+        type: string
+      terraform-version:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+
+jobs:
+  apply:
+    runs-on: ${{ inputs.github-runner }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    environment: ${{ inputs.environment }}
+    env:
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
+      TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "${{ inputs.terraform-version }}"
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}"
+
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive
+
+      - name: Validate Terraform Configuration
+        run: terraform apply -auto-approve tfplan
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan

@@ -1,0 +1,19 @@
+name: Apply Terraform
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'environments/testing/**'
+      - 'modules/**'
+  workflow_dispatch:
+
+jobs:
+  apply:
+    uses: ./.github/workflows/includes/terraform-apply.yml
+    if: github.event_name == 'pull_request'
+    with:
+      environment: testing
+      working-directory: environments/testing
+      terraform-version: 1.11.3
+      github-runner: ubuntu-22.04
