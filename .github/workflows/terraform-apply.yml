@@ -15,6 +15,11 @@ on:
       github-runner:
         required: true
         type: string
+  secrets:
+    GOOGLE_CREDENTIALS_B64:
+      required: true
+    PROJECT_ID:
+      required: true
 
 jobs:
   apply:

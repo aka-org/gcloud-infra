@@ -12,10 +12,13 @@ on:
 
 jobs:
   apply:
-    uses: ./.github/workflows/terraform-apply.yml
     if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
       working-directory: environments/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }} 
