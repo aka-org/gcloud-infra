@@ -36,6 +36,11 @@ jobs:
         with:
           terraform_version: "${{ inputs.terraform-version }}"
 
+      - name: Authenticate to Google Cloud
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > $HOME/gcloud.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
+
       - name: Terraform Init
         run: terraform init -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}"
 
