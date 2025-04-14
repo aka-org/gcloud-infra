@@ -26,7 +26,6 @@ jobs:
     env:
       GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
-      TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
 
     steps:
       - name: Checkout repo
