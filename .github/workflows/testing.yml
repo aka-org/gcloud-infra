@@ -6,6 +6,8 @@ on:
     paths:
       - 'environments/testing/**'
       - 'modules/**'
+      - '.github/workflows/testing.yml'
+      - '.github/workflows/terraform-apply.yml'  
   workflow_dispatch:
 
 jobs:
