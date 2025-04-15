@@ -26,6 +26,7 @@ jobs:
   destroy:
     if: github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/terraform-destroy.yml
+    needs: [apply]
     with:
       environment: testing
       working-directory: environments/testing
