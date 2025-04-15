@@ -1,0 +1,49 @@
+name: Apply Terraform Testing
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'environments/testing/**'
+      - 'modules/**'
+      - '.github/workflows/testing.yml'
+      - '.github/workflows/terraform-apply.yml'  
+      - '.github/workflows/terraform-destroy.yml'  
+  workflow_dispatch:
+
+jobs:
+  apply:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: testing
+      working-directory: environments/testing
+      terraform-version: 1.11.3
+      github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }} 
+  destroy:
+    if: success() && github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/terraform-destroy.yml
+    needs: [apply]
+    with:
+      environment: testing
+      working-directory: environments/testing
+      terraform-version: 1.11.3
+      github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }} 
+  re-apply:
+    if: success() && github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/terraform-apply.yml
+    needs: [destroy]  
+    with:
+      environment: testing
+      working-directory: environments/testing
+      terraform-version: 1.11.3
+      github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }} 

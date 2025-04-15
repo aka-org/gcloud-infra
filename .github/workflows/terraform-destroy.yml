@@ -1,0 +1,63 @@
+name: Terraform Destroy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      working-directory:
+        required: true
+        type: string
+      terraform-version:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+      PROJECT_ID:
+        required: true
+
+jobs:
+  apply:
+    runs-on: ${{ inputs.github-runner }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    environment: ${{ inputs.environment }}
+    env:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "${{ inputs.terraform-version }}"
+
+      - name: Authenticate to Google Cloud
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS_B64 }}" | base64 -d > $HOME/gcloud.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}"
+
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive
+
+      - name: Validate Terraform Configuration
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -destroy -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
