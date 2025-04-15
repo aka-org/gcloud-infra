@@ -48,7 +48,7 @@ variable "buckets" {
     force_destroy      = bool
     versioning_enabled = bool
   }))
-  default     = []
+  default = []
 }
 variable "create_gcs_backend" {
   description = "Specify whether a google cloud storage backend will be created"
@@ -70,7 +70,7 @@ variable "sa_display_name" {
 variable "sa_roles" {
   description = "List of IAM roles to bind to the service account"
   type        = list(string)
-  default = []
+  default     = []
 }
 
 # Network
@@ -87,7 +87,7 @@ variable "subnets" {
     name          = string
     ip_cidr_range = string
   }))
-  default     = []
+  default = []
 }
 
 # Firewall Rules
@@ -100,7 +100,7 @@ variable "firewall_rules" {
     source_ranges = list(string)
     tags          = list(string)
   }))
-  default     = []
+  default = []
 }
 
 # Compute Resources
@@ -117,7 +117,7 @@ variable "vms" {
     subnet_name   = string
     tags          = list(string)
   }))
-  default     = []
+  default = []
 }
 
 # SSH & Access
