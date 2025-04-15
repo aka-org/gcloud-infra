@@ -20,3 +20,10 @@ buckets = [
   }
 ]
 create_gcs_backend = true
+sa_id              = "terraform-sa"
+sa_display_name    = "terraform-sa"
+sa_roles = [
+  "roles/compute.admin",
+  "roles/compute.networkAdmin",
+  "roles/storage.objectAdmin"
+]
