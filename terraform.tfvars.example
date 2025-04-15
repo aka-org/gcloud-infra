@@ -1,6 +1,6 @@
 gcp_region = "us-east1"
-gcp_zone   = "us-east1-b"
-project_id              = "myprojectit"
+gcp_zone = "us-east1-b"
+project_id = "myprojectit"
 network_name = "k8s-network-test"
 subnets = [
   {
