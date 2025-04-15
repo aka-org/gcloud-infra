@@ -25,5 +25,5 @@ sa_display_name    = "terraform-sa"
 sa_roles = [
   "roles/compute.admin",
   "roles/compute.networkAdmin",
-  "roles/storage.objectUser"
+  "roles/storage.objectAdmin"
 ]
