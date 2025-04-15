@@ -33,3 +33,12 @@ module "gcs_backend" {
   create_gcs_backend = var.create_gcs_backend
   depends_on         = [module.project, module.apis]
 }
+
+module "service_account" {
+  source          = "../../modules/service_account"
+  sa_id           = var.sa_id
+  sa_display_name = var.sa_display_name
+  sa_project_id   = var.project_id
+  sa_roles        = var.sa_roles
+  depends_on      = [module.project, module.apis]
+}

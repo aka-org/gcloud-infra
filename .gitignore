@@ -29,3 +29,4 @@ backend.tf
 # Logs and temp
 *.log
 *.bak
+*key.json

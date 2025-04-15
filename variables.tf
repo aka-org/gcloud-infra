@@ -50,11 +50,27 @@ variable "buckets" {
   }))
   default     = []
 }
-}
 variable "create_gcs_backend" {
   description = "Specify whether a google cloud storage backend will be created"
   type        = bool
   default     = false
+}
+
+# Service Account
+variable "sa_id" {
+  description = "The ID for the service account (e.g., 'terraform-sa')"
+  type        = string
+  default     = ""
+}
+variable "sa_display_name" {
+  description = "Display name for the service account"
+  type        = string
+  default     = ""
+}
+variable "sa_roles" {
+  description = "List of IAM roles to bind to the service account"
+  type        = list(string)
+  default = []
 }
 
 # Network
@@ -73,7 +89,6 @@ variable "subnets" {
   }))
   default     = []
 }
-}
 
 # Firewall Rules
 variable "firewall_rules" {
@@ -86,7 +101,6 @@ variable "firewall_rules" {
     tags          = list(string)
   }))
   default     = []
-}
 }
 
 # Compute Resources
@@ -105,12 +119,10 @@ variable "vms" {
   }))
   default     = []
 }
-}
 
 # SSH & Access
 variable "admin_ssh_keys" {
   description = "SSH keys to be added to the instances"
   type        = list(string)
   default     = []
-}
 }
