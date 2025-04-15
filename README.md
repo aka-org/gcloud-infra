@@ -79,12 +79,13 @@ terraform init -backend-config="bucket=${TF_VAR_bucket}" -migrate-state
 Type yes when prompted, finish the re-initialization and the state
 will be stored remotely.
 
-### Provisioning resources to evnironments:
+### Provisioning resources to environments:
 
-Environments should be placed under gcloud_infra/environments/, for
-reference checkout environments/testing/
+Environments should be placed under gcloud_infra/environments/
 
-Move to the environment directory
+For reference implementation and configuration check environments/testing/
+
+Move to the environment directory, for example
 ```bash
 cd gcloud_infra/environments/testing
 ```
