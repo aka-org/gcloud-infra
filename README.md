@@ -143,9 +143,7 @@ configure resources such as VMs, subnets and firewall rules.
 | `enable_apis`                | List of Google APIs to be enabled                            | `list(object)` | []          | No        |
 | `buckets`                    | List of buckets to create                                    | `list(object)` | []         | No        |
 | `create_gcs_backend`         | Set to true to initialize an empty gcs backend in the cwd    | `bool`     | false         | No         |
-| `sa_id`                      | The ID for the service account (e.g., 'terraform-sa')        | `string`    | ""             | No    |
-| `sa_display_name`            | Display name for the service account                         | `string`    | ""             | No    |
-| `sa_roles`                   | List of IAM roles to bind to the service account             | `list(object)` | []         | No        |
+| `service_accounts`           | List of service accounts to be created                       | `list(object)`  | []             | No    |
 
 ## 🔧 Terraform Network and Compute Variable Reference
 
