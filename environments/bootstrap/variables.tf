@@ -58,11 +58,13 @@ variable "create_gcs_backend" {
 
 # Service Accounts
 variable "service_accounts" {
-  description = "List of service accounts to create"
+  description = "List of service accounts to be created"
   type = list(object({
     id           = string
     display_name = string
     roles        = list(string)
+    pub_key      = string
+    create_key   = bool
   }))
   default = []
 }
