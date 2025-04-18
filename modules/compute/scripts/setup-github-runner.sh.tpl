@@ -3,7 +3,7 @@ set -euo pipefail
 
 # === Configurable environment variables ===
 GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
-GITHUB_REPO="$${GITHUB_REPO:-ansible}"                         # GitHub repo name
+GITHUB_REPO="$${GITHUB_REPO:-gcloud_ansible}"                         # GitHub repo name
 RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"         # Runner name
 RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
 RUNNER_LABELS="$${RUNNER_LABELS-ansible}"                  # Github Runner Labels
