@@ -56,7 +56,6 @@ variable "create_gcs_backend" {
   default     = false
 }
 
-
 # Service Accounts
 variable "service_accounts" {
   description = "List of service accounts to create"
@@ -67,6 +66,14 @@ variable "service_accounts" {
     create_key   = bool
   }))
   default = []
+}
+
+# Secrets
+variable "secrets_map" {
+  type      = map(string)
+  sensitive = true
+  description = "Map of secret name => secret value"
+  default = {}
 }
 
 # Network

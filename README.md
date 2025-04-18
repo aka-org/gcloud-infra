@@ -144,6 +144,7 @@ configure resources such as VMs, subnets and firewall rules.
 | `buckets`                    | List of buckets to create                                    | `list(object)` | []         | No        |
 | `create_gcs_backend`         | Set to true to initialize an empty gcs backend in the cwd    | `bool`     | false         | No         |
 | `service_accounts`           | List of service accounts to be created                       | `list(object)`  | []             | No    |
+| `secrets_map`                | Map of secret name => secret value                           | `map(string)`    | {}             | ✅ Yes    |
 
 ## 🔧 Terraform Network and Compute Variable Reference
 
