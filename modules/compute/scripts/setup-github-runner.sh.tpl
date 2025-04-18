@@ -4,7 +4,7 @@ set -euo pipefail
 # === Configurable environment variables ===
 GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
 GITHUB_REPO="$${GITHUB_REPO:-ansible}"                         # GitHub repo name
-RUNNER_NAME="$${GITHUB_RUNNER_NAME:-ansible-runner}"         # Runner name
+RUNNER_NAME="$${GITHUB_RUNNER_NAME:-${hostname)}"         # Runner name
 RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
 RUNNER_LABELS="$${RUNNER_LABELS-ansible}"                  # Github Runner Labels
 RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"                  # Installation path
@@ -15,6 +15,7 @@ RUNNER_URL="https://github.com/$${GITHUB_OWNER}/$${GITHUB_REPO}"
 RUNNER_TGZ="actions-runner-linux-x64-$${RUNNER_VERSION}.tar.gz"
 DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v$${RUNNER_VERSION}/$${RUNNER_TGZ}"
 
+# === Get secret from secret manager ===
 GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --quiet)
 
 # === Ensure runner user exists ===
@@ -41,7 +42,6 @@ TOKEN_RESPONSE=$(curl -X POST \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/actions/runners/registration-token")
 
-echo $TOKEN_RESPONSE
 RUNNER_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -oP '"token"\s*:\s*"\K[^"]+')
 
 if [[ -z "$RUNNER_TOKEN" ]]; then
