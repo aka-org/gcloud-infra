@@ -36,7 +36,8 @@ service_accounts = [
     roles = [
       "roles/compute.admin",
       "roles/compute.networkAdmin",
-      "roles/storage.objectAdmin"
+      "roles/storage.objectAdmin",
+      "roles/iam.serviceAccountUser"
     ]
     create_key = true
   }
