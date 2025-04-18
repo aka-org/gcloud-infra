@@ -75,6 +75,11 @@ variable "secrets_map" {
   description = "Map of secret name => secret value"
   default = {}
 }
+variable "secret_ids" {
+  description = "List of secret ids"
+  type = list(string)
+  default = []
+}
 
 # Network
 variable "network_name" {

@@ -68,3 +68,16 @@ variable "service_accounts" {
   default = []
 }
 
+# Secrets
+variable "secrets_map" {
+  type        = map(string)
+  sensitive   = true
+  description = "Map of secret name => secret value"
+  default     = {}
+}
+
+variable "secret_ids" {
+  description = "List of secrets"
+  type        = list(string)
+  default     = []
+}

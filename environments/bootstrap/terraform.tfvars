@@ -4,6 +4,7 @@ project_name = "gcloud-infra"
 enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",
+  "secretmanager.googleapis.com"
 ]
 buckets = [
   {
@@ -22,6 +23,14 @@ buckets = [
 create_gcs_backend = true
 service_accounts = [
   {
+    id           = "secret-manager-sa"
+    display_name = "secret-manager-sa"
+    roles = [
+      "roles/secretmanager.secretAccessor",
+    ]
+    create_key = false
+  },
+  {
     id           = "terraform-sa"
     display_name = "terraform-sa"
     roles = [
@@ -32,3 +41,4 @@ service_accounts = [
     create_key = true
   }
 ]
+secret_ids = ["github-token"]
