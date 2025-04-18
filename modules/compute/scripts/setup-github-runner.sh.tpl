@@ -109,7 +109,7 @@ fi
 source "$VENV_DIR/bin/activate"
 
 # Upgrade pip and install Ansible + GCP requirements
-echo "[+] Installing Python dependencies
+echo "[+] Installing Python dependencies"
 pip install --upgrade pip
 pip install ansible google-auth google-api-python-client google-auth-httplib2 apache-libcloud
 
