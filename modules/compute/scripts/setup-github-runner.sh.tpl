@@ -29,7 +29,7 @@ cd "$RUNNER_DIR"
 # === Install runner if not already installed ===
 if [[ ! -f "./config.sh" ]]; then
   echo "[+] Downloading GitHub Actions runner v$RUNNER_VERSION..."
-  sudo -u $RUNNER_USER curl -sL -o "$RUNNER_TGZ" "$$DOWNLOAD_URL"
+  sudo -u $RUNNER_USER curl -sL -o "$RUNNER_TGZ" "$DOWNLOAD_URL"
   sudo -u $RUNNER_USER tar -xzf "$RUNNER_TGZ"
   sudo -u $RUNNER_USER rm "$RUNNER_TGZ"
 fi

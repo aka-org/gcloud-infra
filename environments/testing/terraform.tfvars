@@ -39,7 +39,7 @@ firewall_rules = [
 ]
 vms = [
   {
-    name           = "k8s-worker-1"
+    name           = "github-runner-1"
     machine_type   = "e2-micro"
     image_project  = "debian-cloud"
     image_family   = "debian-12"
@@ -52,7 +52,7 @@ vms = [
     script_vars = {
       secret_id = "github-token"
     }
-    tags = ["k8s-worker", "ssh", "icmp"]
+    tags = ["ssh", "icmp"]
   }
 ]
 admin_ssh_keys = [
