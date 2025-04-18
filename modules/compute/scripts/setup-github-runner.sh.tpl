@@ -23,7 +23,7 @@ sudo useradd -m -s /bin/bash "$RUNNER_USER" || echo "User $RUNNER_USER already e
 
 # === Ensure runner directory exists ===
 sudo mkdir -p "$RUNNER_DIR"
-sudo chown $RUNNER_USER: $$RUNNER_DIR
+sudo chown $RUNNER_USER: $RUNNER_DIR
 cd "$RUNNER_DIR"
 
 # === Install runner if not already installed ===
