@@ -1,4 +1,9 @@
 # Compute Resources
+variable "project_id" {
+  description = "The GCP project ID"
+  type = string
+  default = ""
+}
 variable "vms" {
   description = "List of virtual machines to create"
   type = list(object({
@@ -10,6 +15,9 @@ variable "vms" {
     disk_type = string
     network_name = string
     subnet_name  = string
+    sa_id = string
+    startup_script = string
+    script_vars    = map(string)
     tags = list(string)
   }))
 }
