@@ -3,7 +3,7 @@ gcp_zone     = "us-east1-b"
 project_name = "gcloud-infra"
 enable_apis = [
   "compute.googleapis.com",
-  "storage.googleapis.com"
+  "storage.googleapis.com",
 ]
 buckets = [
   {
@@ -29,5 +29,6 @@ service_accounts = [
       "roles/compute.networkAdmin",
       "roles/storage.objectAdmin"
     ]
+    create_key = true
   }
 ]

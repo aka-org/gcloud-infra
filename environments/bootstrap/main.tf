@@ -35,11 +35,8 @@ module "gcs_backend" {
 }
 
 module "service_account" {
-  for_each        = { for sa in var.service_accounts : sa.display_name => sa }
-  source          = "../../modules/service_account"
-  sa_id           = each.value.id
-  sa_display_name = each.value.display_name
-  sa_project_id   = var.project_id
-  sa_roles        = each.value.roles
-  depends_on      = [module.project, module.apis]
+  source           = "../../modules/service_account"
+  project_id       = var.project_id
+  service_accounts = var.service_accounts
+  depends_on       = [module.project, module.apis]
 }
