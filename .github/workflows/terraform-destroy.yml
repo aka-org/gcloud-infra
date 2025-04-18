@@ -22,7 +22,7 @@ on:
         required: true
 
 jobs:
-  apply:
+  destroy:
     runs-on: ${{ inputs.github-runner }}
     defaults:
       run:
