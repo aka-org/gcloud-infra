@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# === Setup Github-runner ===
+
 # === Configurable environment variables ===
 GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
 GITHUB_REPO="$${GITHUB_REPO:-gcloud_ansible}"                         # GitHub repo name
@@ -8,7 +10,7 @@ RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"         # Runner name
 RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
 RUNNER_LABELS="$${RUNNER_LABELS-ansible}"                  # Github Runner Labels
 RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"                  # Installation path
-RUNNER_USER="$${RUNNER_USER:-ansible-runner}"                   # Github runner system user
+RUNNER_USER="$${RUNNER_USER:-github-runner}"                   # Github runner system user
 
 # === Derived variables ===
 RUNNER_URL="https://github.com/$${GITHUB_OWNER}/$${GITHUB_REPO}"
@@ -77,3 +79,48 @@ else
   echo "[+] GitHub runner systemd service already installed."
   sudo systemctl restart $SERVICE_NAME
 fi
+
+echo "[✓] Finished setting up Github-runner."
+
+# === Install ansible ===
+
+# === Derived variables ===
+VENV_DIR="/home/$RUNNER_USER/.ansible_venv"
+PLUGIN_PATH="/home/$RUNNER_USER/.ansible/plugins/inventory"
+
+echo "[+] Installing Ansible and dependencies"
+
+# Install system dependencies
+sudo apt-get update -y
+sudo apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    sshpass \
+    git \
+    curl
+
+# Ensure virtualenv exists
+if [[ ! -d "$VENV_DIR" ]]; then
+  sudo -u "$RUNNER_USER" python3 -m venv "$VENV_DIR"
+fi
+
+# Activate virtualenv
+source "$VENV_DIR/bin/activate"
+
+# Upgrade pip and install Ansible + GCP requirements
+echo "[+] Installing Python dependencies
+pip install --upgrade pip
+pip install ansible google-auth google-api-python-client google-auth-httplib2 apache-libcloud
+
+# Confirm Ansible is installed
+echo "[*] Ansible version:"
+ansible --version
+
+# Create Ansible plugin directory (optional, for clarity)
+mkdir -p "$PLUGIN_PATH"
+
+# Optional: Set plugin path explicitly (can also be set in ansible.cfg)
+export ANSIBLE_INVENTORY_PLUGINS="$PLUGIN_PATH"
+
+echo "[✓] Finished setting up Ansible with GCP inventory support."
