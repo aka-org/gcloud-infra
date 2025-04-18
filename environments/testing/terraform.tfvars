@@ -52,7 +52,7 @@ vms = [
     script_vars = {
       secret_id = "github-token"
     }
-    tags = ["ssh", "icmp", "github-runner", "ansible". "vpn"]
+    tags = ["ssh", "icmp", "github-runner", "ansible", "vpn"]
   }
 ]
 admin_ssh_keys = [
