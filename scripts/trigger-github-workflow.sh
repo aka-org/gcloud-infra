@@ -17,8 +17,10 @@ if [ -z "$WORKFLOW_FILE" ]; then
 fi
 
 # Trigger the workflow
-curl -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github.v3+json" \
-  "https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW_FILE/dispatches" \
-  -d '{"ref":"main"}'  # Specify the branch to trigger
+curl -L \
+  -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW_FILE/dispatches \
+  -d '{"ref":"main"}' # Specify the branch to trigger
