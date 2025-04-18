@@ -18,9 +18,23 @@ resource "google_compute_instance" "vm" {
     access_config {}
   }
 
-  tags = each.value.tags
+  dynamic "service_account" {
+    for_each = try(each.value.sa_id, "") != "" ? [1] : []
 
+    content {
+      email  = "${each.value.sa_id}@${var.project_id}.iam.gserviceaccount.com"
+      scopes = ["cloud-platform"]
+    }
+  } 
+
+  tags = each.value.tags
+  
   metadata = {
     ssh-keys = join("\n", var.admin_ssh_keys)
   }
+  metadata_startup_script = (
+    try(each.value.startup_script, "") != ""
+    ? templatefile("${path.module}/${each.value.startup_script}", each.value.script_vars)
+    : null
+  )
 }

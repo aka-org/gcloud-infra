@@ -40,3 +40,11 @@ module "service_account" {
   service_accounts = var.service_accounts
   depends_on       = [module.project, module.apis]
 }
+
+module "secrets" {
+  source           = "../../modules/secrets"
+  secret_ids       = var.secret_ids
+  secrets_map      = var.secrets_map
+  secrets_location = var.gcp_region
+  depends_on       = [module.project, module.apis]
+}

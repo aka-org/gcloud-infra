@@ -2,20 +2,21 @@
 set -euo pipefail
 
 # === Configurable environment variables ===
-GITHUB_OWNER="${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
-GITHUB_REPO="${GITHUB_REPO:-ansible}"                         # GitHub repo name
-GITHUB_PAT="${GITHUB_PAT:?GITHUB_PAT environment variable is required}"  # Fine-grained PAT with Actions permissions
-RUNNER_NAME="${GITHUB_RUNNER_NAME:-ansible-runner}"         # Runner name
-RUNNER_VERSION="${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
-RUNNER_LABELS="${RUNNER_LABELS-ansible}"                  # Github Runner Labels
-RUNNER_DIR="${RUNNER_DIR:-/opt/github-runner}"                  # Installation path
-RUNNER_USER="${RUNNER_USER:-ansible-runner}"                   # Github runner system user
+GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
+GITHUB_REPO="$${GITHUB_REPO:-ansible}"                         # GitHub repo name
+RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"         # Runner name
+RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
+RUNNER_LABELS="$${RUNNER_LABELS-ansible}"                  # Github Runner Labels
+RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"                  # Installation path
+RUNNER_USER="$${RUNNER_USER:-ansible-runner}"                   # Github runner system user
 
 # === Derived variables ===
-RUNNER_URL="https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}"
-RUNNER_TGZ="actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz"
-DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_TGZ}"
+RUNNER_URL="https://github.com/$${GITHUB_OWNER}/$${GITHUB_REPO}"
+RUNNER_TGZ="actions-runner-linux-x64-$${RUNNER_VERSION}.tar.gz"
+DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v$${RUNNER_VERSION}/$${RUNNER_TGZ}"
 
+# === Get secret from secret manager ===
+GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --quiet)
 
 # === Ensure runner user exists ===
 echo "[*] Creating runner user"
@@ -37,11 +38,10 @@ fi
 # === Get registration token from GitHub ===
 echo "[+] Requesting GitHub registration token..."
 TOKEN_RESPONSE=$(curl -X POST \
-  -H "Authorization: Bearer ${GITHUB_PAT}" \
+  -H "Authorization: Bearer $${GITHUB_PAT}" \
   -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runners/registration-token")
+  "https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/actions/runners/registration-token")
 
-echo $TOKEN_RESPONSE
 RUNNER_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -oP '"token"\s*:\s*"\K[^"]+')
 
 if [[ -z "$RUNNER_TOKEN" ]]; then
@@ -65,7 +65,7 @@ else
 fi
 
 # Derive the service name based on GitHub org/repo and runner name
-SERVICE_NAME="actions.runner.${GITHUB_OWNER}-${GITHUB_REPO}.${RUNNER_NAME}.service"
+SERVICE_NAME="actions.runner.$${GITHUB_OWNER}-$${GITHUB_REPO}.$${RUNNER_NAME}.service"
 
 # === Install and start runner as a service (idempotent) ===
 if [[ ! -f "/etc/systemd/system/github-runner.service" ]]; then

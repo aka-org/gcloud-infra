@@ -39,15 +39,20 @@ firewall_rules = [
 ]
 vms = [
   {
-    name          = "k8s-worker-1"
-    machine_type  = "e2-micro"
-    image_project = "debian-cloud"
-    image_family  = "debian-12"
-    disk_size     = 10
-    disk_type     = "pd-standard"
-    network_name  = "k8s-network-test"
-    subnet_name   = "k8s-subnet-test"
-    tags          = ["k8s-worker", "ssh", "icmp"]
+    name           = "github-runner-1"
+    machine_type   = "e2-micro"
+    image_project  = "debian-cloud"
+    image_family   = "debian-12"
+    disk_size      = 10
+    disk_type      = "pd-standard"
+    network_name   = "k8s-network-test"
+    subnet_name    = "k8s-subnet-test"
+    sa_id          = "secret-manager-sa"
+    startup_script = "scripts/setup-github-runner.sh.tpl"
+    script_vars = {
+      secret_id = "github-token"
+    }
+    tags = ["ssh", "icmp"]
   }
 ]
 admin_ssh_keys = [
