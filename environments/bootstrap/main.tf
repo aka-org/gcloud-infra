@@ -31,7 +31,7 @@ module "gcs_backend" {
   source             = "../../modules/gcs_backend"
   buckets            = var.buckets
   create_gcs_backend = var.create_gcs_backend
-  depends_on         = [module.project,module.apis]
+  depends_on         = [module.project, module.apis]
 }
 
 module "service_account" {

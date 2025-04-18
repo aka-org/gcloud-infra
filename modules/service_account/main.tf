@@ -12,10 +12,6 @@ locals {
     sa.id => sa
     if sa.create_key
   }
-  sa_pub_keys = [
-    for sa in var.service_accounts : sa.pub_key
-    if contains(keys(sa), "pub_key") && sa.pub_key != null && sa.pub_key != ""
-  ]
 }
 
 resource "google_service_account" "sa" {
@@ -49,14 +45,4 @@ resource "local_file" "sa_key_file" {
 
   content  = google_service_account_key.sa_key[each.value.id].private_key
   filename = "${path.cwd}/${google_service_account.sa[each.value.id].display_name}-key.json"
-}
-
-resource "google_compute_project_metadata" "oslogin" {
-  count = length(local.sa_pub_keys) > 0 ? 1 : 0
-  project = var.project_id
-
-  metadata = {
-    enable-oslogin = "TRUE"
-    "ssh-keys" = join("\n", local.sa_pub_keys)
-  }
 }

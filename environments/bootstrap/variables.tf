@@ -63,8 +63,8 @@ variable "service_accounts" {
     id           = string
     display_name = string
     roles        = list(string)
-    pub_key      = string
     create_key   = bool
   }))
   default = []
 }
+

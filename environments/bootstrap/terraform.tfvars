@@ -4,7 +4,6 @@ project_name = "gcloud-infra"
 enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",
-  "oslogin.googleapis.com"
 ]
 buckets = [
   {
@@ -23,15 +22,6 @@ buckets = [
 create_gcs_backend = true
 service_accounts = [
   {
-    id           = "ansible-sa"
-    display_name = "ansible-sa"
-    roles = [
-      "roles/compute.osAdminLogin"
-    ]
-    pub_key    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJI1QdTQkaL/+CRzCTUlrKHLAQWRxjVdR5Y1C0FA3o2a 06042025"
-    create_key = false
-  },
-  {
     id           = "terraform-sa"
     display_name = "terraform-sa"
     roles = [
@@ -39,7 +29,6 @@ service_accounts = [
       "roles/compute.networkAdmin",
       "roles/storage.objectAdmin"
     ]
-    pub_key    = ""
     create_key = true
   }
 ]
