@@ -54,8 +54,8 @@ vms = [
       secret_id = "github-token"
     }
     labels = {
-      env   = "testing"
-      role  = "github-runner"
+      env  = "testing"
+      role = "github-runner"
     }
     tags = ["ssh", "icmp", "vpn"]
   }
