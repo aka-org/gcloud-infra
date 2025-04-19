@@ -4,16 +4,15 @@ set -euo pipefail
 # === Setup Github-runner ===
 
 # === Configurable environment variables ===
-GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"           # GitHub user or org name
-GITHUB_REPO="$${GITHUB_REPO:-gcloud_ansible}"           # GitHub repo name
+GITHUB_ORG="$${GITHUB_ORG:-aka-org}"                    # GitHub org name
 RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"       # Runner name
 RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"            # GitHub Runner version (default: latest as of now)
-RUNNER_LABELS="$${RUNNER_LABELS-ansible}"               # Github Runner Labels
+RUNNER_LABELS="$${RUNNER_LABELS-ansible,docker}"        # Github Runner Labels
 RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"         # Installation path
-RUNNER_USER="$${RUNNER_USER:-ansible}"                  # Github runner system user
+RUNNER_USER="$${RUNNER_USER:-github-runner}"            # Github runner system user
 
 # === Derived variables ===
-RUNNER_URL="https://github.com/$${GITHUB_OWNER}/$${GITHUB_REPO}"
+RUNNER_URL="https://github.com/$${GITHUB_ORG}"
 RUNNER_TGZ="actions-runner-linux-x64-$${RUNNER_VERSION}.tar.gz"
 DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v$${RUNNER_VERSION}/$${RUNNER_TGZ}"
 VENV_DIR="/home/$RUNNER_USER/.ansible_venv"
@@ -24,7 +23,7 @@ GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --qui
 
 # === Ensure runner user exists ===
 echo "[*] Creating runner user"
-sudo useradd -m -s /bin/bash "$RUNNER_USER" || echo "User $RUNNER_USER already exists"
+sudo useradd -m -s /bin/bash "$RUNNER_USER" || true 
 
 # === Install ansible ===
 echo "[+] Installing Ansible and dependencies"
@@ -35,7 +34,6 @@ sudo apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
-    sshpass \
     git \
     curl
 
@@ -50,23 +48,26 @@ source "$VENV_DIR/bin/activate"
 # Upgrade pip and install Ansible + GCP requirements
 echo "[+] Installing Python dependencies"
 pip install --upgrade pip
-pip install ansible google-auth google-api-python-client google-auth-httplib2 apache-libcloud
+pip install ansible google-auth requests
 
 # Confirm Ansible is installed
 echo "[*] Ansible version:"
 ansible --version
 
-# Create Ansible plugin directory (optional, for clarity)
-sudo -u "$RUNNER_USER" mkdir -p "$PLUGIN_PATH"
-
 # Deactivate venv
 deactivate
 
-echo "[✓] Finished setting up Ansible with GCP inventory support."
+echo "[✓] Finished setting up Ansible with GCPinventory support."
+
+# Installing Docker
+sudo apt install -y docker.io
+sudo usermod -aG docker $RUNNER_USER
+
+echo "[✓] Finished setting up Docker." 
 
 # === Ensure runner directory exists ===
 sudo mkdir -p "$RUNNER_DIR"
-sudo chown $RUNNER_USER: $RUNNER_DIR
+sudo chown $RUNNER_USER:$RUNNER_USER $RUNNER_DIR
 cd "$RUNNER_DIR"
 
 # === Install runner if not already installed ===
@@ -82,7 +83,7 @@ echo "[+] Requesting GitHub registration token..."
 TOKEN_RESPONSE=$(curl -X POST \
   -H "Authorization: Bearer $${GITHUB_PAT}" \
   -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/$${GITHUB_OWNER}/$${GITHUB_REPO}/actions/runners/registration-token")
+  "https://api.github.com/orgs/$${GITHUB_ORG}/actions/runners/registration-token")
 
 RUNNER_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -oP '"token"\s*:\s*"\K[^"]+')
 
@@ -107,7 +108,7 @@ else
 fi
 
 # Derive the service name based on GitHub org/repo and runner name
-SERVICE_NAME="actions.runner.$${GITHUB_OWNER}-$${GITHUB_REPO}.$${RUNNER_NAME}.service"
+SERVICE_NAME="actions.runner.$${GITHUB_ORG}.$${RUNNER_NAME}.service"
 
 # === Install and start runner as a service (idempotent) ===
 if [[ ! -f "/etc/systemd/system/github-runner.service" ]]; then

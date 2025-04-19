@@ -26,7 +26,8 @@ resource "google_compute_instance" "vm" {
       scopes = ["cloud-platform"]
     }
   } 
-
+  
+  labels = each.value.labels
   tags = each.value.tags
   
   metadata = {
@@ -34,7 +35,7 @@ resource "google_compute_instance" "vm" {
   }
   metadata_startup_script = (
     try(each.value.startup_script, "") != ""
-    ? templatefile("${path.module}/${each.value.startup_script}", each.value.script_vars)
+    ? templatefile("${path.module}/${each.value.startup_script}", each.value.secrets_map)
     : null
   )
 }

@@ -1,6 +1,7 @@
 gcp_region   = "us-east1"
 gcp_zone     = "us-east1-b"
 project_name = "gcloud-infra"
+project_id   = "gcloud-infra-13042025"
 enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",

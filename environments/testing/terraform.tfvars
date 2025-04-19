@@ -1,5 +1,6 @@
 gcp_region   = "us-east1"
 gcp_zone     = "us-east1-b"
+project_id   = "gcloud-infra-13042025"
 network_name = "gcloud-infra-network"
 subnets = [
   {
@@ -49,10 +50,14 @@ vms = [
     subnet_name    = "public-subnet-test"
     sa_id          = "ansible-sa"
     startup_script = "scripts/setup-github-runner.sh.tpl"
-    script_vars = {
+    secrets_map = {
       secret_id = "github-token"
     }
-    tags = ["ssh", "icmp", "github-runner", "ansible", "vpn"]
+    labels = {
+      env   = "testing"
+      role  = "github-runner"
+    }
+    tags = ["ssh", "icmp", "vpn"]
   }
 ]
 admin_ssh_keys = [
