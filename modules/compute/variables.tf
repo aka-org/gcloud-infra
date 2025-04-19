@@ -17,7 +17,8 @@ variable "vms" {
     subnet_name  = string
     sa_id = string
     startup_script = string
-    script_vars    = map(string)
+    secrets_map    = map(string)
+    labels = map(string)
     tags = list(string)
   }))
 }

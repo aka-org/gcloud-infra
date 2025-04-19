@@ -1,7 +1,6 @@
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
-  sensitive   = true
   default     = ""
 }
 variable "project_name" {

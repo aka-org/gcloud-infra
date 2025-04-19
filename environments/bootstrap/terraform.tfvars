@@ -1,6 +1,7 @@
 gcp_region   = "us-east1"
 gcp_zone     = "us-east1-b"
 project_name = "gcloud-infra"
+project_id   = "gcloud-infra-13042025"
 enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",
@@ -23,10 +24,11 @@ buckets = [
 create_gcs_backend = true
 service_accounts = [
   {
-    id           = "secret-manager-sa"
-    display_name = "secret-manager-sa"
+    id           = "ansible-sa"
+    display_name = "ansible-sa"
     roles = [
       "roles/secretmanager.secretAccessor",
+      "roles/compute.viewer"
     ]
     create_key = false
   },
