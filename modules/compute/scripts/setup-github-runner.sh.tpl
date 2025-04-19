@@ -4,13 +4,13 @@ set -euo pipefail
 # === Setup Github-runner ===
 
 # === Configurable environment variables ===
-GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"                        # GitHub user or org name
-GITHUB_REPO="$${GITHUB_REPO:-gcloud_ansible}"                         # GitHub repo name
-RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"         # Runner name
-RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"                     # GitHub Runner version (default: latest as of now)
-RUNNER_LABELS="$${RUNNER_LABELS-ansible}"                  # Github Runner Labels
-RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"                  # Installation path
-RUNNER_USER="$${RUNNER_USER:-github-runner}"                   # Github runner system user
+GITHUB_OWNER="$${GITHUB_OWNER:-akatsantonis}"           # GitHub user or org name
+GITHUB_REPO="$${GITHUB_REPO:-gcloud_ansible}"           # GitHub repo name
+RUNNER_NAME="$${GITHUB_RUNNER_NAME:-$(hostname)}"       # Runner name
+RUNNER_VERSION="$${RUNNER_VERSION:-2.323.0}"            # GitHub Runner version (default: latest as of now)
+RUNNER_LABELS="$${RUNNER_LABELS-ansible}"               # Github Runner Labels
+RUNNER_DIR="$${RUNNER_DIR:-/opt/github-runner}"         # Installation path
+RUNNER_USER="$${RUNNER_USER:-ansible}"                  # Github runner system user
 
 # === Derived variables ===
 RUNNER_URL="https://github.com/$${GITHUB_OWNER}/$${GITHUB_REPO}"
