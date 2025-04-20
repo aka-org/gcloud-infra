@@ -38,4 +38,8 @@ resource "google_compute_instance" "vm" {
     ? templatefile("${path.module}/${each.value.startup_script}", each.value.secrets_map)
     : null
   )
+
+  lifecycle {
+    ignore_changes = [labels["ansible_configured"]]
+  }
 }

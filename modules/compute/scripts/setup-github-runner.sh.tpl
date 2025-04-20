@@ -17,6 +17,7 @@ RUNNER_TGZ="actions-runner-linux-x64-$${RUNNER_VERSION}.tar.gz"
 DOWNLOAD_URL="https://github.com/actions/runner/releases/download/v$${RUNNER_VERSION}/$${RUNNER_TGZ}"
 VENV_DIR="/home/$RUNNER_USER/.ansible_venv"
 PLUGIN_PATH="/home/$RUNNER_USER/.ansible/plugins/inventory"
+RUNNER_PRIVATE_KEY_DIR="/home/$RUNNER_USER/.ssh"
 
 # === Get secret from secret manager ===
 GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --quiet)
@@ -24,6 +25,7 @@ GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --qui
 # === Ensure runner user exists ===
 echo "[*] Creating runner user"
 sudo useradd -m -s /bin/bash "$RUNNER_USER" || true 
+sudo mkdir -p "$RUNNER_PRIVATE_KEY_DIR"
 
 # === Install ansible ===
 echo "[+] Installing Ansible and dependencies"
@@ -48,7 +50,10 @@ source "$VENV_DIR/bin/activate"
 # Upgrade pip and install Ansible + GCP requirements
 echo "[+] Installing Python dependencies"
 pip install --upgrade pip
-pip install ansible google-auth requests
+pip install ansible google-auth requests google-api-python-client
+
+# Install Ansible collections
+ansible-galaxy collection install community.google
 
 # Confirm Ansible is installed
 echo "[*] Ansible version:"
