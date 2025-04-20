@@ -28,7 +28,8 @@ service_accounts = [
     display_name = "ansible-sa"
     roles = [
       "roles/secretmanager.secretAccessor",
-      "roles/compute.viewer"
+      "roles/compute.viewer",
+      "roles/compute.instanceAdmin.v1"
     ]
     create_key = false
   },

@@ -54,8 +54,9 @@ vms = [
       secret_id = "github-token"
     }
     labels = {
-      env  = "testing"
-      role = "github-runner"
+      env                = "testing"
+      role               = "github-runner"
+      ansible_configured = "false"
     }
     tags = ["ssh", "icmp", "vpn"]
   }
