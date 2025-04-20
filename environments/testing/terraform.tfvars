@@ -56,7 +56,7 @@ vms = [
     labels = {
       env                = "testing"
       role               = "github-runner"
-      ansible_configured = false
+      ansible_configured = "false"
     }
     tags = ["ssh", "icmp", "vpn"]
   }
