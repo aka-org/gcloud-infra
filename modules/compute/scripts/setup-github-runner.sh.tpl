@@ -26,6 +26,7 @@ GITHUB_PAT=$(gcloud secrets versions access latest --secret="${secret_id}" --qui
 echo "[*] Creating runner user"
 sudo useradd -m -s /bin/bash "$RUNNER_USER" || true 
 sudo mkdir -p "$RUNNER_PRIVATE_KEY_DIR"
+sudo chown $RUNNER_USER:$RUNNER_USER $RUNNER_PRIVATE_KEY_DIR
 
 # === Install ansible ===
 echo "[+] Installing Ansible and dependencies"
