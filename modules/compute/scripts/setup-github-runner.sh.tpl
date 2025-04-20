@@ -45,24 +45,28 @@ if [[ ! -d "$VENV_DIR" ]]; then
   sudo -u "$RUNNER_USER" python3 -m venv "$VENV_DIR"
 fi
 
-# Activate virtualenv
-source "$VENV_DIR/bin/activate"
+# Setup Ansible
+sudo -u "$RUNNER_USER" bash -c '
+  VENV_DIR="/home/$USER/.ansible_venv"
 
-# Upgrade pip and install Ansible + GCP requirements
-echo "[+] Installing Python dependencies"
-pip install --upgrade pip
-pip install ansible google-auth requests google-api-python-client
+  # Activate virtualenv
+  source "$VENV_DIR/bin/activate"
 
-# Install Ansible collections
-ansible-galaxy collection install community.google
+  # Upgrade pip and install Ansible + GCP requirements
+  echo "[+] Installing Python dependencies"
+  pip install --upgrade pip
+  pip install ansible google-auth requests google-api-python-client
 
-# Confirm Ansible is installed
-echo "[*] Ansible version:"
-ansible --version
+  # Install Ansible collections
+  ansible-galaxy collection install community.google
 
-# Deactivate venv
-deactivate
+  # Confirm Ansible is installed
+  echo "[*] Ansible version:"
+  ansible --version
 
+  # Deactivate venv
+  deactivate
+'
 echo "[✓] Finished setting up Ansible with GCPinventory support."
 
 # Installing Docker
