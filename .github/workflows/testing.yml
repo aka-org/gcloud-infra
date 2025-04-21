@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'environments/testing/**'
-      - 'modules/**'
+      - 'terraform/environments/testing/**'
+      - 'terraform/modules/**'
       - '.github/workflows/testing.yml'
       - '.github/workflows/terraform-apply.yml'  
       - '.github/workflows/terraform-destroy.yml'  
@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: environments/testing
+      working-directory: terraform/environments/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
     secrets:
@@ -39,7 +39,7 @@ jobs:
     uses: ./.github/workflows/terraform-destroy.yml
     with:
       environment: testing
-      working-directory: environments/testing
+      working-directory: terraform/environments/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
     secrets:
