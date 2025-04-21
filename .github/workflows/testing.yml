@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'environments/testing/**'
-      - 'modules/**'
+      - 'terraform/environments/testing/**'
+      - 'terraform/modules/**'
       - '.github/workflows/testing.yml'
       - '.github/workflows/terraform-apply.yml'  
       - '.github/workflows/terraform-destroy.yml'  
@@ -18,28 +18,28 @@ jobs:
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: environments/testing
+      working-directory: terraform/environments/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-  configure:
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/trigger-workflow.yml
-    with:
-      environment: testing
-      github-runner: ubuntu-22.04
-      repo: aka-org/gcloud_ansible
-      workflow_file: testing.yml
-    secrets:
-      GITHUB_REPO_TOKEN: ${{ secrets.ANSIBLE_REPO_TOKEN }}
-    needs: [provision]
+        #  configure:
+        #if: github.event_name == 'pull_request'
+        #uses: ./.github/workflows/trigger-workflow.yml
+        #with:
+        #environment: testing
+        #github-runner: ubuntu-22.04
+        #repo: aka-org/gcloud_ansible
+        #workflow_file: testing.yml
+        #secrets:
+        #GITHUB_REPO_TOKEN: ${{ secrets.ANSIBLE_REPO_TOKEN }}
+        #needs: [provision]
   deprovision:
     if: github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/terraform-destroy.yml
     with:
       environment: testing
-      working-directory: environments/testing
+      working-directory: terraform/environments/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
     secrets:
