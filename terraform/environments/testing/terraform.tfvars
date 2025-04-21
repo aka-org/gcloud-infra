@@ -39,27 +39,6 @@ firewall_rules = [
   }
 ]
 vms = [
-  {
-    name           = "github-runner-1"
-    machine_type   = "e2-micro"
-    image_project  = "debian-cloud"
-    image_family   = "debian-12"
-    disk_size      = 10
-    disk_type      = "pd-standard"
-    network_name   = "gcloud-infra-network"
-    subnet_name    = "public-subnet-test"
-    sa_id          = "ansible-sa"
-    startup_script = "scripts/setup-github-runner.sh.tpl"
-    secrets_map = {
-      secret_id = "github-token"
-    }
-    labels = {
-      env                = "testing"
-      role               = "github-runner"
-      ansible_configured = "false"
-    }
-    tags = ["ssh", "icmp", "vpn"]
-  }
 ]
 admin_ssh_keys = [
   "aka:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXCS1q9tidu+NWd4JCu+vOozjefnxTAa1hwkdizf/0M 06042025",
