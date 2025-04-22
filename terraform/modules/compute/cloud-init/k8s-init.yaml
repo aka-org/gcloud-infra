@@ -1,0 +1,42 @@
+#cloud-config
+write_files:
+  - path: /tmp/kubeadm-config.yaml
+    permissions: '0644'
+    content: |
+      kind: ClusterConfiguration
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kubernetesVersion: "v1.32.0"
+      #controlPlaneEndpoint: "10.0.2.2:6443"
+      networking:
+        podSubnet: "192.168.0.0/16"
+      ---
+      kind: InitConfiguration
+      apiVersion: kubeadm.k8s.io/v1beta4
+      localAPIEndpoint:
+        advertiseAddress: "10.0.2.2"
+        bindPort: 6443
+      cgroupDriver: systemd
+      ---
+      kind: KubeletConfiguration
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      cgroupDriver: systemd
+runcmd:
+  - |
+    # Run kubeadm init
+    INIT_OUTPUT=$(kubeadm init --config /tmp/kubeadm-config.yaml 2>&1)
+
+    # Extract token and hash
+    TOKEN=$(echo "$INIT_OUTPUT" | grep -oP '(?<=--token )\S+')
+    HASH=$(echo "$INIT_OUTPUT" | grep -oP '(?<=--discovery-token-ca-cert-hash sha256:)\S+')
+
+    # Combine and push to Secret Manager
+    echo -n "$${TOKEN}:$${HASH}" | gcloud secrets versions add ${k8s-secret} --data-file=-
+  - |
+    # Export kubeconfig file path
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+
+    # Install CNI operator and Calico
+    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/tigera-operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/custom-resources.yaml
+
+

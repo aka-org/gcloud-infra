@@ -27,15 +27,21 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  labels = merge(each.value.labels, { version = var.image_version })
+  labels = merge(each.value.labels, { version = each.value.image_version })
   tags   = each.value.tags
 
-  metadata = {
-    ssh-keys = join("\n", var.admin_ssh_keys)
-  }
+  metadata = merge(
+    {
+      ssh-keys = join("\n", var.admin_ssh_keys)
+    },
+    each.value.cloud_init != "" ? {
+      "user-data" = templatefile("${path.module}/cloud-init/${each.value.cloud_init}", each.value.cloud_init_data)
+    } : {}
+  )
+
   metadata_startup_script = (
     try(each.value.startup_script, "") != ""
-    ? templatefile("${path.module}/${each.value.startup_script}", each.value.secrets_map)
+    ? templatefile("${path.module}/${each.value.startup_script}", each.value.startup_script_data)
     : null
   )
 

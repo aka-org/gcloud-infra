@@ -7,20 +7,22 @@ variable "project_id" {
 variable "vms" {
   description = "List of virtual machines to create"
   type = list(object({
-    name           = string
-    machine_type   = string
-    image_project  = string
-    image_family   = string
-    image_version  = string
-    disk_size      = number
-    disk_type      = string
-    network_name   = string
-    subnet_name    = string
-    sa_id          = string
-    startup_script = string
-    secrets_map    = map(string)
-    labels         = map(string)
-    tags           = list(string)
+    name                = string
+    machine_type        = string
+    image_project       = string
+    image_family        = string
+    image_version       = string
+    disk_size           = number
+    disk_type           = string
+    network_name        = string
+    subnet_name         = string
+    sa_id               = string
+    cloud_init          = string
+    cloud_init_data     = map(string)
+    startup_script      = string
+    startup_script_data = map(string)
+    labels              = map(string)
+    tags                = list(string)
   }))
 }
 
