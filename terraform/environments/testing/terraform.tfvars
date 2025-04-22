@@ -5,23 +5,30 @@ network_name = "gcloud-infra-network"
 subnets = [
   {
     name          = "public-subnet-test"
-    ip_cidr_range = "10.0.1.0/24"
+    ip_cidr_range = "10.0.2.0/24"
   }
 ]
 firewall_rules = [
   {
     name          = "k8s-master"
     protocol      = "tcp"
-    ports         = ["6443", "2379", "2380", "10251", "10252", "4443"]
+    ports         = ["6443", "2379", "10259", "10257", "2380", "10251", "10252", "443"]
     source_ranges = ["10.0.2.0/24"]
     tags          = ["k8s-master"]
   },
   {
     name          = "k8s-worker"
     protocol      = "tcp"
-    ports         = ["10250", "10256"]
+    ports         = ["10250"]
     source_ranges = ["10.0.2.0/24"]
     tags          = ["k8s-worker"]
+  },
+  {
+    name          = "calico-vxlan"
+    protocol      = "udp"
+    ports         = ["4789", "10256"]
+    source_ranges = ["10.0.2.0/24"]
+    tags          = ["calico"]
   },
   {
     name          = "allow-ssh"
@@ -39,6 +46,25 @@ firewall_rules = [
   }
 ]
 vms = [
+  {
+    name           = "k8s-master-1"
+    machine_type   = "e2-micro"
+    image_project  = "gcloud-infra-13042025"
+    image_family   = "k8s-node"
+    image_version  = "v20250421"
+    disk_size      = 10
+    disk_type      = "pd-standard"
+    network_name   = "gcloud-infra-network"
+    subnet_name    = "public-subnet-test"
+    sa_id          = ""
+    startup_script = ""
+    secrets_map    = {}
+    labels = {
+      env  = "testing"
+      role = "k8s-master"
+    }
+    tags = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
+  }
 ]
 admin_ssh_keys = [
   "aka:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXCS1q9tidu+NWd4JCu+vOozjefnxTAa1hwkdizf/0M 06042025",

@@ -1,19 +1,19 @@
 resource "google_compute_instance" "vm" {
-  for_each = { for vm in var.vms : vm.name => vm}
+  for_each = { for vm in var.vms : vm.name => vm }
 
-  name         = each.value.name 
+  name         = each.value.name
   machine_type = each.value.machine_type
 
   boot_disk {
     initialize_params {
-      image = "${each.value.image_project}/${each.value.image_family}"
+      image = "projects/${each.value.image_project}/global/images/${each.value.image_family}-${each.value.image_version}"
       size  = each.value.disk_size
       type  = each.value.disk_type
     }
   }
 
   network_interface {
-    network = each.value.network_name
+    network    = each.value.network_name
     subnetwork = each.value.subnet_name
     access_config {}
   }
@@ -25,11 +25,11 @@ resource "google_compute_instance" "vm" {
       email  = "${each.value.sa_id}@${var.project_id}.iam.gserviceaccount.com"
       scopes = ["cloud-platform"]
     }
-  } 
-  
-  labels = each.value.labels
-  tags = each.value.tags
-  
+  }
+
+  labels = merge(each.value.labels, { version = var.image_version })
+  tags   = each.value.tags
+
   metadata = {
     ssh-keys = join("\n", var.admin_ssh_keys)
   }

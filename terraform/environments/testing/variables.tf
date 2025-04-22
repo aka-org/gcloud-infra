@@ -53,6 +53,7 @@ variable "vms" {
     machine_type   = string
     image_project  = string
     image_family   = string
+    image_version  = string
     disk_size      = number
     disk_type      = string
     network_name   = string

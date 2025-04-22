@@ -9,7 +9,7 @@ packer {
 
 variable "project_id" {
   type = string
-  default = ""
+  default = "project_id"
 }
 
 variable "zone" {
@@ -17,14 +17,9 @@ variable "zone" {
   default = "us-east1-b"
 }
 
-variable "image_name" {
+variable "image_family" {
   type = string
   default = "k8s-node"
-}
-
-variable "image_version" {
-  type = string
-  default = "1.0.0"
 }
 
 variable "subnetwork" {
@@ -32,20 +27,21 @@ variable "subnetwork" {
   default = "public-subnet-test"
 }
 
-variables "network_tags" {
-  type = list
+variable "network_tags" {
+  type = list(string)
   default = ["ssh"]
 }
 
 
-source "googlecompute" "ubuntu" {
+source "googlecompute" "debian" {
   project_id         = var.project_id
   source_image       = "debian-12-bookworm-v20250415"
-  source_image_project_id = "debian-cloud"
+  source_image_project_id = ["debian-cloud"]
   zone               = var.zone
   machine_type       = "e2-micro"
-  disk_size          = 20
-  image_name         = "${var.image_name}-${formatdate("YYYYMMDDhhmm", timestamp())}"
+  disk_size          = 10 
+  image_name         = "${var.image_family}-v${formatdate("YYYYMMDD", timestamp())}"
+  image_family       = var.image_family
   communicator       = "ssh"
   temporary_key_pair_type = "ed25519"
   ssh_username       = "packer"
@@ -53,7 +49,7 @@ source "googlecompute" "ubuntu" {
   tags               = var.network_tags
   
   image_labels = {
-    version     = var.version
+    version     = "v${formatdate("YYYYMMDD",timestamp())}"
     created_by  = "packer"
   }
 }
@@ -62,13 +58,17 @@ build {
   sources = ["source.googlecompute.debian"]
 
   provisioner "shell" {
-    scripts = [
-      "../scripts/common.sh",
-      "../scripts/install-k8s.sh"
-    ]
+    script = "scripts/common.sh"
+    execute_command = "sudo bash '{{.Path}}'"
   }
 
   provisioner "shell" {
-    script = "../scripts/clean.sh"
+    script = "scripts/install-k8s.sh"
+    execute_command = "sudo bash '{{.Path}}'"
+  }
+
+  provisioner "shell" {
+    script = "scripts/clean.sh"
+    execute_command = "sudo bash '{{.Path}}'"
   }
 }
