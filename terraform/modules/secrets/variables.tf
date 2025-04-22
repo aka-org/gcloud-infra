@@ -11,7 +11,12 @@ variable "secrets_map" {
   default     = {}
 }
 variable "secret_ids" {
-  description = "List of secret ids"
+  description = "List of secret ids for which a version will not be created"
+  type        = list(string)
+  default     = []
+}
+variable "secret_ids_versioned" {
+  description = "List of secret ids for which a version will be created"
   type        = list(string)
   default     = []
 }

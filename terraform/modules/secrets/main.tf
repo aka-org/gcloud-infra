@@ -1,5 +1,5 @@
 resource "google_secret_manager_secret" "secret" {
-  for_each = toset(var.secret_ids)
+  for_each = toset(concat(var.secret_ids, var.secret_ids_versioned))
 
   secret_id = each.key
 
@@ -13,7 +13,7 @@ resource "google_secret_manager_secret" "secret" {
 }
 
 resource "google_secret_manager_secret_version" "secret_version" {
-  for_each = toset(var.secret_ids)
+  for_each = toset(var.secret_ids_versioned)
 
   secret      = google_secret_manager_secret.secret[each.key].id
   secret_data = var.secrets_map[each.key]
