@@ -8,7 +8,7 @@ variable "network_name" {
 variable "subnets" {
   description = "List of subnets to create"
   type = list(object({
-    name     = string
+    name          = string
     ip_cidr_range = string
   }))
 }
@@ -22,10 +22,10 @@ variable "firewall_no_ports_protocols" {
 variable "firewall_rules" {
   description = "List of firewall rules to create"
   type = list(object({
-    name     = string
-    protocol = string
-    ports    = list(string)
+    name          = string
+    protocol      = string
+    ports         = list(string)
     source_ranges = list(string)
-    tags = list(string)
+    tags          = list(string)
   }))
 }

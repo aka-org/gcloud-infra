@@ -5,23 +5,30 @@ network_name = "gcloud-infra-network"
 subnets = [
   {
     name          = "public-subnet-test"
-    ip_cidr_range = "10.0.1.0/24"
+    ip_cidr_range = "10.0.2.0/24"
   }
 ]
 firewall_rules = [
   {
     name          = "k8s-master"
     protocol      = "tcp"
-    ports         = ["6443", "2379", "2380", "10251", "10252", "4443"]
+    ports         = ["6443", "2379", "10259", "10257", "2380", "10251", "10252", "443"]
     source_ranges = ["10.0.2.0/24"]
     tags          = ["k8s-master"]
   },
   {
     name          = "k8s-worker"
     protocol      = "tcp"
-    ports         = ["10250", "10256"]
+    ports         = ["10250"]
     source_ranges = ["10.0.2.0/24"]
     tags          = ["k8s-worker"]
+  },
+  {
+    name          = "calico-vxlan"
+    protocol      = "udp"
+    ports         = ["4789", "10256"]
+    source_ranges = ["10.0.2.0/24"]
+    tags          = ["calico"]
   },
   {
     name          = "allow-ssh"
@@ -40,25 +47,54 @@ firewall_rules = [
 ]
 vms = [
   {
-    name           = "github-runner-1"
-    machine_type   = "e2-micro"
-    image_project  = "debian-cloud"
-    image_family   = "debian-12"
-    disk_size      = 10
-    disk_type      = "pd-standard"
-    network_name   = "gcloud-infra-network"
-    subnet_name    = "public-subnet-test"
-    sa_id          = "ansible-sa"
-    startup_script = "scripts/setup-github-runner.sh.tpl"
-    secrets_map = {
-      secret_id = "github-token"
+    name          = "k8s-master-1"
+    machine_type  = "e2-medium"
+    image_project = "gcloud-infra-13042025"
+    image_family  = "k8s-node"
+    image_version = "v20250422"
+    disk_size     = 10
+    disk_type     = "pd-standard"
+    network_name  = "gcloud-infra-network"
+    subnet_name   = "public-subnet-test"
+    sa_id         = "k8s-gcloud-sa"
+    cloud_init    = "k8s-init.yaml"
+    cloud_init_data = {
+      k8s-secret = "k8s-secret-test"
+      label-env  = "testing"
+      label-role = "k8s-master"
     }
+    startup_script      = ""
+    startup_script_data = {}
     labels = {
-      env                = "testing"
-      role               = "github-runner"
-      ansible_configured = "false"
+      env  = "testing"
+      role = "k8s-master"
     }
-    tags = ["ssh", "icmp", "vpn"]
+    tags = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
+  },
+  {
+    name          = "k8s-worker-1"
+    machine_type  = "e2-medium"
+    image_project = "gcloud-infra-13042025"
+    image_family  = "k8s-node"
+    image_version = "v20250422"
+    disk_size     = 10
+    disk_type     = "pd-standard"
+    network_name  = "gcloud-infra-network"
+    subnet_name   = "public-subnet-test"
+    sa_id         = "k8s-gcloud-sa"
+    cloud_init    = "k8s-node.yaml"
+    cloud_init_data = {
+      k8s-secret = "k8s-secret-test"
+      label-env  = "testing"
+      label-role = "k8s-master"
+    }
+    startup_script      = ""
+    startup_script_data = {}
+    labels = {
+      env  = "testing"
+      role = "k8s-worker"
+    }
+    tags = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
   }
 ]
 admin_ssh_keys = [

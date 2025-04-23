@@ -80,3 +80,9 @@ variable "secret_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "secret_ids_versioned" {
+  description = "List of secret ids for which a version will be created"
+  type        = list(string)
+  default     = []
+}

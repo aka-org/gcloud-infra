@@ -6,6 +6,7 @@ terraform {
     }
   }
   backend "gcs" {
+    bucket = "test-tfstate-13042025"
   }
 }
 

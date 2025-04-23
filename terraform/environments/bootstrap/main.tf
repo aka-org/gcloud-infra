@@ -42,9 +42,10 @@ module "service_account" {
 }
 
 module "secrets" {
-  source           = "../../modules/secrets"
-  secret_ids       = var.secret_ids
-  secrets_map      = var.secrets_map
-  secrets_location = var.gcp_region
-  depends_on       = [module.project, module.apis]
+  source               = "../../modules/secrets"
+  secret_ids           = var.secret_ids
+  secret_ids_versioned = var.secret_ids_versioned
+  secrets_map          = var.secrets_map
+  secrets_location     = var.gcp_region
+  depends_on           = [module.project, module.apis]
 }

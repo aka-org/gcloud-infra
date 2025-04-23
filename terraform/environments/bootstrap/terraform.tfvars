@@ -34,6 +34,16 @@ service_accounts = [
     create_key = false
   },
   {
+    id           = "k8s-gcloud-sa"
+    display_name = "k8s-gcloud-sa"
+    roles = [
+      "roles/secretmanager.secretAccessor",
+      "roles/secretmanager.secretVersionAdder",
+      "roles/compute.viewer"
+    ]
+    create_key = false
+  },
+  {
     id           = "terraform-sa"
     display_name = "terraform-sa"
     roles = [
@@ -45,4 +55,5 @@ service_accounts = [
     create_key = true
   }
 ]
-secret_ids = ["github-token"]
+secret_ids           = ["k8s-secret-test"]
+secret_ids_versioned = ["github-token"]
