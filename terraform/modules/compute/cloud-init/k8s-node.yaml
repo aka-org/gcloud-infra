@@ -1,10 +1,22 @@
 #cloud-config
 runcmd:
   - |
+    # Discover the control-plane ip
+    MASTER_IP=""
+    while [ -z "$MASTER_IP" ]; do
+        echo "Waiting for control plane IP..."
+        sleep 5
+        MASTER_IP=$(gcloud compute instances list \
+          --filter="labels.env=${label-env} AND labels.role=${label-role}" \
+          --format="value(networkInterfaces[0].networkIP)" 2>/dev/null | head -n 1)
+
+          # Set to empty string if the result is empty or null
+        MASTER_IP="$${MASTER_IP:-""}"
+    done
     # Retrieve token and hash from GCP Secret Manager
     SECRET=$(gcloud secrets versions access latest --secret="${k8s-secret}")
     TOKEN=$(echo "$SECRET" | cut -d':' -f1)
     HASH=$(echo "$SECRET" | cut -d':' -f2)
 
     # Join the Kubernetes cluster (replace <MASTER_IP>)
-    kubeadm join <MASTER_IP>:6443 --token $TOKEN --discovery-token-ca-cert-hash sha256:$HASH
+    kubeadm join $MASTER_IP:6443 --token $TOKEN --discovery-token-ca-cert-hash sha256:$HASH

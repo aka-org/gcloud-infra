@@ -38,7 +38,8 @@ service_accounts = [
     display_name = "k8s-gcloud-sa"
     roles = [
       "roles/secretmanager.secretAccessor",
-      "roles/secretmanager.secretVersionAdder"
+      "roles/secretmanager.secretVersionAdder",
+      "roles/compute.viewer"
     ]
     create_key = false
   },

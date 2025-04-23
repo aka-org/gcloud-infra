@@ -3,25 +3,67 @@ write_files:
   - path: /tmp/kubeadm-config.yaml
     permissions: '0644'
     content: |
+      ---
+      apiVersion: kubeadm.k8s.io/v1beta4
       kind: ClusterConfiguration
-      apiVersion: kubeadm.k8s.io/v1beta4
       kubernetesVersion: "v1.32.0"
-      #controlPlaneEndpoint: "10.0.2.2:6443"
+      clusterName: test-cluster-01
+      #controlPlaneEndpoint: "lb.example.com:6443"  # Replace with your LB or DNS name
+      imageRepository: registry.k8s.io  # Or override with your own registry
       networking:
-        podSubnet: "192.168.0.0/16"
+        serviceSubnet: "10.96.0.0/12"         # Adjust for multi-cluster uniqueness
+        podSubnet: "192.168.0.0/16"          # Calico-compatible range
+        dnsDomain: "cluster.local"           # Optional override
+      apiServer:
+        extraArgs:
+          - name: authorization-mode
+            value: Node,RBAC
+          - name: audit-log-path
+            value: /var/log/kubernetes/audit.log
+          - name: audit-log-maxage
+            value: "5"
+          - name: audit-log-maxbackup
+            value: "1"
+          - name: audit-log-maxsize
+            value: "100"
+        #certSANs:
+        #  - "lb.example.com"
+        #  - "10.0.2.2"  # Replace with your LB IP or host IP if needed
+      etcd:
+        local:
+          dataDir: /var/lib/etcd
       ---
-      kind: InitConfiguration
       apiVersion: kubeadm.k8s.io/v1beta4
+      kind: InitConfiguration
       localAPIEndpoint:
-        advertiseAddress: "10.0.2.2"
+        advertiseAddress: ADVERTISE_ADDRESS  # Replace with your control plane node's IP
         bindPort: 6443
+      nodeRegistration:
+        #name: k8s-master-1
+        criSocket: unix:///var/run/containerd/containerd.sock
+        imagePullPolicy: IfNotPresent
+      ---
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      kind: KubeletConfiguration
       cgroupDriver: systemd
       ---
-      kind: KubeletConfiguration
-      apiVersion: kubelet.config.k8s.io/v1beta1
-      cgroupDriver: systemd
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: JoinConfiguration
+        #discovery:
+        #  bootstrapToken:
+        #    token: abcdef.0123456789abcdef
+        #    apiServerEndpoint: "lb.example.com:6443"
+        #    unsafeSkipCAVerification: true
+      nodeRegistration:
+        criSocket: unix:///var/run/containerd/containerd.sock
+        imagePullPolicy: IfNotPresent
 runcmd:
   - |
+    # Get the private ip of the instance
+    API_ENDPOINT="http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip"
+    PRIVATE_IP=$(curl -s -H "Metadata-Flavor: Google" $API_ENDPOINT)
+    # Inject private ip as advertise address for k8s api server
+    sed -i "s|ADVERTISE_ADDRESS|\"$PRIVATE_IP\"|" /tmp/kubeadm-config.yaml
     # Run kubeadm init
     INIT_OUTPUT=$(kubeadm init --config /tmp/kubeadm-config.yaml 2>&1)
 
@@ -38,5 +80,3 @@ runcmd:
     # Install CNI operator and Calico
     kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/tigera-operator.yaml
     kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/custom-resources.yaml
-
-
