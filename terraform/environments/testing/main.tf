@@ -26,6 +26,7 @@ module "network" {
 module "compute" {
   source         = "../../modules/compute"
   vms            = var.vms
+  vm_defaults    = var.vm_defaults
   admin_ssh_keys = var.admin_ssh_keys
   project_id     = var.project_id
   depends_on     = [module.network]

@@ -46,10 +46,9 @@ variable "firewall_rules" {
 }
 
 # Compute Resources
-variable "vms" {
-  description = "List of virtual machines to create"
-  type = list(object({
-    name                = string
+variable "vm_defaults" {
+  description = "Default parameters of Kubernetes Nodes"
+  type = object({
     machine_type        = string
     image_project       = string
     image_family        = string
@@ -58,20 +57,40 @@ variable "vms" {
     disk_type           = string
     network_name        = string
     subnet_name         = string
-    sa_id               = string
-    cloud_init          = string
-    cloud_init_data     = map(string)
-    startup_script      = string
-    startup_script_data = map(string)
-    labels              = map(string)
+    role                = string
+    env                 = string
     tags                = list(string)
-  }))
-  default = []
+    sa_id               = optional(string)
+    cloud_init          = optional(string)
+    cloud_init_data     = optional(map(string))
+    startup_script      = optional(string)
+    startup_script_data = optional(map(string))
+  })
 }
-
+variable "vms" {
+  description = "List of Kubernetes Nodes to be created"
+  type = list(object({
+    name                = string
+    machine_type        = optional(string)
+    image_project       = optional(string)
+    image_family        = optional(string)
+    image_version       = optional(string)
+    disk_size           = optional(number)
+    disk_type           = optional(string)
+    network_name        = optional(string)
+    subnet_name         = optional(string)
+    sa_id               = optional(string)
+    cloud_init          = optional(string)
+    cloud_init_data     = optional(map(string))
+    startup_script      = optional(string)
+    startup_script_data = optional(map(string))
+    role                = optional(string)
+    env                 = optional(string)
+    tags                = optional(list(string))
+  }))
+}
 # SSH & Access
 variable "admin_ssh_keys" {
   description = "SSH keys to be added to the instances"
   type        = list(string)
-  default     = []
 }

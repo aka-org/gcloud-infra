@@ -45,56 +45,42 @@ firewall_rules = [
     tags          = ["icmp"]
   }
 ]
+vm_defaults = {
+  machine_type  = "e2-medium"
+  image_project = "gcloud-infra-13042025"
+  image_family  = "k8s-node"
+  image_version = "v20250422"
+  disk_size     = 10
+  disk_type     = "pd-standard"
+  network_name  = "gcloud-infra-network"
+  subnet_name   = "public-subnet-test"
+  sa_id         = "k8s-gcloud-sa"
+  env           = "testing"
+  role          = ""
+  tags          = []
+  startup_script = ""
+  startup_script_data = {}
+}
 vms = [
   {
-    name          = "k8s-master-1"
-    machine_type  = "e2-medium"
-    image_project = "gcloud-infra-13042025"
-    image_family  = "k8s-node"
-    image_version = "v20250422"
-    disk_size     = 10
-    disk_type     = "pd-standard"
-    network_name  = "gcloud-infra-network"
-    subnet_name   = "public-subnet-test"
-    sa_id         = "k8s-gcloud-sa"
-    cloud_init    = "k8s-init.yaml"
+    name       = "k8s-master-1"
+    cloud_init = "k8s-init.yaml"
     cloud_init_data = {
       k8s-secret = "k8s-secret-test"
-      label-env  = "testing"
-      label-role = "k8s-master"
     }
-    startup_script      = ""
-    startup_script_data = {}
-    labels = {
-      env  = "testing"
-      role = "k8s-master"
-    }
-    tags = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
+    role       = "k8s-master"
+    tags       = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
   },
   {
-    name          = "k8s-worker-1"
-    machine_type  = "e2-medium"
-    image_project = "gcloud-infra-13042025"
-    image_family  = "k8s-node"
-    image_version = "v20250422"
-    disk_size     = 10
-    disk_type     = "pd-standard"
-    network_name  = "gcloud-infra-network"
-    subnet_name   = "public-subnet-test"
-    sa_id         = "k8s-gcloud-sa"
-    cloud_init    = "k8s-node.yaml"
+    name       = "k8s-worker-1"
+    cloud_init = "k8s-node.yaml"
     cloud_init_data = {
       k8s-secret = "k8s-secret-test"
-      label-env  = "testing"
-      label-role = "k8s-master"
+      filter-env = "testing"
+      filter-role = "k8s-master"
     }
-    startup_script      = ""
-    startup_script_data = {}
-    labels = {
-      env  = "testing"
-      role = "k8s-worker"
-    }
-    tags = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
+    role       = "k8s-worker"
+    tags       = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
   }
 ]
 admin_ssh_keys = [
