@@ -1,6 +1,18 @@
-resource "google_compute_instance" "vm" {
-  for_each = { for vm in var.vms : vm.name => vm }
+locals {
+  vms = [
+    for vm in var.vms : merge(
+      var.vm_defaults,
+      {
+        for k, v in vm : k => v if v != null
+      }
+    )
+  ]
+}
 
+resource "google_compute_instance" "vm" {
+  for_each = { for vm in local.vms : vm.name => vm }
+
+  project      = var.project_id
   name         = each.value.name
   machine_type = each.value.machine_type
 
@@ -13,39 +25,43 @@ resource "google_compute_instance" "vm" {
   }
 
   network_interface {
-    network    = each.value.network_name
-    subnetwork = each.value.subnet_name
+    network = var.network
+    subnetwork = one([
+      for s in var.subnetworks : s.subnet if contains(s.roles, each.value.role)
+    ])
     access_config {}
   }
 
   dynamic "service_account" {
-    for_each = try(each.value.sa_id, "") != "" ? [1] : []
-
+    for_each = var.service_account != "" ? [1] : []
     content {
-      email  = "${each.value.sa_id}@${var.project_id}.iam.gserviceaccount.com"
+      email  = var.service_account
       scopes = ["cloud-platform"]
     }
   }
 
-  labels = merge(each.value.labels, { version = each.value.image_version })
-  tags   = each.value.tags
+  labels = merge(
+    {
+      version = each.value.image_version
+      env     = var.env
+      role    = each.value.role
+    }
+  )
+
+  tags = each.value.tags
 
   metadata = merge(
     {
       ssh-keys = join("\n", var.admin_ssh_keys)
     },
     each.value.cloud_init != "" ? {
-      "user-data" = templatefile("${path.module}/cloud-init/${each.value.cloud_init}", each.value.cloud_init_data)
+      "user-data" = templatefile("${var.base_path}/cloud-init/${each.value.cloud_init}", each.value.cloud_init_data)
     } : {}
   )
 
   metadata_startup_script = (
     try(each.value.startup_script, "") != ""
-    ? templatefile("${path.module}/${each.value.startup_script}", each.value.startup_script_data)
+    ? templatefile("${var.base_path}/${each.value.startup_script}", each.value.startup_script_data)
     : null
   )
-
-  lifecycle {
-    ignore_changes = [labels["ansible_configured"]]
-  }
 }

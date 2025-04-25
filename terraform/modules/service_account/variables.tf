@@ -4,13 +4,12 @@ variable "project_id" {
   type        = string
   default     = ""
 }
-variable "service_accounts" {
-  description = "List of service accounts to be created"
-  type = list(object({
+variable "service_account" {
+  description = "Service accounts to be created"
+  type = object({
     id           = string
     display_name = string
     roles        = list(string)
     create_key   = bool
-  }))
-  default = []
+  })
 }

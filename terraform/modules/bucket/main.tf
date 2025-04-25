@@ -1,13 +1,12 @@
 resource "google_storage_bucket" "bucket" {
-  for_each      = { for bucket in var.buckets : bucket.name => bucket }
-  name          = each.value.name
-  location      = each.value.location
-  force_destroy = each.value.force_destroy
+  name          = var.bucket.name
+  location      = var.gcp_region
+  project       = var.project_id
+  force_destroy = var.bucket.force_destroy
   versioning {
-    enabled = each.value.versioning_enabled
+    enabled = var.bucket.versioning_enabled
   }
 }
-
 
 resource "local_file" "default" {
   count           = var.create_gcs_backend ? 1 : 0
@@ -17,6 +16,7 @@ resource "local_file" "default" {
   content = <<-EOT
   terraform {
     backend "gcs" {
+      bucket = "${google_storage_bucket.bucket.name}"
     }
   }
   EOT

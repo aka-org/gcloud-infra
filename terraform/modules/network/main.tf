@@ -1,33 +1,29 @@
-resource "google_compute_network" "vpc" {
-  name                    = var.network_name
-  auto_create_subnetworks = false
+module "vpc" {
+  source       = "../../modules/vpc"
+  project_id   = var.project_id
+  network_name = var.network_name
 }
 
-resource "google_compute_subnetwork" "subnetwork" {
-  for_each = { for subnet in var.subnets : subnet.name => subnet }
-
-  name          = each.value.name
-  ip_cidr_range = each.value.ip_cidr_range
-  network       = google_compute_network.vpc.self_link
+module "subnetwork" {
+  source     = "../../modules/subnetwork"
+  subnets    = var.subnets
+  project_id = var.project_id
+  network    = module.vpc.network_self_link
+  depends_on = [module.vpc]
 }
 
-resource "google_compute_firewall" "firewall" {
-  for_each = { for rule in var.firewall_rules : rule.name => rule }
-
-  name    = each.value.name
-  network = google_compute_network.vpc.self_link
-
-  allow {
-    protocol = each.value.protocol
-    # Check if specified protocol allows to specify ports
-    ports = contains(var.firewall_no_ports_protocols, each.value.protocol) ? [] : each.value.ports
-  }
-
-  source_ranges = each.value.source_ranges
-
-  target_tags = each.value.tags
+module "firewall" {
+  source         = "../../modules/firewall"
+  project_id     = var.project_id
+  firewall_rules = var.firewall_rules
+  network        = module.vpc.network_self_link
+  depends_on     = [module.vpc]
 }
 
 output "network_self_link" {
-  value = google_compute_network.vpc.self_link
+  value = module.vpc.network_self_link
+}
+
+output "subnetwork_self_links" {
+  value = module.subnetwork.subnetwork_self_links
 }

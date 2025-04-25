@@ -1,26 +1,19 @@
-# Generic Project settings
+# Generic Project Settings
 variable "project_id" {
   description = " The GCP Project id"
   type        = string
 }
-
 # Network
-variable "network_name" {
-  description = "vpc network name"
+variable "network" {
+  description = "Self link to VPC network"
   type        = string
 }
-
-# Subnets
-variable "subnets" {
-  description = "List of subnets to create"
-  type = list(object({
-    name          = string
-    ip_cidr_range = string
-    roles         = list(string)
-  }))
+# Firewall Rules
+variable "firewall_no_ports_protocols" {
+  description = "Lists of protocols that do not need ports specified"
+  type        = list(string)
+  default     = ["icmp", "esp", "ah"]
 }
-
-# Firewall rules
 variable "firewall_rules" {
   description = "List of firewall rules to create"
   type = list(object({

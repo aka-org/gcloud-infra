@@ -9,11 +9,6 @@ variable "gcp_zone" {
   type        = string
   default     = "us-east1-b"
 }
-variable "project_id" {
-  description = "The GCP project ID"
-  type        = string
-  default     = ""
-}
 variable "project_name" {
   description = "A human-readable name for the project"
   type        = string
@@ -39,50 +34,55 @@ variable "enable_apis" {
 }
 
 # GCS Backend
-variable "buckets" {
-  description = "List of buckets to create"
-  type = list(object({
+variable "tf_state_bucket" {
+  description = "Object describing a terraform state bucket to be created"
+  type = object({
     name               = string
-    location           = string
     force_destroy      = bool
     versioning_enabled = bool
-  }))
-  default = []
+  })
 }
 variable "create_gcs_backend" {
-  description = "Specify whether a google cloud storage backend will be created"
+  description = "Specify whether a backend.tf with gcs backend will be created locally"
   type        = bool
   default     = false
 }
 
 # Service Accounts
-variable "service_accounts" {
-  description = "List of service accounts to be created"
-  type = list(object({
+variable "tf_service_account" {
+  description = "Terraform service account to be created"
+  type = object({
     id           = string
     display_name = string
     roles        = list(string)
     create_key   = bool
+  })
+}
+
+# Network
+variable "network_name" {
+  description = "vpc network name"
+  type        = string
+}
+
+# Subnets
+variable "subnets" {
+  description = "List of subnets to create"
+  type = list(object({
+    name          = string
+    ip_cidr_range = string
+    roles         = list(string)
   }))
-  default = []
 }
 
-# Secrets
-variable "secrets_map" {
-  type        = map(string)
-  sensitive   = true
-  description = "Map of secret name => secret value"
-  default     = {}
-}
-
-variable "secret_ids" {
-  description = "List of secrets"
-  type        = list(string)
-  default     = []
-}
-
-variable "secret_ids_versioned" {
-  description = "List of secret ids for which a version will be created"
-  type        = list(string)
-  default     = []
+# Firewall rules
+variable "firewall_rules" {
+  description = "List of firewall rules to create"
+  type = list(object({
+    name          = string
+    protocol      = string
+    ports         = list(string)
+    source_ranges = list(string)
+    tags          = list(string)
+  }))
 }
