@@ -28,7 +28,6 @@ service_accounts = [
       "roles/compute.networkAdmin",
       "roles/storage.admin",
       "roles/iam.serviceAccountUser",
-      "roles/storage.insightsCollectorService",
       "roles/secretmanager.admin",
       "roles/resourcemanager.projectIamAdmin",
       "roles/iam.serviceAccountAdmin",
