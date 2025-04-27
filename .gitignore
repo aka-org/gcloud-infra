@@ -13,7 +13,7 @@ crash.log
 tfplan
 
 # Terraform backend
-backend.tf
+#backend.tf
 
 # .terraformrc and .terraform.d directories
 .terraformrc
