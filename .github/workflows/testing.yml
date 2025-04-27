@@ -23,6 +23,7 @@ jobs:
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
         #  configure:
         #if: github.event_name == 'pull_request'
         #uses: ./.github/workflows/trigger-workflow.yml
@@ -44,3 +45,4 @@ jobs:
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
