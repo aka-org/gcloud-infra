@@ -4,7 +4,7 @@ locals {
   service_accounts = [
     for sa in var.service_accounts : {
       id           = "${sa.prefix}-${var.env}"
-      display_name = sa.description 
+      display_name = sa.description
       assign_to    = sa.assign_to
       roles        = sa.roles
       create_key   = sa.create_key
@@ -23,7 +23,7 @@ locals {
       }
     ]
   ])
-  
+
   # Determine which service accounts require
   # a key to be generated and stored locally
   sa_create_keys = [

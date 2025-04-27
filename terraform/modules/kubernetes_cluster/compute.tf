@@ -12,7 +12,7 @@ locals {
 resource "google_compute_instance" "vm" {
   for_each = { for vm in local.vms : vm.name => vm }
 
-#  project      = var.project_id
+  #  project      = var.project_id
   name         = each.value.name
   machine_type = each.value.machine_type
 

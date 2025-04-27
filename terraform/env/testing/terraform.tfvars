@@ -88,7 +88,7 @@ firewall_rules = [
 
 secrets = [
   {
-    id = "k8s-secret"
+    id          = "k8s-secret"
     add_version = false
   }
 ]
@@ -105,7 +105,7 @@ k8s_node_defaults = {
   startup_script      = ""
   startup_script_data = {}
   cloud_init          = "k8s-join.yaml"
-  cloud_init_data     = {
+  cloud_init_data = {
     k8s-secret  = "k8s-secret"
     filter-env  = "testing"
     filter-role = "k8s-master"
@@ -119,9 +119,9 @@ k8s_nodes = [
     tags       = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
   },
   {
-    name       = "k8s-worker-1"
-    role       = "k8s-worker"
-    tags       = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
+    name = "k8s-worker-1"
+    role = "k8s-worker"
+    tags = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
   }
 ]
 

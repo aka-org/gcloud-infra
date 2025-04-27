@@ -37,7 +37,7 @@ variable "gcs_backend" {
 variable "tf_state_bucket" {
   description = "Object describing a bucket for tf state"
   type = object({
-    location    = string 
+    location           = string
     force_destroy      = bool
     versioning_enabled = bool
   })

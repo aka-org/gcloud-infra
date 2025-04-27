@@ -16,15 +16,15 @@ locals {
     for vm in local.tmp_vms : merge(
       vm,
       {
-         service_account = length([
-           for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
-         ]) > 0 ? one([
-           for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
-         ]) : ""
-         subnetwork = one([
-           for s in var.subnetworks : s.subnetwork if contains(s.assign_to, vm.role)
-         ])
-         image = "projects/${vm.image_project}/global/images/${vm.image_family}-${vm.image_version}"
+        service_account = length([
+          for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
+          ]) > 0 ? one([
+          for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
+        ]) : ""
+        subnetwork = one([
+          for s in var.subnetworks : s.subnetwork if contains(s.assign_to, vm.role)
+        ])
+        image = "projects/${vm.image_project}/global/images/${vm.image_family}-${vm.image_version}"
       }
     )
   ]
@@ -45,7 +45,7 @@ resource "google_compute_instance" "vm" {
   }
 
   network_interface {
-    network = var.network
+    network    = var.network
     subnetwork = each.value.subnetwork
     access_config {}
   }
@@ -74,7 +74,7 @@ resource "google_compute_instance" "vm" {
     },
     each.value.cloud_init != "" ? {
       "user-data" = templatefile(
-        "${path.module}/cloud-init/${each.value.cloud_init}", 
+        "${path.module}/cloud-init/${each.value.cloud_init}",
         each.value.cloud_init_data
       )
     } : {}
@@ -83,7 +83,7 @@ resource "google_compute_instance" "vm" {
   metadata_startup_script = (
     try(each.value.startup_script, "") != ""
     ? templatefile(
-      "${path.module}/scripts/${each.value.startup_script}", 
+      "${path.module}/scripts/${each.value.startup_script}",
       each.value.startup_script_data
     ) : null
   )

@@ -62,11 +62,11 @@ variable "tf_state_bucket" {
 variable "service_accounts" {
   description = "List of service accounts to be created"
   type = list(object({
-    prefix       = string
-    roles        = list(string)
-    create_key   = bool
-    assign_to    = list(string)
-    description  = string
+    prefix      = string
+    roles       = list(string)
+    create_key  = bool
+    assign_to   = list(string)
+    description = string
   }))
 }
 
@@ -98,8 +98,8 @@ variable "firewall_rules" {
 # Secrets
 variable "secrets" {
   description = "List of Secret objects to be created"
-  type        = list(object({
-    id = string
+  type = list(object({
+    id          = string
     add_version = bool
   }))
 }

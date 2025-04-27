@@ -1,5 +1,5 @@
 resource "google_service_account" "sa" {
-#  project      = google_project.project.project_id 
+  #  project      = google_project.project.project_id 
   account_id   = local.sa_id
   display_name = local.sa_id
 }
@@ -10,9 +10,9 @@ resource "google_project_iam_member" "sa_role" {
     "${binding.sa_id}-${binding.role}" => binding
   }
 
-#  project = google_project.project.project_id
-  role    = each.value.role
-  member  = "serviceAccount:${google_service_account.sa.email}"
+  #  project = google_project.project.project_id
+  role   = each.value.role
+  member = "serviceAccount:${google_service_account.sa.email}"
 }
 
 resource "google_service_account_key" "sa_key" {

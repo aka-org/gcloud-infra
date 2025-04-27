@@ -3,7 +3,7 @@ locals {
   project_name = "${var.project_prefix}-${var.env}"
   project_id   = "${local.project_name}-${random_id.project.hex}"
   # Bucket
-  bucket_name  = lower("${local.project_id}-tfstate")
+  bucket_name = lower("${local.project_id}-tfstate")
 }
 
 resource "random_id" "project" {
@@ -24,13 +24,13 @@ resource "google_billing_project_info" "default" {
 
 resource "google_project_service" "enabled_api" {
   for_each = toset(var.enable_apis)
-  project  = google_project.project.project_id 
+  project  = google_project.project.project_id
   service  = each.value
 }
 
 resource "google_storage_bucket" "bucket" {
-  for_each = var.gcs_backend ? { "tf-state-bucket" = {} } : {}
-  name          = local.bucket_name 
+  for_each      = var.gcs_backend ? { "tf-state-bucket" = {} } : {}
+  name          = local.bucket_name
   location      = var.tf_state_bucket.location
   project       = google_project.project.project_id
   force_destroy = var.tf_state_bucket.force_destroy

@@ -1,8 +1,8 @@
 # Secrets
 variable "secrets" {
   description = "List of Secret objects to be created"
-  type        = list(object({
-    id = string
+  type = list(object({
+    id          = string
     add_version = bool
   }))
 }
@@ -11,4 +11,4 @@ variable "secret_values" {
   type        = map(string)
   sensitive   = true
   default     = {}
-}     
+}

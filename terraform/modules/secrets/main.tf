@@ -8,7 +8,7 @@ locals {
 }
 
 resource "google_secret_manager_secret" "secret" {
-  for_each = local.secrets 
+  for_each = local.secrets
 
   secret_id = each.value.id
   replication {

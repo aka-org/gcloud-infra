@@ -13,9 +13,9 @@ provider "google" {
 }
 
 provider "google" {
-  region = var.gcp_region
-  zone   = var.gcp_zone
-  alias  = "post_bootstrap"
+  region  = var.gcp_region
+  zone    = var.gcp_zone
+  alias   = "post_bootstrap"
   project = module.project.project_id
 }
 
@@ -37,50 +37,50 @@ module "iam" {
   project_id       = module.project.project_id
   depends_on       = [module.project]
 
-  providers        = {
+  providers = {
     google = google.post_bootstrap
   }
 }
 
 module "network" {
-  source          = "../../modules/network"
-  env             = var.env
-  subnetworks     = var.subnetworks
-  firewall_rules  = var.firewall_rules
-  depends_on      = [module.project]
+  source         = "../../modules/network"
+  env            = var.env
+  subnetworks    = var.subnetworks
+  firewall_rules = var.firewall_rules
+  depends_on     = [module.project]
 
-  providers       = {
+  providers = {
     google = google.post_bootstrap
   }
 }
 
 module "secrets" {
-  source           = "../../modules/secrets"
-  secrets          = var.secrets
-  secret_values    = var.secret_values
-  depends_on       = [module.project]
+  source        = "../../modules/secrets"
+  secrets       = var.secrets
+  secret_values = var.secret_values
+  depends_on    = [module.project]
 
-  providers        = {
+  providers = {
     google = google.post_bootstrap
   }
 }
 
 module "kubernetes_cluster" {
-  source          = "../../modules/compute"
-  network         = module.network.vpc
-  subnetworks     = module.network.subnetworks
+  source           = "../../modules/compute"
+  network          = module.network.vpc
+  subnetworks      = module.network.subnetworks
   service_accounts = module.iam.service_accounts
-  vm_defaults     = var.k8s_node_defaults
-  vms             = var.k8s_nodes
-  env             = var.env
-  admin_ssh_keys  = var.admin_ssh_keys
-  depends_on      = [
+  vm_defaults      = var.k8s_node_defaults
+  vms              = var.k8s_nodes
+  env              = var.env
+  admin_ssh_keys   = var.admin_ssh_keys
+  depends_on = [
     module.project,
     module.network,
     module.secrets,
     module.iam
   ]
-  providers       = {
+  providers = {
     google = google.post_bootstrap
   }
 }

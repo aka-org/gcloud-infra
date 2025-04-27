@@ -6,8 +6,8 @@ variable "env" {
 variable "service_accounts" {
   description = "List of available SA emails mapping to specific vm roles"
   type = list(object({
-    email = string
-    assign_to  = list(string)
+    email     = string
+    assign_to = list(string)
   }))
 }
 # Network

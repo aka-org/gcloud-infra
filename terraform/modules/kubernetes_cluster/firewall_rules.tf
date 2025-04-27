@@ -2,7 +2,7 @@ resource "google_compute_firewall" "firewall" {
   for_each = { for rule in var.firewall_rules : rule.name => rule }
 
   name    = each.value.name
-  network = google_compute_network.vpc.self_link 
+  network = google_compute_network.vpc.self_link
 
   allow {
     protocol = each.value.protocol
