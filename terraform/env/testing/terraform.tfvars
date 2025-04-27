@@ -25,9 +25,8 @@ service_accounts = [
     roles = [
       "roles/compute.admin",
       "roles/compute.networkAdmin",
-      "roles/storage.objectAdmin",
-      "roles/iam.serviceAccountUser",
-      "roles/storage.insightsCollectorService"
+      "roles/storage.admin",
+      "roles/iam.serviceAccountUser"
     ]
     assign_to  = [],
     create_key = true
