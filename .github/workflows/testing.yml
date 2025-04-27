@@ -39,7 +39,7 @@ jobs:
     uses: ./.github/workflows/terraform-destroy.yml
     with:
       environment: testing
-      working-directory: terraform/environments/testing
+      working-directory: terraform/env/testing
       terraform-version: 1.11.3
       github-runner: ubuntu-22.04
     secrets:

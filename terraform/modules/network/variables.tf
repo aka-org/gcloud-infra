@@ -1,22 +1,17 @@
-# Generic Project settings
-variable "project_id" {
-  description = " The GCP Project id"
+# Generic project settings
+variable "env" {
+  description = "Infrastructure environment"
   type        = string
-}
-
-# Network
-variable "network_name" {
-  description = "vpc network name"
-  type        = string
+  default     = ""
 }
 
 # Subnets
-variable "subnets" {
+variable "subnetworks" {
   description = "List of subnets to create"
   type = list(object({
-    name          = string
+    suffix        = string
     ip_cidr_range = string
-    roles         = list(string)
+    assign_to     = list(string)
   }))
 }
 

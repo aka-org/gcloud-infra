@@ -1,7 +1,8 @@
+infra_version           = "0.0.1"
 env                     = "testing"
 gcp_region              = "us-east1"
 gcp_zone                = "us-east1-b"
-project_name            = "gcloud-infra-test"
+project_prefix          = "gcloud-infra"
 project_deletion_policy = "DELETE"
 enable_apis = [
   "compute.googleapis.com",
@@ -9,29 +10,42 @@ enable_apis = [
   "secretmanager.googleapis.com"
 ]
 tf_state_bucket = {
-  name               = "test-tfstate"
+  location           = "us-east1"
   force_destroy      = true
   versioning_enabled = true
 }
-create_gcs_backend = true
-tf_service_account = {
-  id           = "terraform-sa"
-  display_name = "terraform-sa"
-  roles = [
-    "roles/compute.admin",
-    "roles/compute.networkAdmin",
-    "roles/storage.objectAdmin",
-    "roles/iam.serviceAccountUser"
-  ]
-  create_key = true
-}
-
-network_name = "gcloud-infra-network"
-subnets = [
+gcs_backend = true
+service_accounts = [
   {
-    name          = "public-subnet"
+    prefix      = "terraform"
+    description = "Service account used by Terraform"
+    roles = [
+      "roles/compute.admin",
+      "roles/compute.networkAdmin",
+      "roles/storage.objectAdmin",
+      "roles/iam.serviceAccountUser"
+    ]
+    assign_to  = [],
+    create_key = true
+  },
+  {
+    prefix      = "k8s"
+    description = "Service account used by k8s nodes"
+    roles = [
+      "roles/secretmanager.secretAccessor",
+      "roles/secretmanager.secretVersionAdder",
+      "roles/compute.viewer"
+    ]
+    assign_to  = ["k8s-worker", "k8s-master"],
+    create_key = false
+  }
+]
+
+subnetworks = [
+  {
+    suffix        = "public"
     ip_cidr_range = "10.0.2.0/24"
-    roles         = ["k8s-worker", "k8s-master"]
+    assign_to     = ["k8s-worker", "k8s-master"]
   }
 ]
 firewall_rules = [
@@ -48,10 +62,7 @@ firewall_rules = [
     ports         = []
     source_ranges = ["0.0.0.0/0"]
     tags          = ["icmp"]
-  }
-]
-
-k8s_firewall_rules = [
+  },
   {
     name          = "k8s-master"
     protocol      = "tcp"
@@ -75,51 +86,44 @@ k8s_firewall_rules = [
   }
 ]
 
+secrets = [
+  {
+    id = "k8s-secret"
+    add_version = false
+  }
+]
+
 k8s_node_defaults = {
   machine_type        = "e2-medium"
-  image_project       = "gcloud-infra-13042025"
+  image_project       = "gcloud-infra-testing-aab1735b"
   image_family        = "k8s-node"
-  image_version       = "v20250422"
+  image_version       = "v20250427"
   disk_size           = 10
   disk_type           = "pd-standard"
-  sa_id               = "k8s-gcloud-sa"
   role                = ""
   tags                = []
   startup_script      = ""
   startup_script_data = {}
-  cloud_init_data = {
-    k8s-secret  = "k8s-secret-test"
+  cloud_init          = "k8s-join.yaml"
+  cloud_init_data     = {
+    k8s-secret  = "k8s-secret"
     filter-env  = "testing"
     filter-role = "k8s-master"
   }
 }
-k8s_master_nodes = [
+k8s_nodes = [
   {
     name       = "k8s-master-1"
     cloud_init = "k8s-init.yaml"
     role       = "k8s-master"
     tags       = ["ssh", "icmp", "calico-vxlan", "k8s-master", "k8s-worker"]
-  }
-]
-k8s_worker_nodes = [
+  },
   {
     name       = "k8s-worker-1"
-    cloud_init = "k8s-node.yaml"
     role       = "k8s-worker"
     tags       = ["ssh", "icmp", "calico-vxlan", "k8s-worker"]
   }
 ]
-k8s_service_account = {
-  id           = "k8s-sa"
-  display_name = "k8s-sa"
-  roles = [
-    "roles/secretmanager.secretAccessor",
-    "roles/secretmanager.secretVersionAdder",
-    "roles/compute.viewer"
-  ]
-  create_key = false
-}
-k8s_secret_id = "k8s-test-secret"
 
 admin_ssh_keys = [
   "aka:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXCS1q9tidu+NWd4JCu+vOozjefnxTAa1hwkdizf/0M 06042025",

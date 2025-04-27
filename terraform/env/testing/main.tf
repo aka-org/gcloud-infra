@@ -12,34 +12,75 @@ provider "google" {
   zone   = var.gcp_zone
 }
 
-module "bootstrap_project" {
-  source                  = "../../modules/bootstrap"
-  project_name            = var.project_name
+provider "google" {
+  region = var.gcp_region
+  zone   = var.gcp_zone
+  alias  = "post_bootstrap"
+  project = module.project.project_id
+}
+
+module "project" {
+  source                  = "../../modules/project"
+  env                     = var.env
+  project_prefix          = var.project_prefix
   project_deletion_policy = var.project_deletion_policy
   billing_account_id      = var.billing_account_id
   enable_apis             = var.enable_apis
   tf_state_bucket         = var.tf_state_bucket
-  create_gcs_backend      = var.create_gcs_backend
-  gcp_region              = var.gcp_region
-  tf_service_account      = var.tf_service_account
-  network_name            = var.network_name
-  subnets                 = var.subnets
-  firewall_rules          = var.firewall_rules
+  gcs_backend             = var.gcs_backend
+}
+
+module "iam" {
+  source           = "../../modules/iam"
+  env              = var.env
+  service_accounts = var.service_accounts
+  project_id       = module.project.project_id
+  depends_on       = [module.project]
+
+  providers        = {
+    google = google.post_bootstrap
+  }
+}
+
+module "network" {
+  source          = "../../modules/network"
+  env             = var.env
+  subnetworks     = var.subnetworks
+  firewall_rules  = var.firewall_rules
+  depends_on      = [module.project]
+
+  providers       = {
+    google = google.post_bootstrap
+  }
+}
+
+module "secrets" {
+  source           = "../../modules/secrets"
+  secrets          = var.secrets
+  secret_values    = var.secret_values
+  depends_on       = [module.project]
+
+  providers        = {
+    google = google.post_bootstrap
+  }
 }
 
 module "kubernetes_cluster" {
-  source          = "../../modules/kubernetes_cluster"
-  project_id      = module.bootstrap_project.project_id
-  network         = module.bootstrap_project.network
-  subnetworks     = module.bootstrap_project.subnetworks
-  node_defaults   = var.k8s_node_defaults
-  master_nodes    = var.k8s_master_nodes
-  worker_nodes    = var.k8s_worker_nodes
-  firewall_rules  = var.k8s_firewall_rules
-  service_account = var.k8s_service_account
+  source          = "../../modules/compute"
+  network         = module.network.vpc
+  subnetworks     = module.network.subnetworks
+  service_accounts = module.iam.service_accounts
+  vm_defaults     = var.k8s_node_defaults
+  vms             = var.k8s_nodes
   env             = var.env
   admin_ssh_keys  = var.admin_ssh_keys
-  secret_id       = var.k8s_secret_id
-  secret_data     = var.k8s_secret_data
-  depends_on      = [module.bootstrap_project]
+  depends_on      = [
+    module.project,
+    module.network,
+    module.secrets,
+    module.iam
+  ]
+  providers       = {
+    google = google.post_bootstrap
+  }
 }

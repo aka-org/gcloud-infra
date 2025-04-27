@@ -45,7 +45,7 @@ jobs:
         shell: bash
 
       - name: Terraform Init
-        run: terraform init -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}"
+        run: terraform init
 
       - name: Check Terraform Formatting
         run: terraform fmt -check -recursive
@@ -54,7 +54,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -destroy -out=tfplan
+        run: terraform plan -destroy -target="module.kubernetes_cluster" -out=tfplan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan

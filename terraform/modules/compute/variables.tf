@@ -1,20 +1,14 @@
 # Generic project settings
-variable "project_id" {
-  description = " The GCP Project id"
-  type        = string
-}
 variable "env" {
   description = "Infrastructure environment"
   type        = string
 }
-variable "base_path" {
-  description = "DIR path relative to invocation module"
-  type        = string
-}
-variable "service_account" {
-  description = "SA to attach to the VMs"
-  type        = string
-  default     = ""
+variable "service_accounts" {
+  description = "List of available SA emails mapping to specific vm roles"
+  type = list(object({
+    email = string
+    assign_to  = list(string)
+  }))
 }
 # Network
 variable "network" {
@@ -22,10 +16,10 @@ variable "network" {
   type        = string
 }
 variable "subnetworks" {
-  description = "List of available subnetworks and mapping to specific vm roles"
+  description = "List of available subnetworks mapping to specific vm roles"
   type = list(object({
-    subnet = string
-    roles  = list(string)
+    subnetwork = string
+    assign_to  = list(string)
   }))
   default = []
 }
@@ -40,10 +34,10 @@ variable "vm_defaults" {
     disk_type           = string
     role                = string
     tags                = list(string)
-    cloud_init          = optional(string)
-    cloud_init_data     = optional(map(string))
-    startup_script      = optional(string)
-    startup_script_data = optional(map(string))
+    cloud_init          = string
+    cloud_init_data     = map(string)
+    startup_script      = string
+    startup_script_data = map(string)
   })
 }
 variable "vms" {

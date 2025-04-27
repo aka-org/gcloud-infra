@@ -1,8 +1,4 @@
 # Generic Project settings
-variable "project_id" {
-  description = " The GCP Project id"
-  type        = string
-}
 variable "env" {
   description = "Infrastructure environment"
   type        = string
@@ -20,8 +16,8 @@ variable "service_account" {
 }
 
 # Network
-variable "network" {
-  description = "Self link to k8s network"
+variable "vpc" {
+  description = "Self link to vpc network"
   type        = string
 }
 variable "subnetworks" {
@@ -47,7 +43,7 @@ variable "firewall_rules" {
 }
 
 # Compute Resources
-variable "node_defaults" {
+variable "vm_defaults" {
   description = "Default parameters of Kubernetes Nodes"
   type = object({
     machine_type        = string
@@ -65,26 +61,7 @@ variable "node_defaults" {
     startup_script_data = optional(map(string))
   })
 }
-variable "master_nodes" {
-  description = "List of Kubernetes Nodes to be created"
-  type = list(object({
-    name                = string
-    machine_type        = optional(string)
-    image_project       = optional(string)
-    image_family        = optional(string)
-    image_version       = optional(string)
-    disk_size           = optional(number)
-    disk_type           = optional(string)
-    sa_id               = optional(string)
-    cloud_init          = optional(string)
-    cloud_init_data     = optional(map(string))
-    startup_script      = optional(string)
-    startup_script_data = optional(map(string))
-    role                = optional(string)
-    tags                = optional(list(string))
-  }))
-}
-variable "worker_nodes" {
+variable "vms" {
   description = "List of Kubernetes Nodes to be created"
   type = list(object({
     name                = string
