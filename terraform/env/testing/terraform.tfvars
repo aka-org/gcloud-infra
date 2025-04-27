@@ -10,7 +10,8 @@ enable_apis = [
   "secretmanager.googleapis.com",
   "cloudresourcemanager.googleapis.com",
   "cloudbilling.googleapis.com",
-  "serviceusage.googleapis.com"
+  "serviceusage.googleapis.com",
+  "iam.googleapis.com"
 ]
 tf_state_bucket = {
   location           = "us-east1"
@@ -27,7 +28,8 @@ service_accounts = [
       "roles/compute.networkAdmin",
       "roles/storage.admin",
       "roles/iam.serviceAccountUser",
-      "roles/storage.insightsCollectorService"
+      "roles/storage.insightsCollectorService",
+      "roles/secretmanager.admin"
     ]
     assign_to  = [],
     create_key = true
