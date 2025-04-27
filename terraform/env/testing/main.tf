@@ -64,7 +64,7 @@ module "secrets" {
     google = google.post_bootstrap
   }
 }
-/*
+
 module "kubernetes_cluster" {
   source           = "../../modules/compute"
   network          = module.network.vpc
@@ -84,5 +84,3 @@ module "kubernetes_cluster" {
     google = google.post_bootstrap
   }
 }
-*/
-
