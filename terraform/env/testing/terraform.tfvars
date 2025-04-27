@@ -7,7 +7,8 @@ project_deletion_policy = "DELETE"
 enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",
-  "secretmanager.googleapis.com"
+  "secretmanager.googleapis.com",
+  "cloudresourcemanager.googleapis.com"
 ]
 tf_state_bucket = {
   location           = "us-east1"
