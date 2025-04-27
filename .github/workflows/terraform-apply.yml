@@ -18,6 +18,8 @@ on:
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
+      BILLING_ACCOUNT_ID:
+        required: true
 
 jobs:
   apply:
@@ -28,6 +30,7 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
 
     steps:
       - name: Checkout repo
@@ -45,7 +48,7 @@ jobs:
         shell: bash
 
       - name: Terraform Init
-        run: terraform init -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}"
+        run: terraform init
 
       - name: Check Terraform Formatting
         run: terraform fmt -check -recursive

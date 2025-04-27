@@ -1,28 +1,48 @@
-# Generic project settings
+# Generic Project settings
 variable "env" {
   description = "Infrastructure environment"
   type        = string
 }
-variable "service_accounts" {
-  description = "List of available SA emails mapping to specific vm roles"
-  type = list(object({
-    email     = string
-    assign_to = list(string)
-  }))
+
+# Service Account
+variable "service_account" {
+  description = "K8s service account to be created"
+  type = object({
+    id           = string
+    display_name = string
+    roles        = list(string)
+    create_key   = bool
+  })
 }
+
 # Network
-variable "network" {
-  description = "Self link to VPC network"
+variable "vpc" {
+  description = "Self link to vpc network"
   type        = string
 }
 variable "subnetworks" {
-  description = "List of available subnetworks mapping to specific vm roles"
+  description = "List of available subnetworks and mapping to specific vm roles"
   type = list(object({
-    subnetwork = string
-    assign_to  = list(string)
+    subnet = string
+    roles  = list(string)
   }))
   default = []
 }
+
+# Firewall Rules
+variable "firewall_rules" {
+  description = "List of firewall rules to create for k8s nodes"
+  type = list(object({
+    name          = string
+    protocol      = string
+    ports         = list(string)
+    source_ranges = list(string)
+    tags          = list(string)
+  }))
+  default = []
+}
+
+# Compute Resources
 variable "vm_defaults" {
   description = "Default parameters of Kubernetes Nodes"
   type = object({
@@ -34,10 +54,11 @@ variable "vm_defaults" {
     disk_type           = string
     role                = string
     tags                = list(string)
-    cloud_init          = string
-    cloud_init_data     = map(string)
-    startup_script      = string
-    startup_script_data = map(string)
+    sa_id               = optional(string)
+    cloud_init          = optional(string)
+    cloud_init_data     = optional(map(string))
+    startup_script      = optional(string)
+    startup_script_data = optional(map(string))
   })
 }
 variable "vms" {
@@ -50,6 +71,7 @@ variable "vms" {
     image_version       = optional(string)
     disk_size           = optional(number)
     disk_type           = optional(string)
+    sa_id               = optional(string)
     cloud_init          = optional(string)
     cloud_init_data     = optional(map(string))
     startup_script      = optional(string)
@@ -57,6 +79,16 @@ variable "vms" {
     role                = optional(string)
     tags                = optional(list(string))
   }))
+}
+variable "secret_id" {
+  description = "Secret to be created"
+  type        = string
+}
+variable "secret_data" {
+  description = "Value of Secret"
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
 # SSH & Access

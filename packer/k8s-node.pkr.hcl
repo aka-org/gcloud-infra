@@ -24,7 +24,7 @@ variable "image_family" {
 
 variable "subnetwork" {
   type = string
-  default = "public-subnet-test"
+  default = "testing-public"
 }
 
 variable "network_tags" {

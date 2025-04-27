@@ -1,20 +1,24 @@
+locals {
+  secrets = {
+    for secret in var.secrets : secret.id => secret
+  }
+  versioned_secrets = {
+    for secret in var.secrets : secret.id => secret if secret.add_version
+  }
+}
+
 resource "google_secret_manager_secret" "secret" {
-  for_each = toset(concat(var.secret_ids, var.secret_ids_versioned))
+  for_each = local.secrets
 
-  secret_id = each.key
-
+  secret_id = each.value.id
   replication {
-    user_managed {
-      replicas {
-        location = var.secrets_location
-      }
-    }
+    auto {}
   }
 }
 
 resource "google_secret_manager_secret_version" "secret_version" {
-  for_each = toset(var.secret_ids_versioned)
+  for_each = local.versioned_secrets
 
-  secret      = google_secret_manager_secret.secret[each.key].id
-  secret_data = var.secrets_map[each.key]
+  secret      = google_secret_manager_secret.secret[each.value.id].id
+  secret_data = var.secret_values[each.value.id]
 }

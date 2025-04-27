@@ -18,11 +18,12 @@ jobs:
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/environments/testing
-      terraform-version: 1.11.3
+      working-directory: terraform/env/testing
+      terraform-version: 1.11.4
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
         #  configure:
         #if: github.event_name == 'pull_request'
         #uses: ./.github/workflows/trigger-workflow.yml
@@ -39,8 +40,9 @@ jobs:
     uses: ./.github/workflows/terraform-destroy.yml
     with:
       environment: testing
-      working-directory: terraform/environments/testing
-      terraform-version: 1.11.3
+      working-directory: terraform/env/testing
+      terraform-version: 1.11.4
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}

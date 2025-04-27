@@ -1,22 +1,14 @@
 # Secrets
-variable "secrets_location" {
-  type        = string
-  description = "Secret replication location"
-  default     = "us-east1"
+variable "secrets" {
+  description = "List of Secret objects to be created"
+  type = list(object({
+    id          = string
+    add_version = bool
+  }))
 }
-variable "secrets_map" {
+variable "secret_values" {
+  description = "Map of secret key-value pairs"
   type        = map(string)
   sensitive   = true
-  description = "Map of secret name => secret value"
   default     = {}
-}
-variable "secret_ids" {
-  description = "List of secret ids for which a version will not be created"
-  type        = list(string)
-  default     = []
-}
-variable "secret_ids_versioned" {
-  description = "List of secret ids for which a version will be created"
-  type        = list(string)
-  default     = []
 }

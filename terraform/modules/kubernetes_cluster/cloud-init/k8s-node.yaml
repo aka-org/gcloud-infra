@@ -7,7 +7,7 @@ runcmd:
         echo "Waiting for control plane IP..."
         sleep 5
         MASTER_IP=$(gcloud compute instances list \
-          --filter="labels.env=${label-env} AND labels.role=${label-role}" \
+          --filter="labels.env=${filter-env} AND labels.role=${filter-role}" \
           --format="value(networkInterfaces[0].networkIP)" 2>/dev/null | head -n 1)
 
           # Set to empty string if the result is empty or null
