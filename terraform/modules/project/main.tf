@@ -48,7 +48,7 @@ resource "local_file" "gcs_backend" {
   content = <<-EOT
   terraform {
     backend "gcs" {
-      bucket = "${google_storage_bucket.bucket["tf-state-bucket"].name}" 
+      bucket = "${google_storage_bucket.bucket["tf-state-bucket"].name}"
     }
   }
   EOT
