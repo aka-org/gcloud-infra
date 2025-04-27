@@ -30,7 +30,7 @@ service_accounts = [
       "roles/iam.serviceAccountUser",
       "roles/storage.insightsCollectorService",
       "roles/secretmanager.admin",
-      "roles/iam.serviceAccountAdmin"
+      "roles/resourcemanager.projectIamAdmin"
     ]
     assign_to  = [],
     create_key = true
