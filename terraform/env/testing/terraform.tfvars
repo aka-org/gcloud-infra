@@ -29,7 +29,8 @@ service_accounts = [
       "roles/storage.admin",
       "roles/iam.serviceAccountUser",
       "roles/storage.insightsCollectorService",
-      "roles/secretmanager.admin"
+      "roles/secretmanager.admin",
+      "roles/iam.serviceAccountAdmin"
     ]
     assign_to  = [],
     create_key = true
