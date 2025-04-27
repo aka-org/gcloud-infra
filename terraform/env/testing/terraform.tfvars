@@ -8,7 +8,8 @@ enable_apis = [
   "compute.googleapis.com",
   "storage.googleapis.com",
   "secretmanager.googleapis.com",
-  "cloudresourcemanager.googleapis.com"
+  "cloudresourcemanager.googleapis.com",
+  "cloudbilling.googleapis.com"
 ]
 tf_state_bucket = {
   location           = "us-east1"
