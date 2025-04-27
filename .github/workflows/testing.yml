@@ -19,7 +19,7 @@ jobs:
     with:
       environment: testing
       working-directory: terraform/env/testing
-      terraform-version: 1.11.3
+      terraform-version: 1.11.4
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
@@ -41,7 +41,7 @@ jobs:
     with:
       environment: testing
       working-directory: terraform/env/testing
-      terraform-version: 1.11.3
+      terraform-version: 1.11.4
       github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
