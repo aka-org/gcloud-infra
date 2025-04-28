@@ -65,6 +65,7 @@ variable "service_accounts" {
     prefix      = string
     roles       = list(string)
     create_key  = bool
+    write_key   = bool
     assign_to   = list(string)
     description = string
   }))

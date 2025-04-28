@@ -19,6 +19,7 @@ variable "service_accounts" {
     roles       = list(string)
     assign_to   = list(string)
     create_key  = bool
+    write_key   = bool
   }))
   default = []
 }
