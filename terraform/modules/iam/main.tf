@@ -8,6 +8,7 @@ locals {
       assign_to    = sa.assign_to
       roles        = sa.roles
       create_key   = sa.create_key
+      write_key    = sa.write_key
       project      = var.project_id
     }
   ]
@@ -25,9 +26,15 @@ locals {
   ])
 
   # Determine which service accounts require
-  # a key to be generated and stored locally
+  # a key to be created
   sa_create_keys = [
     for sa in local.service_accounts : sa.id if sa.create_key
+  ]
+
+  # Determine which service accounts require
+  # requires their private key to be stored in current work directory 
+  sa_write_keys = [
+    for sa in local.service_accounts : sa.id if sa.create_key && sa.write_key
   ]
 }
 
@@ -58,7 +65,7 @@ resource "google_service_account_key" "sa_key" {
 }
 
 resource "local_file" "sa_key_file" {
-  for_each = toset(local.sa_create_keys)
+  for_each = toset(local.sa_write_keys)
 
   content  = google_service_account_key.sa_key[each.value].private_key
   filename = "${path.cwd}/${google_service_account.sa[each.value].account_id}-key.json"

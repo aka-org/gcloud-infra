@@ -35,6 +35,7 @@ service_accounts = [
     ]
     assign_to  = [],
     create_key = true
+    write_key  = true
   },
   {
     prefix      = "k8s"
@@ -46,6 +47,7 @@ service_accounts = [
     ]
     assign_to  = ["k8s-worker", "k8s-master"],
     create_key = false
+    write_key  = false
   }
 ]
 
