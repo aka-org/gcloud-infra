@@ -35,7 +35,7 @@ service_accounts = [
     ]
     assign_to  = [],
     create_key = true
-    write_key  = true
+    write_key  = false 
   },
   {
     prefix      = "k8s"
