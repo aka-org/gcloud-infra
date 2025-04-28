@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'terraform/environments/testing/**'
-      - 'terraform/modules/**'
+      - 'terraform/env/testing/**'
+      - 'terraform/modules/**/**'
       - '.github/workflows/testing.yml'
       - '.github/workflows/terraform-apply.yml'  
       - '.github/workflows/terraform-destroy.yml'  
