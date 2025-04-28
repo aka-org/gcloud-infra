@@ -33,9 +33,9 @@ service_accounts = [
       "roles/iam.serviceAccountAdmin",
       "roles/iam.serviceAccountKeyAdmin"
     ]
-    assign_to  = [],
+    assign_to  = []
     create_key = true
-    write_key  = false 
+    write_key  = false
   },
   {
     prefix      = "k8s"
@@ -45,7 +45,7 @@ service_accounts = [
       "roles/secretmanager.secretVersionAdder",
       "roles/compute.viewer"
     ]
-    assign_to  = ["k8s-worker", "k8s-master"],
+    assign_to  = ["k8s-worker", "k8s-master"]
     create_key = false
     write_key  = false
   }
