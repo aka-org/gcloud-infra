@@ -2,7 +2,7 @@
 variable "infra_version" {
   description = "Version of the overall infrastructure"
   type        = string
-  default     = "0.0.1"
+  default     = "v20250503"
 }
 variable "env" {
   description = "Infrastructure environment"
@@ -13,11 +13,6 @@ variable "gcp_region" {
   description = "The GCP region to deploy resources in"
   type        = string
   default     = "us-east1"
-}
-variable "gcp_zone" {
-  description = "The GCP zone to deploy resources in"
-  type        = string
-  default     = "us-east1-b"
 }
 variable "project_prefix" {
   description = "A human-readable prefix for the project"
@@ -62,22 +57,27 @@ variable "tf_state_bucket" {
 variable "service_accounts" {
   description = "List of service accounts to be created"
   type = list(object({
-    prefix      = string
+    id          = string
     roles       = list(string)
     create_key  = bool
     write_key   = bool
-    assign_to   = list(string)
     description = string
   }))
+}
+
+# Network
+variable "vpc_name" {
+  description = "Name of the vpc to be created"
+  type        = string
+  default     = ""
 }
 
 # Subnets
 variable "subnetworks" {
   description = "List of subnets to create"
   type = list(object({
-    suffix        = string
+    name          = string
     ip_cidr_range = string
-    assign_to     = list(string)
   }))
   default = []
 }
@@ -109,48 +109,4 @@ variable "secret_values" {
   type        = map(string)
   sensitive   = true
   default     = {}
-}
-
-variable "k8s_node_defaults" {
-  description = "Default parameters of Kubernetes Nodes"
-  type = object({
-    machine_type        = string
-    image_project       = string
-    image_family        = string
-    image_version       = string
-    disk_size           = number
-    disk_type           = string
-    role                = string
-    tags                = list(string)
-    sa_id               = optional(string)
-    cloud_init          = optional(string)
-    cloud_init_data     = optional(map(string))
-    startup_script      = optional(string)
-    startup_script_data = optional(map(string))
-  })
-}
-variable "k8s_nodes" {
-  description = "List of Kubernetes Nodes to be created"
-  type = list(object({
-    name                = string
-    machine_type        = optional(string)
-    image_project       = optional(string)
-    image_family        = optional(string)
-    image_version       = optional(string)
-    disk_size           = optional(number)
-    disk_type           = optional(string)
-    sa_id               = optional(string)
-    cloud_init          = optional(string)
-    cloud_init_data     = optional(map(string))
-    startup_script      = optional(string)
-    startup_script_data = optional(map(string))
-    role                = optional(string)
-    tags                = optional(list(string))
-  }))
-}
-
-# SSH & Access
-variable "admin_ssh_keys" {
-  description = "SSH keys to be added to the instances"
-  type        = list(string)
 }
