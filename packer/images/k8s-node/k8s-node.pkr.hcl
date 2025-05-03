@@ -58,17 +58,17 @@ build {
   sources = ["source.googlecompute.debian"]
 
   provisioner "shell" {
-    script = "scripts/common.sh"
+    script = "../../shared-scripts/common.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 
   provisioner "shell" {
-    script = "scripts/install-k8s.sh"
+    script = "scripts/setup_k8s.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 
   provisioner "shell" {
-    script = "scripts/clean.sh"
+    script = "../../shared-scripts/clean.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 }

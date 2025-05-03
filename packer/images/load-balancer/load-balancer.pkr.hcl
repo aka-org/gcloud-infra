@@ -19,12 +19,12 @@ variable "zone" {
 
 variable "image_family" {
   type = string
-  default = "haproxy-node"
+  default = "load-balancer"
 }
 
 variable "subnetwork" {
   type = string
-  default = "testing-public"
+  default = "infra-public"
 }
 
 variable "network_tags" {
@@ -58,17 +58,54 @@ build {
   sources = ["source.googlecompute.debian"]
 
   provisioner "shell" {
-    script = "scripts/common.sh"
+    script = "../../shared-scripts/common.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 
   provisioner "shell" {
-    script = "scripts/install-haproxy.sh"
+    script = "scripts/setup_lb.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 
+  provisioner "file" {
+    source      = "config/haproxy.cfg"
+    destination = "/tmp/haproxy.cfg"
+  }
+
+  provisioner "file" {
+    source      = "config/keepalived.conf"
+    destination = "/tmp/keepalived.conf"
+  }
+
+  provisioner "file" {
+    source      = "scripts/init_keepalived.sh"
+    destination = "/tmp/init_keepalived.sh"
+  }
+
+  provisioner "file" {
+    source      = "scripts/takeover.sh"
+    destination = "/tmp/takeover.sh"
+  }
+
   provisioner "shell" {
-    script = "scripts/clean.sh"
+    inline = [
+      "sudo mv /tmp/haproxy.cfg /etc/haproxy/haproxy.cfg",
+      "sudo chmod 660 /etc/haproxy/haproxy.cfg",
+      "sudo chown haproxy:haproxy /etc/haproxy/haproxy.cfg",
+      "sudo mv /tmp/keepalived.conf /etc/keepalived/keepalived.conf",
+      "sudo chmod 660 /etc/keepalived/keepalived.conf",
+      "sudo chown root:root /etc/keepalived/keepalived.conf",
+      "sudo mv /tmp/init_keepalived.sh /usr/local/bin/init_keepalived.sh",
+      "sudo chmod 550 /usr/local/bin/init_keepalived.sh",
+      "sudo chown root:root /usr/local/bin/init_keepalived.sh",
+      "sudo mv /tmp/takeover.sh /usr/local/bin/takeover.sh",
+      "sudo chmod 550 /usr/local/bin/takeover.sh",
+      "sudo chown root:root /usr/local/bin/takeover.sh"
+    ]
+  }
+
+  provisioner "shell" {
+    script = "../../shared-scripts/clean.sh"
     execute_command = "sudo bash '{{.Path}}'"
   }
 }
