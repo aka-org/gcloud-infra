@@ -30,12 +30,6 @@ write_files:
   - path: /etc/haproxy/haproxy.cfg
     append: true
     content: |
-      frontend kube-apiserver
-        bind *:6443     # BIND to any address so it is accessible via VIP
-        mode tcp
-        option tcplog
-        default_backend kube-apiserver
-
       backend kube-apiserver
         balance roundrobin
         mode tcp
@@ -45,4 +39,4 @@ write_files:
 %{ endfor ~}
 runcmd:
   - systemctl enable --now haproxy
-  - /usr/local/bin/init_keepalived.sh ${env} ${role} ${deployment}
+  - /usr/local/bin/init_keepalived.sh ${env} ${role} 

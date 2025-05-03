@@ -1,3 +1,7 @@
+data "google_service_account" "sa" {
+  account_id = var.service_account
+}
+
 locals {
   # Merge defaults with individual vm configuration
   # overriding any of the defaults that is configured on both
@@ -9,22 +13,19 @@ locals {
       }
     )
   ]
-
-  # Add to individual configuration of VMs the corresponding
-  # os image, service_account email and subnetwork
   vms = [
     for vm in local.tmp_vms : merge(
       vm,
       {
-        service_account = length([
-          for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
-          ]) > 0 ? one([
-          for s in var.service_accounts : s.email if contains(s.assign_to, vm.role)
-        ]) : ""
-        subnetwork = one([
-          for s in var.subnetworks : s.subnetwork if contains(s.assign_to, vm.role)
-        ])
-        image = "projects/${vm.image_project}/global/images/${vm.image_family}-${vm.image_version}"
+        service_account = data.google_service_account.sa.email
+        subnetwork = var.subnetwork
+        image = "projects/${vm.image_project}/global/images/${vm.image_family}-${var.image_version}"
+        labels = {
+          image_version = var.image_version
+          infra_version = var.infra_version
+          env     = var.env
+          role    = vm.role
+        }
       }
     )
   ]
@@ -58,13 +59,11 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  labels = merge(
-    {
-      version = each.value.image_version
-      env     = var.env
-      role    = each.value.role
-    }
-  )
+  labels = each.value.labels 
+
+  lifecycle {
+    ignore_changes = [network_interface[0].alias_ip_range]
+  }
 
   tags = each.value.tags
 

@@ -1,6 +1,5 @@
-# Generic project settings
-variable "env" {
-  description = "Infrastructure environment"
+variable "vpc_name" {
+  description = "Name of the vpc to be created"
   type        = string
   default     = ""
 }
@@ -9,9 +8,8 @@ variable "env" {
 variable "subnetworks" {
   description = "List of subnets to create"
   type = list(object({
-    suffix        = string
+    name          = string
     ip_cidr_range = string
-    assign_to     = list(string)
   }))
 }
 
