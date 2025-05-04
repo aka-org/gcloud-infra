@@ -37,7 +37,7 @@ jobs:
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
-      project: gloud-infra-testing-aab1735b  
+      project: gcloud-infra-testing-aab1735b  
       github-runner: ubuntu-22.04
       packer-version: 1.12.0 
     secrets:
