@@ -3,6 +3,7 @@ gcp_zone           = "us-east1-c"
 gcp_region         = "us-east1"
 env                = "testing"
 infra_version      = "v20250504"
+provisioned        = false
 network            = "main"
 subnetwork         = "k8s-green-private"
 lb_service_account = "load-balancer"
