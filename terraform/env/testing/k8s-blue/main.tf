@@ -17,6 +17,8 @@ module "secrets" {
   source        = "../../../modules/secrets"
   secrets       = var.secrets
   secret_values = var.secret_values
+
+  count = var.provisioned ? 1 :0
 }
 
 module "load_balancers" {
@@ -30,4 +32,6 @@ module "load_balancers" {
   infra_version   = var.infra_version
   image_version   = var.lb_image_version
   admin_ssh_keys  = var.admin_ssh_keys
+
+  count = var.provisioned ? 1 :0
 }

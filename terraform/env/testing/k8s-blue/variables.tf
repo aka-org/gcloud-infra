@@ -1,4 +1,4 @@
-# General project settings
+# Generic project settings
 variable "project_id" {
   description = "The Project id of the project to deploy resources in"
   type        = string
@@ -9,19 +9,26 @@ variable "gcp_region" {
   type        = string
   default     = "us-east1"
 }
+variable "env" {
+  description = "Infrastructure environment"
+  type        = string
+}
+
+# Settings specific to provisioned infra
 variable "gcp_zone" {
   description = "The GCP zone to deploy resources in"
   type        = string
   default     = "us-east1-b"
 }
-variable "env" {
-  description = "Infrastructure environment"
-  type        = string
-}
 variable "infra_version" {
   description = "Overall deployment version"
   type        = string
   default     = "0.0.1"
+}
+variable "provisioned" {
+  description = "Specify whether to provision the described infra"
+  type        = bool
+  default     = false
 }
 # Network
 variable "network" {
