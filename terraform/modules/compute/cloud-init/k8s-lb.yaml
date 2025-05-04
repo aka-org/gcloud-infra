@@ -1,0 +1,45 @@
+#cloud-config
+write_files:
+  - path: /etc/keepalived/keepalived.conf
+    append: true
+    content: |
+      vrrp_instance LB_VIP {
+          state ${lb_state}
+          interface ens4 
+
+          virtual_router_id 51
+          priority ${lb_prio}
+
+          advert_int 1
+
+          track_script {
+              chk_haproxy
+          }
+
+          unicast_src_ip {{SRC_IP}}
+          unicast_peer {
+              {{PEER_IP}}
+          }
+          
+          virtual_ipaddress {
+              ${lb_vip}
+          }
+          
+          notify_master "/usr/local/bin/takeover.sh {{PEER_NAME}} ${gcp_zone} ${lb_vip}"
+      }
+  - path: /etc/haproxy/haproxy.cfg
+    append: true
+    content: |
+      frontend kube-apiserver
+        bind *:6443     # BIND to any address so it is accessible via VIP
+        mode tcp
+        option tcplog
+        default_backend kube-apiserver
+
+      backend kube-apiserver
+        balance roundrobin
+        mode tcp
+        option tcp-check
+runcmd:
+  - systemctl enable --now haproxy
+  - /usr/local/bin/init_keepalived.sh ${role} ${infra_version}

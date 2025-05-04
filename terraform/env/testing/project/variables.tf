@@ -1,8 +1,18 @@
 # General project settings
+variable "infra_version" {
+  description = "Version of the overall infrastructure"
+  type        = string
+  default     = "v20250503"
+}
 variable "env" {
   description = "Infrastructure environment"
   type        = string
   default     = ""
+}
+variable "gcp_region" {
+  description = "The GCP region to deploy resources in"
+  type        = string
+  default     = "us-east1"
 }
 variable "project_prefix" {
   description = "A human-readable prefix for the project"
@@ -28,7 +38,7 @@ variable "enable_apis" {
   default     = []
 }
 
-# Buckets 
+# Terraform state GCS Backend
 variable "gcs_backend" {
   description = "If true creates bucket to store tf state and a local backend.tf"
   type        = bool
@@ -41,5 +51,17 @@ variable "buckets" {
     location           = string
     force_destroy      = bool
     versioning_enabled = bool
+  }))
+}
+
+# Service Account
+variable "service_accounts" {
+  description = "List of service accounts to be created"
+  type = list(object({
+    id          = string
+    roles       = list(string)
+    create_key  = bool
+    write_key   = bool
+    description = string
   }))
 }

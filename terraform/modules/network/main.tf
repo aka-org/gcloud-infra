@@ -1,27 +1,15 @@
 locals {
-  # VPC
-  vpc_name = "${var.env}-vpc"
-
   # Firewall Rules
-  no_ports_protocols = ["icmp", "esp", "ah"]
-
-  # Subnetworks
-  subnetworks = [
-    for s in var.subnetworks : {
-      name          = "${var.env}-${s.suffix}"
-      ip_cidr_range = s.ip_cidr_range
-      assign_to     = s.assign_to
-    }
-  ]
+  no_ports_protocols = ["icmp", "esp", "ah", "all", "sctp", "ipip"]
 }
 
 resource "google_compute_network" "vpc" {
-  name                    = local.vpc_name
+  name                    = var.vpc_name
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "subnetwork" {
-  for_each = { for s in local.subnetworks : s.name => s }
+  for_each = { for s in var.subnetworks : s.name => s }
 
   name          = each.value.name
   ip_cidr_range = each.value.ip_cidr_range

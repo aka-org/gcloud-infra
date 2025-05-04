@@ -1,35 +1,36 @@
-# Generic project settings
 variable "env" {
   description = "Infrastructure environment"
   type        = string
 }
-variable "service_accounts" {
-  description = "List of available SA emails mapping to specific vm roles"
-  type = list(object({
-    email     = string
-    assign_to = list(string)
-  }))
+variable "infra_version" {
+  description = "Overall infra version"
+  type        = string
+}
+variable "service_account" {
+  description = "Name of the service account to assign to vm"
+  type = string
+  default = ""
 }
 # Network
 variable "network" {
-  description = "Self link to VPC network"
+  description = "Name of VPC network"
   type        = string
 }
-variable "subnetworks" {
-  description = "List of available subnetworks mapping to specific vm roles"
-  type = list(object({
-    subnetwork = string
-    assign_to  = list(string)
-  }))
-  default = []
+variable "subnetwork" {
+  description = "Name of subnetwork"
+  type        = string
 }
+variable "image_version" {
+  description = "Version of the os image used for vm provisioning"
+  type        = string
+}
+
 variable "vm_defaults" {
   description = "Default parameters of Kubernetes Nodes"
   type = object({
     machine_type        = string
     image_project       = string
     image_family        = string
-    image_version       = string
     disk_size           = number
     disk_type           = string
     role                = string
@@ -47,7 +48,6 @@ variable "vms" {
     machine_type        = optional(string)
     image_project       = optional(string)
     image_family        = optional(string)
-    image_version       = optional(string)
     disk_size           = optional(number)
     disk_type           = optional(string)
     cloud_init          = optional(string)

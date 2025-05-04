@@ -2,8 +2,6 @@ locals {
   # Generic
   project_name = "${var.project_prefix}-${var.env}"
   project_id   = "${local.project_name}-${random_id.project.hex}"
-  # Bucket
-  bucket_name = lower("${local.project_id}-tfstate")
 }
 
 resource "random_id" "project" {
@@ -29,18 +27,18 @@ resource "google_project_service" "enabled_api" {
 }
 
 resource "google_storage_bucket" "bucket" {
-  for_each      = var.gcs_backend ? { "tf-state-bucket" = {} } : {}
-  name          = local.bucket_name
-  location      = var.tf_state_bucket.location
+  for_each      = { for bucket in var.buckets : bucket.suffix => bucket }
+  name          = "${local.project_id}-${each.value.suffix}"
+  location      = each.value.location
   project       = google_project.project.project_id
-  force_destroy = var.tf_state_bucket.force_destroy
+  force_destroy = each.value.force_destroy
   versioning {
-    enabled = var.tf_state_bucket.versioning_enabled
+    enabled = each.value.versioning_enabled
   }
 }
 
 resource "local_file" "gcs_backend" {
-  for_each = var.gcs_backend ? { tf-state-backend = {} } : {}
+  for_each = var.gcs_backend ? { project-tf-state-backend = {} } : {}
 
   file_permission = "0644"
   filename        = "${path.cwd}/backend.tf"
@@ -48,7 +46,6 @@ resource "local_file" "gcs_backend" {
   content = <<-EOT
   terraform {
     backend "gcs" {
-      bucket = "${google_storage_bucket.bucket["tf-state-bucket"].name}"
     }
   }
   EOT
