@@ -42,7 +42,7 @@ jobs:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
-    needs: filter
+    needs: [filter, project]
     if: needs.filter.outputs.network == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -54,7 +54,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: filter
+    needs: [filter, project, network]
     if: needs.filter.outputs.k8s_blue == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -66,7 +66,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: filter
+    needs: [filter, project, network]
     if: needs.filter.outputs.k8s_green == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:

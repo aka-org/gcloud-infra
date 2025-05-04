@@ -1,4 +1,4 @@
-infra_version           = "v20250503"
+infra_version           = "v20250504"
 env                     = "testing"
 gcp_region              = "us-east1"
 project_prefix          = "gcloud-infra"
