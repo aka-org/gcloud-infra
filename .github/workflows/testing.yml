@@ -37,7 +37,7 @@ jobs:
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
-      project: gloud-infra-testing-aan1735b  
+      project: gloud-infra-testing-aab1735b  
       github-runner: ubuntu-22.04
       packer-version: 1.12.0 
     secrets:
@@ -57,9 +57,7 @@ jobs:
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
     needs: [filter, project]
-    if: >
-      (needs.project.result == 'success' || needs.project.result == 'skipped') &&
-      needs.filter.outputs.network == 'true' 
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.network == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -70,8 +68,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, network]
-    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.k8s_blue == 'true' 
+    needs: [filter, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -82,8 +80,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, network]
-    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.k8s_green == 'true' 
+    needs: [filter, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
