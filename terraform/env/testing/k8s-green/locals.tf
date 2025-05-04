@@ -47,10 +47,10 @@ locals {
         cloud_init_data = merge(
           node.cloud_init_data,
           {
-            role           = node.role
-            infra_version  = var.infra_version
-            gcp_zone       = var.gcp_zone
-            lb_vip         = local.lb_vip
+            role          = node.role
+            infra_version = var.infra_version
+            gcp_zone      = var.gcp_zone
+            lb_vip        = local.lb_vip
           }
         )
       }
