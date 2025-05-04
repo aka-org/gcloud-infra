@@ -2,7 +2,7 @@ infra_version = "v20250503"
 project_id    = "gcloud-infra-testing-aab1735b"
 gcp_region    = "us-east1"
 vpc_name      = "main"
-subnetworks   = [
+subnetworks = [
   {
     name          = "infra-public"
     ip_cidr_range = "10.0.1.0/24"

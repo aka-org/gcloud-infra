@@ -60,7 +60,7 @@ service_accounts = [
       "roles/iam.serviceAccountKeyAdmin"
     ]
     create_key = true
-    write_key  = true
+    write_key  = false
   },
   {
     id          = "load-balancer"
