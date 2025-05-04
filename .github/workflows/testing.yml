@@ -65,7 +65,7 @@ jobs:
       tf-state: gcloud-infra-testing-aab1735b-k8s-blue-tf-state
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-  provision_k8s_blue:
+  provision_k8s_green:
     if: needs.filter.outputs.k8s_green == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
