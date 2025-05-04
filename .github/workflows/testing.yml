@@ -32,8 +32,11 @@ jobs:
               - 'packer/**'
 
   packer:
-    needs: [filter, network]
-    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.packer == 'true' 
+    needs: [filter, project, network]
+    if: > 
+      (needs.project.result == 'success' || needs.project.result == 'skipped') && 
+      (needs.network.result == 'success' || needs.network.result == 'skipped') &&
+      needs.filter.outputs.packer == 'true' 
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
@@ -57,7 +60,9 @@ jobs:
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
     needs: [filter, project]
-    if: (needs.project.result == 'success' || needs.project.result == 'skipped') && needs.filter.outputs.network == 'true' 
+    if: >
+      (needs.project.result == 'success' || needs.project.result == 'skipped') &&
+      needs.filter.outputs.network == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
