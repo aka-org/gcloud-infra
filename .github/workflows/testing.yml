@@ -32,6 +32,7 @@ jobs:
               - 'terraform/env/testing/k8s_green/**'
 
   project:
+    needs: filter
     if: needs.filter.outputs.project == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -44,6 +45,7 @@ jobs:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
+    needs: filter
     if: needs.filter.outputs.network == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -55,6 +57,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
+    needs: filter
     if: needs.filter.outputs.k8s_blue == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -66,6 +69,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
+    needs: filter
     if: needs.filter.outputs.k8s_green == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
