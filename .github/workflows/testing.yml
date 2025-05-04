@@ -32,8 +32,8 @@ jobs:
               - 'packer/**'
 
   packer:
-    needs: filter
-    if: needs.filter.outputs.packer == 'true' 
+    needs: [filter, network]
+    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.packer == 'true' 
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
@@ -57,7 +57,7 @@ jobs:
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
     needs: [filter, project]
-    if: needs.filter.outputs.network == 'true' 
+    if: (needs.project.result == 'success' || needs.project.result == 'skipped') && needs.filter.outputs.network == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -68,8 +68,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, project, network]
-    if: needs.filter.outputs.k8s_blue == 'true' 
+    needs: [filter, network]
+    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.k8s_blue == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -80,8 +80,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, project, network]
-    if: needs.filter.outputs.k8s_green == 'true' 
+    needs: [filter, network]
+    if: (needs.network.result == 'success' || needs.network.result == 'skipped') && needs.filter.outputs.k8s_green == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing

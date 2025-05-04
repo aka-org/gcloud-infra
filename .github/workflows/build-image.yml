@@ -15,9 +15,6 @@ on:
       packer-version:
         required: true
         type: string
-      tf-state:
-        required: true
-        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
