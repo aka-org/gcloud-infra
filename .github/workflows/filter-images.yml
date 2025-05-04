@@ -21,7 +21,7 @@ on:
 
 jobs:
   filter_images:
-    runs-on: ${{ github-runner }}
+    runs-on: ${{ inputs.github-runner }}
     outputs:
       k8s_node: ${{ steps.filter_images.outputs.k8s_node }}
       load_balancer: ${{ steps.filter_images.outputs.load_balancer }}
