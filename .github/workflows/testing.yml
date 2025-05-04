@@ -3,9 +3,6 @@ name: Provision Testing Environment
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'terraform/env/testing/**'
-  workflow_dispatch:
 
 jobs:
   filter:
