@@ -12,6 +12,7 @@ jobs:
       network: ${{ steps.filter.outputs.network }}
       k8s_blue: ${{ steps.filter.outputs.k8s_blue }}
       k8s_green: ${{ steps.filter.outputs.k8s_green }}
+      packer: ${{ steps.filter.outputs.packer }}
     steps:
       - uses: actions/checkout@v3
 
@@ -27,7 +28,20 @@ jobs:
               - 'terraform/env/testing/k8s_blue/**'
             k8s_green:
               - 'terraform/env/testing/k8s_green/**'
+            packer:
+              - 'packer/**'
 
+  packer:
+    needs: filter
+    if: needs.filter.outputs.packer == 'true' 
+    uses: ./.github/workflows/filter-images.yml
+    with:
+      environment: testing
+      project: gloud-infra-testing-aan1735b  
+      github-runner: ubuntu-22.04
+      packer-version: 1.12.0 
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   project:
     needs: filter
     if: needs.filter.outputs.project == 'true' 

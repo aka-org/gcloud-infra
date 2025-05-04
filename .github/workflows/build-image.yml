@@ -1,0 +1,64 @@
+name: Build OS Image 
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      working-directory:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+      packer-version:
+        required: true
+        type: string
+      tf-state:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ inputs.github-runner }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    environment: ${{ inputs.environment }}
+    env:
+      PKR_VAR_project_id: ${{ inputs.project }}
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Packer 
+        uses: hashicorp/setup-packer@v2
+        with:
+          packer_version: "${{ inputs.packer-version }}"
+
+      - name: Set image version
+        id: version
+        run: |
+          echo "PKR_VAR_image_version=v$(date +'%Y%m%d')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Authenticate to Google Cloud
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS_B64 }}" | base64 -d > $HOME/gcloud.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Packer Init
+        run: packer plugins install github.com/hashicorp/googlecompute 
+
+      - name: Packer Build
+        run: packer build --force . 
+
+      - name: Remove Creds
+        run: rm $HOME/gcloud.json

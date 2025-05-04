@@ -9,7 +9,6 @@ packer {
 
 variable "project_id" {
   type = string
-  default = "project_id"
 }
 
 variable "zone" {
@@ -22,9 +21,12 @@ variable "image_family" {
   default = "k8s-node"
 }
 
+variable "image_version" {
+  type = string
+}
 variable "subnetwork" {
   type = string
-  default = "testing-public"
+  default = "infra-public"
 }
 
 variable "network_tags" {
@@ -40,7 +42,7 @@ source "googlecompute" "debian" {
   zone               = var.zone
   machine_type       = "e2-micro"
   disk_size          = 10 
-  image_name         = "${var.image_family}-v${formatdate("YYYYMMDD", timestamp())}"
+  image_name         = "${var.image_family}-${var.image_version}"
   image_family       = var.image_family
   communicator       = "ssh"
   temporary_key_pair_type = "ed25519"
@@ -49,7 +51,7 @@ source "googlecompute" "debian" {
   tags               = var.network_tags
   
   image_labels = {
-    version     = "v${formatdate("YYYYMMDD",timestamp())}"
+    version     = "${var.image_version}"
     created_by  = "packer"
   }
 }
