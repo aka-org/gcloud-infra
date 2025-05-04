@@ -73,3 +73,10 @@ admin_ssh_keys = [
   "aka:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXCS1q9tidu+NWd4JCu+vOozjefnxTAa1hwkdizf/0M 06042025",
   "ansible:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJI1QdTQkaL/+CRzCTUlrKHLAQWRxjVdR5Y1C0FA3o2a 06042025"
 ]
+
+secrets = [
+  {
+    id          = "k8s-blue-secret"
+    add_version = false
+  }
+]

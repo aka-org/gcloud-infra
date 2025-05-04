@@ -13,6 +13,12 @@ provider "google" {
   zone    = var.gcp_zone
 }
 
+module "secrets" {
+  source        = "../../../modules/secrets"
+  secrets       = var.secrets
+  secret_values = var.secret_values
+}
+
 module "load_balancers" {
   source          = "../../../modules/compute"
   network         = var.network

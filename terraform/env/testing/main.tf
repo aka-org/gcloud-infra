@@ -38,14 +38,3 @@ module "iam" {
     google = google.post_bootstrap
   }
 }
-
-module "secrets" {
-  source        = "../../modules/secrets"
-  secrets       = var.secrets
-  secret_values = var.secret_values
-  depends_on    = [module.project]
-
-  providers = {
-    google = google.post_bootstrap
-  }
-}
