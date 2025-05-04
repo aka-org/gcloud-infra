@@ -12,11 +12,38 @@ enable_apis = [
   "serviceusage.googleapis.com",
   "iam.googleapis.com"
 ]
-tf_state_bucket = {
-  location           = "us-east1"
-  force_destroy      = true
-  versioning_enabled = true
-}
+buckets = [
+  {
+    suffix             = "project-tf-state"
+    location           = "us-east1"
+    force_destroy      = true
+    versioning_enabled = true
+  },
+  {
+    suffix             = "network-tf-state"
+    location           = "us-east1"
+    force_destroy      = true
+    versioning_enabled = true
+  },
+  {
+    suffix             = "infra-tf-state"
+    location           = "us-east1"
+    force_destroy      = true
+    versioning_enabled = true
+  },
+  {
+    suffix             = "k8s-blue-tf-state"
+    location           = "us-east1"
+    force_destroy      = true
+    versioning_enabled = true
+  },
+  {
+    suffix             = "k8s-green-tf-state"
+    location           = "us-east1"
+    force_destroy      = true
+    versioning_enabled = true
+  }
+]
 gcs_backend = true
 service_accounts = [
   {
@@ -33,7 +60,7 @@ service_accounts = [
       "roles/iam.serviceAccountKeyAdmin"
     ]
     create_key = true
-    write_key  = false
+    write_key  = true
   },
   {
     id          = "load-balancer"

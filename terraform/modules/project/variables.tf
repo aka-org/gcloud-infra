@@ -28,17 +28,18 @@ variable "enable_apis" {
   default     = []
 }
 
-# Bucket 
+# Buckets 
 variable "gcs_backend" {
   description = "If true creates bucket to store tf state and a local backend.tf"
   type        = bool
   default     = false
 }
-variable "tf_state_bucket" {
+variable "buckets" {
   description = "Object describing a bucket for tf state"
-  type = object({
+  type = list(object({
+    suffix             = string
     location           = string
     force_destroy      = bool
     versioning_enabled = bool
-  })
+  }))
 }

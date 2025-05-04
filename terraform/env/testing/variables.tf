@@ -44,13 +44,14 @@ variable "gcs_backend" {
   type        = bool
   default     = false
 }
-variable "tf_state_bucket" {
-  description = "Object describing a terraform state bucket to be created"
-  type = object({
+variable "buckets" {
+  description = "Object describing a bucket for tf state"
+  type = list(object({
+    suffix             = string
+    location           = string
     force_destroy      = bool
     versioning_enabled = bool
-    location           = string
-  })
+  }))
 }
 
 # Service Account

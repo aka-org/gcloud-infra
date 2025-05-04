@@ -24,7 +24,7 @@ module "project" {
   project_deletion_policy = var.project_deletion_policy
   billing_account_id      = var.billing_account_id
   enable_apis             = var.enable_apis
-  tf_state_bucket         = var.tf_state_bucket
+  buckets                 = var.buckets
   gcs_backend             = var.gcs_backend
 }
 
