@@ -1,48 +1,78 @@
-name: Apply Terraform Testing
+name: Provision Testing Environment
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'terraform/env/testing/**'
-      - 'terraform/modules/**/**'
-      - '.github/workflows/testing.yml'
-      - '.github/workflows/terraform-apply.yml'  
-      - '.github/workflows/terraform-destroy.yml'  
-      - '.github/workflows/trigger-workflow.yml'  
   workflow_dispatch:
 
 jobs:
-  provision:
-    if: github.event_name == 'pull_request'
+  filter:
+    runs-on: ubuntu-22.04
+    outputs:
+      project: ${{ steps.filter.outputs.project }}
+      network: ${{ steps.filter.outputs.network }}
+      k8s_blue: ${{ steps.filter.outputs.k8s_blue }}
+      k8s_green: ${{ steps.filter.outputs.k8s_green }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            project:
+              - 'terraform/env/testing/project/**'
+            network:
+              - 'terraform/env/testing/network/**'
+            k8s_blue:
+              - 'terraform/env/testing/k8s_blue/**'
+            k8s_green:
+              - 'terraform/env/testing/k8s_green/**'
+
+  apply_project_changes:
+    if: needs.filter.outputs.project == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing
+      working-directory: terraform/env/testing/project
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
+      tf-state: gcloud-infra-testing-aab1735b-project-tf-state
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
-        #  configure:
-        #if: github.event_name == 'pull_request'
-        #uses: ./.github/workflows/trigger-workflow.yml
-        #with:
-        #environment: testing
-        #github-runner: ubuntu-22.04
-        #repo: aka-org/gcloud_ansible
-        #workflow_file: testing.yml
-        #secrets:
-        #GITHUB_REPO_TOKEN: ${{ secrets.ANSIBLE_REPO_TOKEN }}
-        #needs: [provision]
-  deprovision:
-    if: github.event_name == 'workflow_dispatch'
-    uses: ./.github/workflows/terraform-destroy.yml
+  apply_network_changes:
+    if: needs.filter.outputs.network == 'true' 
+    uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing
+      working-directory: terraform/env/testing/network
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
+      tf-state: gcloud-infra-testing-aab1735b-network-tf-state
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
+  provision_k8s_blue:
+    if: needs.filter.outputs.k8s_blue == 'true' 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: testing
+      working-directory: terraform/env/testing/k8s_blue
+      terraform-version: 1.11.4
+      github-runner: ubuntu-22.04
+      tf-state: gcloud-infra-testing-aab1735b-k8s-blue-tf-state
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+  provision_k8s_blue:
+    if: needs.filter.outputs.k8s_green == 'true' 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: testing
+      working-directory: terraform/env/testing/k8s_green
+      terraform-version: 1.11.4
+      github-runner: ubuntu-22.04
+      tf-state: gcloud-infra-testing-aab1735b-k8s-green-tf-state
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}

@@ -15,11 +15,14 @@ on:
       github-runner:
         required: true
         type: string
+      tf-state:
+        required: true
+        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
       BILLING_ACCOUNT_ID:
-        required: true
+        required: false
 
 jobs:
   apply:
@@ -48,7 +51,7 @@ jobs:
         shell: bash
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ inputs.tf-state }}" 
 
       - name: Check Terraform Formatting
         run: terraform fmt -check -recursive
