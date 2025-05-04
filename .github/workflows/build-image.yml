@@ -40,7 +40,7 @@ jobs:
       - name: Set up Packer 
         uses: hashicorp/setup-packer@v2
         with:
-          packer_version: "${{ inputs.packer-version }}"
+          version: "${{ inputs.packer-version }}"
 
       - name: Set image version
         id: version
