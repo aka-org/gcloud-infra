@@ -1,9 +1,4 @@
 # Generic project settings
-variable "infra_version" {
-  description = "Version of the overall infrastructure"
-  type        = string
-  default     = "v20250504"
-}
 variable "project_id" {
   description = "The Project id of the project to deploy resources in"
   type        = string

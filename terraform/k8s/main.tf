@@ -14,7 +14,7 @@ provider "google" {
 }
 
 module "secrets" {
-  source        = "../../../modules/secrets"
+  source        = "../modules/secrets"
   secrets       = var.secrets
   secret_values = var.secret_values
 
@@ -22,15 +22,15 @@ module "secrets" {
 }
 
 module "load_balancers" {
-  source          = "../../../modules/compute"
+  source          = "../modules/compute"
   network         = var.network
   subnetwork      = var.subnetwork
   service_account = var.lb_service_account
   vm_defaults     = var.lb_node_defaults
   vms             = local.lb_nodes
   env             = var.env
-  infra_version   = var.infra_version
-  image_version   = var.lb_image_version
+  image_project   = var.project_id
+  image_versions  = var.image_versions
   admin_ssh_keys  = var.admin_ssh_keys
 
   count = var.provisioned ? 1 : 0

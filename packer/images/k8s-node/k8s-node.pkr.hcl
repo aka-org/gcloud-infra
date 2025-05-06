@@ -10,6 +10,9 @@ packer {
 variable "project_id" {
   type = string
 }
+variable "build_version" {
+  type = string
+}
 
 variable "zone" {
   type = string
@@ -21,8 +24,9 @@ variable "image_family" {
   default = "k8s-node"
 }
 
-variable "image_version" {
+variable "base_version" {
   type = string
+  default = "1.0.0"
 }
 variable "subnetwork" {
   type = string
@@ -34,6 +38,10 @@ variable "network_tags" {
   default = ["ssh"]
 }
 
+locals {
+  image_version = "${var.base_version}-${var.build_version}"
+  image_name = "${var.image_family}-${var.base_version}-${var.build_version}"
+}
 
 source "googlecompute" "debian" {
   project_id         = var.project_id
@@ -42,7 +50,7 @@ source "googlecompute" "debian" {
   zone               = var.zone
   machine_type       = "e2-micro"
   disk_size          = 10 
-  image_name         = "${var.image_family}-${var.image_version}"
+  image_name         = local.image_name
   image_family       = var.image_family
   communicator       = "ssh"
   temporary_key_pair_type = "ed25519"
@@ -51,7 +59,7 @@ source "googlecompute" "debian" {
   tags               = var.network_tags
   
   image_labels = {
-    version     = "${var.image_version}"
+    version     = local.image_version
     created_by  = "packer"
   }
 }
@@ -72,5 +80,13 @@ build {
   provisioner "shell" {
     script = "../../shared-scripts/clean.sh"
     execute_command = "sudo bash '{{.Path}}'"
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      FILE_NAME="${var.image_family}"
+      VERSION="${local.image_version}"
+      echo "$VERSION" > "$FILE_NAME"
+    EOT
   }
 }

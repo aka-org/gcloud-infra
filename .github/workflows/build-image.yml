@@ -6,7 +6,10 @@ on:
       environment:
         required: true
         type: string
-      working-directory:
+      images-path:
+        required: true
+        type: string
+      image:
         required: true
         type: string
       github-runner:
@@ -27,7 +30,7 @@ jobs:
     runs-on: ${{ inputs.github-runner }}
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: "${{ inputs.images-path }}/${{ inputs.image }}"
     environment: ${{ inputs.environment }}
     env:
       PKR_VAR_project_id: ${{ inputs.project }}
@@ -45,7 +48,7 @@ jobs:
       - name: Set image version
         id: version
         run: |
-          echo "PKR_VAR_image_version=v$(date +'%Y%m%d')" >> $GITHUB_ENV
+          echo "PKR_VAR_build_version=$(date +'%Y%m%d')" >> $GITHUB_ENV
         shell: bash
 
       - name: Authenticate to Google Cloud
@@ -59,6 +62,11 @@ jobs:
 
       - name: Packer Build
         run: packer build --force . 
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.image }}
+          path: ${{ inputs.image }} 
 
       - name: Remove Creds
         run: rm $HOME/gcloud.json

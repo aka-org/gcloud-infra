@@ -13,7 +13,7 @@ provider "google" {
 }
 
 module "network" {
-  source         = "../../../modules/network"
+  source         = "../modules/network"
   vpc_name       = var.vpc_name
   subnetworks    = var.subnetworks
   firewall_rules = var.firewall_rules

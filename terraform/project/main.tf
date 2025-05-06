@@ -18,7 +18,7 @@ provider "google" {
 }
 
 module "project" {
-  source                  = "../../../modules/project"
+  source                  = "../modules/project"
   env                     = var.env
   project_prefix          = var.project_prefix
   project_deletion_policy = var.project_deletion_policy
@@ -29,7 +29,7 @@ module "project" {
 }
 
 module "iam" {
-  source           = "../../../modules/iam"
+  source           = "../modules/iam"
   service_accounts = var.service_accounts
   project_id       = module.project.project_id
   depends_on       = [module.project]

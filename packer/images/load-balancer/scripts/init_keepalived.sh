@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROLE="$1"
-INFRA_VERSION="$2"
+VERSION="$2"
 
 # Get the private IP of the current instance
 API_ENDPOINT="http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip"
@@ -19,7 +19,7 @@ while [ -z "$PEER_IP" ]; do
     read -r PEER_NAME PEER_IP <<< "$(
         gcloud compute instances list \
             --format="json" \
-            --filter="networkInterfaces[0].networkIP!=$SRC_IP AND labels.role=$ROLE AND labels.infra_version=$INFRA_VERSION" 2>/dev/null |
+            --filter="networkInterfaces[0].networkIP!=$SRC_IP AND labels.role=$ROLE AND labels.infra_version=$VERSION" 2>/dev/null |
         jq -r '.[0] | "\(.name) \(.networkInterfaces[0].networkIP)"'
     )" || true
 

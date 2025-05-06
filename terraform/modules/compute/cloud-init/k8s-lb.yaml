@@ -42,4 +42,4 @@ write_files:
         option tcp-check
 runcmd:
   - systemctl enable --now haproxy
-  - /usr/local/bin/init_keepalived.sh ${role} ${infra_version}
+  - /usr/local/bin/init_keepalived.sh ${role} ${version}

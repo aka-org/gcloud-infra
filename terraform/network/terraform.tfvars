@@ -1,7 +1,5 @@
-infra_version = "v20250504"
-project_id    = "gcloud-infra-testing-aab1735b"
-gcp_region    = "us-east1"
-vpc_name      = "main"
+gcp_region = "us-east1"
+vpc_name   = "main"
 subnetworks = [
   {
     name          = "infra-public"

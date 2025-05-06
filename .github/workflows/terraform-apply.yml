@@ -18,6 +18,9 @@ on:
       tf-state:
         required: true
         type: string
+      vars:
+        required: true
+        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
@@ -60,7 +63,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -var-file="${{ inputs.environment }}/${{ inputs.vars }}"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
