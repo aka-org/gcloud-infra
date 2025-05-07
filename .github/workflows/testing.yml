@@ -34,7 +34,7 @@ jobs:
 
   packer:
     needs: [filter, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' && github.actor != 'github-actions[bot]' }} 
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' && !contains(github.event.head_commit.message, '[skip ci]') }} 
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
