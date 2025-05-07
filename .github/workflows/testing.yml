@@ -34,7 +34,7 @@ jobs:
 
   packer:
     needs: [filter, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' }} 
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' github.actor != 'github-actions[bot]' }} 
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
@@ -72,7 +72,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, project, network, packer]
+    needs: [filter, project, network]
     if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -85,7 +85,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, project, network, packer]
+    needs: [filter, project, network]
     if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
