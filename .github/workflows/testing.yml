@@ -3,6 +3,7 @@ name: Provision Testing Environment
 on:
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   filter:
