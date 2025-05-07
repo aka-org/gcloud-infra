@@ -19,7 +19,7 @@ while [ -z "$PEER_IP" ]; do
     read -r PEER_NAME PEER_IP <<< "$(
         gcloud compute instances list \
             --format="json" \
-            --filter="networkInterfaces[0].networkIP!=$SRC_IP AND labels.role=$ROLE AND labels.infra_version=$VERSION" 2>/dev/null |
+            --filter="networkInterfaces[0].networkIP!=$SRC_IP AND labels.role=$ROLE AND labels.version=$VERSION" 2>/dev/null |
         jq -r '.[0] | "\(.name) \(.networkInterfaces[0].networkIP)"'
     )" || true
 
