@@ -36,11 +36,9 @@ jobs:
         with:
           filters: |
             k8s_node:
-              #- 'packer/images/k8s-node/**'
-              - 'packer/shared-scripts/**'
+              - 'packer/images/k8s-node/**'
             load_balancer:
-              #- 'packer/images/load-balancer/**'
-              - 'packer/shared-scripts/**'
+              - 'packer/images/load-balancer/**'
             shared_scripts:
               - 'packer/shared-scripts/**'
 
