@@ -77,7 +77,7 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
       if [[ -n $(git status --porcelain) ]]; then
         # Commit changes
         git add . 
-        git commit -m "$image_family: Update image version to $image_version [skip ci]"
+        git commit -m "packer:images:$image_family: Update image version to $image_version [skip ci]"
       fi
     done
   done
