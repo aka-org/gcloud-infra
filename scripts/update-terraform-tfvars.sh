@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Inputs
 REPO_URL="https://github.com/aka-org/gcloud_infra.git"
-CICD_TOKEN="${GITHUB_TOKEN:?GITHUB_TOKEN is required}"
+CICD_TOKEN="${CICD_TOKEN:?CICD_TOKEN is required}"
 WORK_DIR=$(mktemp -d)
 GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
