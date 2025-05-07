@@ -29,22 +29,13 @@ jobs:
       PROJECT: ${{ inputs.project }}
 
     steps:
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2.0.0'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS_B64 }}'
 
-      - name: Authenticate to Google Cloud
-        run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS_B64 }}" | base64 -d > $HOME/gcloud.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
-          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
-          gcloud config set project "${{ inputs.project }}"
-        shell: bash
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
       - name: Update terraform tfvars 
         run: scripts/update-terraform-tfvars.sh
-
-      - name: Remove Creds
-        run: rm $HOME/gcloud.json
-
-      - name: Logout from gcloud
-        run: gcloud auth revoke
