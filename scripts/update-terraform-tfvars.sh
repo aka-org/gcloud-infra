@@ -74,9 +74,11 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
           | (if has("provisioned") then .provisioned = true else . end)
         end
       ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
-      # Commit changes
-      git add . 
-      git commit -m "$image_family: Update image version to $image_version"
+      if [[ -n $(git status --porcelain) ]]; then
+        # Commit changes
+        git add . 
+        git commit -m "$image_family: Update image version to $image_version"
+      fi
     done
   done
 done
