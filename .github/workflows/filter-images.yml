@@ -18,6 +18,8 @@ on:
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
+      CICD_TOKEN:
+        required: true
 
 jobs:
   filter_images:
@@ -49,8 +51,8 @@ jobs:
       project: ${{ inputs.project }} 
       github-runner: ${{ inputs.github-runner }}
       packer-version: ${{ inputs.packer-version }}
-      images-path: packer/images
-      image: k8s-node 
+      working-directory: packer/images/k8s-node
+      build-version: build${{ github.run_number }}
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   load-balancer:
@@ -62,24 +64,19 @@ jobs:
       project: ${{ inputs.project }} 
       github-runner: ${{ inputs.github-runner }}
       packer-version: ${{ inputs.packer-version }}
-      images-path: packer/images
-      image: load-balancer
+      working-directory: packer/images/load-balancer
+      build-version: build${{ github.run_number }}
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
 
-  update-images:
+  update-infra:
     needs: [k8s-node,load-balancer]
     if: ${{ ! failure() && ! cancelled() }} 
-    runs-on: ${{ inputs.github-runner }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: outputs/
-
-      - name: Echo images and versions
-        run: |
-          for f in outputs/*;do
-            NAME="$(basename $f)"
-            VERSION="$(cat $f/basename)"
-            echo "Build finished for image $NAME with version $VERSION"
-          done
+    uses: ./.github/workflows/update-terraform-vars.yml
+    with:
+      environment: ${{ inputs.environment }}
+      project: ${{ inputs.project }} 
+      github-runner: ${{ inputs.github-runner }}
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}

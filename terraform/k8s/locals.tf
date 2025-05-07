@@ -34,7 +34,7 @@ locals {
           {
             env     = var.env
             role    = node.role
-            version = var.image_versions[node.image_family]
+            version = replace(var.image_versions[node.image_family], "-", "_")
           }
         )
       }
@@ -48,7 +48,7 @@ locals {
           node.cloud_init_data,
           {
             role     = node.role
-            version  = var.image_versions[node.image_family]
+            version  = replace(var.image_versions[node.image_family], "-", "_")
             gcp_zone = var.gcp_zone
             lb_vip   = local.lb_vip
           }

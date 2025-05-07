@@ -34,7 +34,7 @@ jobs:
   packer:
     needs: [filter, project, network]
     if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' }} 
-    uses: ./.github/workflows/build-images.yml
+    uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
       project: gcloud-infra-testing-aab1735b
@@ -42,6 +42,7 @@ jobs:
       packer-version: 1.12.0 
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
   project:
     needs: filter
     if: needs.filter.outputs.project == 'true' 
@@ -70,7 +71,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, project, network]
+    needs: [filter, project, network, packer]
     if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
@@ -83,7 +84,7 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, project, network]
+    needs: [filter, project, network, packer]
     if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:

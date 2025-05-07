@@ -1,0 +1,47 @@
+name: Update Terraform tfvars 
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+      project:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+      CICD_TOKEN:
+        required: false
+
+jobs:
+  apply:
+    runs-on: ${{ inputs.github-runner }}
+    environment: ${{ inputs.environment }}
+    env:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
+      ENVIRONMENT: ${{ inputs.environment }}
+      PROJECT: ${{ inputs.project }}
+
+    steps:
+      - name: Authenticate to Google Cloud
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS_B64 }}" | base64 -d > $HOME/gcloud.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
+          gcloud config set project "${{ inputs.project }}"
+        shell: bash
+
+      - name: Update terraform tfvars 
+        run: scripts/update-terraform-tfvars.sh
+
+      - name: Remove Creds
+        run: rm $HOME/gcloud.json
+
+      - name: Logout from gcloud
+        run: gcloud auth revoke
