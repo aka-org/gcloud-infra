@@ -8,10 +8,10 @@ packer {
 }
 
 variable "project_id" {
-  type    = string
+  type = string
 }
 variable "build_version" {
-  type    = string
+  type = string
 }
 
 variable "zone" {
