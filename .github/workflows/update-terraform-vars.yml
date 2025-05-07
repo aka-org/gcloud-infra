@@ -29,6 +29,9 @@ jobs:
       PROJECT: ${{ inputs.project }}
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
+
       - id: 'auth'
         uses: 'google-github-actions/auth@v2.0.0'
         with:
