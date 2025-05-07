@@ -19,7 +19,7 @@ on:
         required: false
 
 jobs:
-  apply:
+  update_tfvars:
     runs-on: ${{ inputs.github-runner }}
     environment: ${{ inputs.environment }}
     env:
