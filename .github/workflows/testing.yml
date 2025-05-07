@@ -14,9 +14,9 @@ jobs:
       k8s_green: ${{ steps.filter.outputs.k8s_green }}
       packer: ${{ steps.filter.outputs.packer }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.2.2
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
