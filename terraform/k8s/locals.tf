@@ -24,7 +24,7 @@ locals {
       }
     )
   ]
-  # Add extra cloud-init data to based on vars to each node
+  # Add extra cloud-init data based on vars of each node
   k8s_nodes = [
     for node in local.tmp_lb_nodes : merge(
       node,
@@ -32,9 +32,9 @@ locals {
         cloud_init_data = merge(
           node.cloud_init_data,
           {
-            env           = var.env
-            role          = node.role
-            infra_version = var.infra_version
+            env     = var.env
+            role    = node.role
+            version = replace(var.image_versions[node.image_family], "-", "_")
           }
         )
       }
@@ -47,10 +47,10 @@ locals {
         cloud_init_data = merge(
           node.cloud_init_data,
           {
-            role          = node.role
-            infra_version = var.infra_version
-            gcp_zone      = var.gcp_zone
-            lb_vip        = local.lb_vip
+            role     = node.role
+            version  = replace(var.image_versions[node.image_family], "-", "_")
+            gcp_zone = var.gcp_zone
+            lb_vip   = local.lb_vip
           }
         )
       }

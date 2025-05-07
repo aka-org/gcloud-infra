@@ -1,0 +1,84 @@
+name: Determine OS Images to build
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      project:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+      packer-version:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+      CICD_TOKEN:
+        required: true
+
+jobs:
+  filter_images:
+    runs-on: ${{ inputs.github-runner }}
+    outputs:
+      k8s_node: ${{ steps.filter_images.outputs.k8s_node }}
+      load_balancer: ${{ steps.filter_images.outputs.load_balancer }}
+      shared_scripts: ${{ steps.filter_images.outputs.shared_scripts }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: dorny/paths-filter@v2
+        id: filter_images
+        with:
+          filters: |
+            k8s_node:
+              #- 'packer/images/k8s-node/**'
+              - 'packer/shared-scripts/**'
+            load_balancer:
+              #- 'packer/images/load-balancer/**'
+              - 'packer/shared-scripts/**'
+            shared_scripts:
+              - 'packer/shared-scripts/**'
+
+  k8s-node:
+    needs: filter_images
+    if: needs.filter_images.outputs.k8s_node == 'true' || needs.filter_images.outputs.shared_scripts == 'true'
+    uses: ./.github/workflows/build-image.yml
+    with:
+      environment: ${{ inputs.environment }}
+      project: ${{ inputs.project }} 
+      github-runner: ${{ inputs.github-runner }}
+      packer-version: ${{ inputs.packer-version }}
+      working-directory: packer/images/k8s-node
+      build-version: build${{ github.run_number }}
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+  load-balancer:
+    needs: filter_images
+    if: needs.filter_images.outputs.load_balancer == 'true' || needs.filter_images.outputs.shared_scripts == 'true'
+    uses: ./.github/workflows/build-image.yml
+    with:
+      environment: ${{ inputs.environment }}
+      project: ${{ inputs.project }} 
+      github-runner: ${{ inputs.github-runner }}
+      packer-version: ${{ inputs.packer-version }}
+      working-directory: packer/images/load-balancer
+      build-version: build${{ github.run_number }}
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+
+  update-infra:
+    needs: [k8s-node,load-balancer]
+    if: ${{ ! failure() && ! cancelled() }} 
+    uses: ./.github/workflows/update-terraform-vars.yml
+    with:
+      environment: ${{ inputs.environment }}
+      project: ${{ inputs.project }} 
+      github-runner: ${{ inputs.github-runner }}
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}

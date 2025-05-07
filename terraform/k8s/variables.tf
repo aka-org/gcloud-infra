@@ -20,11 +20,6 @@ variable "gcp_zone" {
   type        = string
   default     = "us-east1-b"
 }
-variable "infra_version" {
-  description = "Overall deployment version"
-  type        = string
-  default     = "0.0.1"
-}
 variable "provisioned" {
   description = "Specify whether to provision the described infra"
   type        = bool
@@ -39,23 +34,24 @@ variable "subnetwork" {
   description = "Name of subnetwork"
   type        = string
 }
-
+variable "image_versions" {
+  description = "Mapping of image families to image versions used for provisioning"
+  type        = map(string)
+}
 variable "k8s_node_defaults" {
   description = "Default parameters of Kubernetes Nodes"
   type = object({
+    name                = optional(string)
     machine_type        = string
-    image_project       = string
     image_family        = string
-    image_version       = string
     disk_size           = number
     disk_type           = string
-    role                = string
-    tags                = list(string)
-    sa_id               = optional(string)
     cloud_init          = optional(string)
     cloud_init_data     = optional(map(string))
     startup_script      = optional(string)
     startup_script_data = optional(map(string))
+    role                = string
+    tags                = list(string)
   })
 }
 variable "k8s_nodes" {
@@ -63,12 +59,9 @@ variable "k8s_nodes" {
   type = list(object({
     name                = string
     machine_type        = optional(string)
-    image_project       = optional(string)
     image_family        = optional(string)
-    image_version       = optional(string)
     disk_size           = optional(number)
     disk_type           = optional(string)
-    sa_id               = optional(string)
     cloud_init          = optional(string)
     cloud_init_data     = optional(map(string))
     startup_script      = optional(string)
@@ -82,15 +75,10 @@ variable "lb_service_account" {
   type        = string
   default     = ""
 }
-variable "lb_image_version" {
-  description = "Version of the os image used for vm provisioning"
-  type        = string
-}
 variable "lb_node_defaults" {
   description = "Default parameters of Kubernetes Nodes"
   type = object({
     machine_type        = string
-    image_project       = string
     image_family        = string
     disk_size           = number
     disk_type           = string
@@ -107,7 +95,6 @@ variable "lb_nodes" {
   type = list(object({
     name                = string
     machine_type        = optional(string)
-    image_project       = optional(string)
     image_family        = optional(string)
     disk_size           = optional(number)
     disk_type           = optional(string)

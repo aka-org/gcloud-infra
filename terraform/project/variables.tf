@@ -1,9 +1,4 @@
 # General project settings
-variable "infra_version" {
-  description = "Version of the overall infrastructure"
-  type        = string
-  default     = "v20250503"
-}
 variable "env" {
   description = "Infrastructure environment"
   type        = string

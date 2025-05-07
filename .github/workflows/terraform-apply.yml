@@ -18,6 +18,9 @@ on:
       tf-state:
         required: true
         type: string
+      vars:
+        required: true
+        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
@@ -37,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
           terraform_version: "${{ inputs.terraform-version }}"
 
@@ -60,7 +63,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -var-file="${{ inputs.environment }}/${{ inputs.vars }}"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan

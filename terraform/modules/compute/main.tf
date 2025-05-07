@@ -5,26 +5,25 @@ data "google_service_account" "sa" {
 locals {
   # Merge defaults with individual vm configuration
   # overriding any of the defaults that is configured on both
-  tmp_vms = [
+  tmp_vms = length(var.vms) > 0 ? [
     for vm in var.vms : merge(
       var.vm_defaults,
       {
         for k, v in vm : k => v if v != null
       }
     )
-  ]
+  ] : [var.vm_defaults]
   vms = [
     for vm in local.tmp_vms : merge(
       vm,
       {
         service_account = data.google_service_account.sa.email
-        subnetwork = var.subnetwork
-        image = "projects/${vm.image_project}/global/images/${vm.image_family}-${var.image_version}"
+        subnetwork      = var.subnetwork
+        image           = "projects/${var.image_project}/global/images/${vm.image_family}-${var.image_versions[vm.image_family]}"
         labels = {
-          image_version = var.image_version
-          infra_version = var.infra_version
-          env     = var.env
-          role    = vm.role
+          version = replace(var.image_versions[vm.image_family], "-", "_")
+          env           = var.env
+          role          = vm.role
         }
       }
     )
@@ -59,7 +58,7 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  labels = each.value.labels 
+  labels = each.value.labels
 
   lifecycle {
     ignore_changes = [network_interface[0].alias_ip_range]

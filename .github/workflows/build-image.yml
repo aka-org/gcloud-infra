@@ -1,4 +1,4 @@
-name: Terraform Destroy
+name: Build OS Image 
 
 on:
   workflow_call:
@@ -6,40 +6,45 @@ on:
       environment:
         required: true
         type: string
-      working-directory:
+      build-version:
         required: true
         type: string
-      terraform-version:
+      working-directory:
         required: true
         type: string
       github-runner:
         required: true
         type: string
+      packer-version:
+        required: true
+        type: string
+      project:
+        required: true
+        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
-      BILLING_ACCOUNT_ID:
-        required: true          
 
 jobs:
-  destroy:
+  build:
     runs-on: ${{ inputs.github-runner }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
     environment: ${{ inputs.environment }}
     env:
+      PKR_VAR_project_id: ${{ inputs.project }}
+      PKR_VAR_build_version: ${{ inputs.build-version }} 
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-      TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.2.2
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
+      - name: Set up Packer 
+        uses: hashicorp/setup-packer@v2
         with:
-          terraform_version: "${{ inputs.terraform-version }}"
+          version: "${{ inputs.packer-version }}"
 
       - name: Authenticate to Google Cloud
         run: |
@@ -47,20 +52,17 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
         shell: bash
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Packer Init
+        run: packer init . 
 
-      - name: Check Terraform Formatting
-        run: terraform fmt -check -recursive
+      - name: Check Packer Formatting
+        run: packer fmt -check -recursive .
 
-      - name: Validate Terraform Configuration
-        run: terraform validate
+      - name: Validate Packer Configuration
+        run:  packer validate .
 
-      - name: Terraform Plan
-        run: terraform plan -destroy -target="module.kubernetes_cluster" -out=tfplan
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
-
+      - name: Packer Build
+        run: packer build --force . 
+      
       - name: Remove Creds
         run: rm $HOME/gcloud.json

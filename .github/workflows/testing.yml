@@ -3,6 +3,7 @@ name: Provision Testing Environment
 on:
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   filter:
@@ -12,68 +13,87 @@ jobs:
       network: ${{ steps.filter.outputs.network }}
       k8s_blue: ${{ steps.filter.outputs.k8s_blue }}
       k8s_green: ${{ steps.filter.outputs.k8s_green }}
+      packer: ${{ steps.filter.outputs.packer }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.2.2
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
             project:
-              - 'terraform/env/testing/project/**'
+              - 'terraform/project/**'
             network:
-              - 'terraform/env/testing/network/**'
-            k8s_blue:
-              - 'terraform/env/testing/k8s_blue/**'
+              - 'terraform/network/**'
             k8s_green:
-              - 'terraform/env/testing/k8s_green/**'
+              - 'terraform/k8s/**/green.tfvars.json'
+            k8s_blue:
+              - 'terraform/k8s/**/blue.tfvars.json'
+            packer:
+              - 'packer/**'
 
+  packer:
+    needs: [filter, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' }} 
+    uses: ./.github/workflows/filter-images.yml
+    with:
+      environment: testing
+      project: gcloud-infra-testing-aab1735b
+      github-runner: ubuntu-22.04
+      packer-version: 1.12.0 
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
   project:
     needs: filter
     if: needs.filter.outputs.project == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing/project
+      working-directory: terraform/project
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
       tf-state: gcloud-infra-testing-aab1735b-project-tf-state
+      vars: testing.tfvars.json
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
     needs: [filter, project]
-    if: needs.filter.outputs.network == 'true' 
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.network == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing/network
+      working-directory: terraform/network
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
       tf-state: gcloud-infra-testing-aab1735b-network-tf-state
+      vars: testing.tfvars.json
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, project, network]
-    if: needs.filter.outputs.k8s_blue == 'true' 
+    needs: [filter, project, network, packer]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing/k8s_blue
+      working-directory: terraform//k8s
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
       tf-state: gcloud-infra-testing-aab1735b-k8s-blue-tf-state
+      vars: blue.tfvars.json
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, project, network]
-    if: needs.filter.outputs.k8s_green == 'true' 
+    needs: [filter, project, network, packer]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
-      working-directory: terraform/env/testing/k8s_green
+      working-directory: terraform/k8s
       terraform-version: 1.11.4
       github-runner: ubuntu-22.04
       tf-state: gcloud-infra-testing-aab1735b-k8s-green-tf-state
+      vars: green.tfvars.json
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
