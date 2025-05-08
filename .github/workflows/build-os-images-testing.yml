@@ -34,7 +34,6 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: filter-images
         with:
-          base: 'HEAD~1'
           filters: |
             k8s_node:
               - 'packer/images/k8s-node/**'
