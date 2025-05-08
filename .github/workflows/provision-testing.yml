@@ -1,40 +1,25 @@
 name: Provision Testing Environment
 
 on:
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+  push:
+    branches:
+      - 'feature/**'
+    paths:
+      - 'terraform/**'
 
 jobs:
-  pre_job:
-  # continue-on-error: true # Uncomment once integration is finished
-    runs-on: ubuntu-22.04
-  # Map a step output to a job output
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5.3.1
-        with:
-          # All of these options are optional, so you can remove them if you are happy with the defaults
-          #concurrent_skipping: 'never'
-          skip_after_successful_duplicate: 'true'
-          # paths_ignore: '["**/README.md", "**/docs/**"]'
-          #do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
-
-  filter:
+  filter-components:
     runs-on: ubuntu-22.04
     outputs:
-      project: ${{ steps.filter.outputs.project }}
-      network: ${{ steps.filter.outputs.network }}
-      k8s_blue: ${{ steps.filter.outputs.k8s_blue }}
-      k8s_green: ${{ steps.filter.outputs.k8s_green }}
-      packer: ${{ steps.filter.outputs.packer }}
+      project: ${{ steps.filter-components.outputs.project }}
+      network: ${{ steps.filter-components.outputs.network }}
+      k8s_blue: ${{ steps.filter-components.outputs.k8s_blue }}
+      k8s_green: ${{ steps.filter-components.outputs.k8s_green }}
     steps:
       - uses: actions/checkout@v4.2.2
 
       - uses: dorny/paths-filter@v3.0.2
-        id: filter
+        id: filter-components
         with:
           filters: |
             project:
@@ -45,24 +30,10 @@ jobs:
               - 'terraform/k8s/**/green.tfvars.json'
             k8s_blue:
               - 'terraform/k8s/**/blue.tfvars.json'
-            packer:
-              - 'packer/**'
 
-  packer:
-    needs: [filter, pre_job, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' && needs.pre_job.outputs.should_skip != 'true' }} 
-    uses: ./.github/workflows/filter-images.yml
-    with:
-      environment: testing
-      project: gcloud-infra-testing-aab1735b
-      github-runner: ubuntu-22.04
-      packer-version: 1.12.0 
-    secrets:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
   project:
-    needs: filter
-    if: needs.filter.outputs.project == 'true' 
+    needs: filter-components
+    if: needs.filter-components.outputs.project == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -75,8 +46,8 @@ jobs:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
-    needs: [filter, project]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.network == 'true' }} 
+    needs: [filter-components, project]
+    if: ${{ ! failure() && ! cancelled() && needs.filter-components.outputs.network == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -88,8 +59,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_blue == 'true' }} 
+    needs: [filter-components, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter-components.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing
@@ -101,8 +72,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.k8s_green == 'true' }} 
+    needs: [filter-components, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter-components.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing

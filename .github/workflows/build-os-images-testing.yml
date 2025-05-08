@@ -1,33 +1,33 @@
-name: Determine OS Images to build
+name: Build OS Images for Testing Environment
 
 on:
-  workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-      project:
-        required: true
-        type: string
-      github-runner:
-        required: true
-        type: string
-      packer-version:
-        required: true
-        type: string
-    secrets:
-      GOOGLE_CREDENTIALS_B64:
-        required: true
-      CICD_TOKEN:
-        required: true
+  push:
+    branches:
+      - 'feature/**' 
+    paths:
+      - 'packer/**'
 
 jobs:
+  #pre_job:
+  # continue-on-error: true # Uncomment once integration is finished
+  # runs-on: ubuntu-22.04
+  # Map a step output to a job output
+  # outputs:
+  #   should_skip: ${{ steps.skip_check.outputs.should_skip }}
+  # steps:
+  #   - id: skip_check
+  #     uses: fkirc/skip-duplicate-actions@v5.3.1
+  #     with:
+  #       # All of these options are optional, so you can remove them if you are happy with the defaults
+  #       #concurrent_skipping: 'never'
+  #       skip_after_successful_duplicate: 'true'
+  #       # paths_ignore: '["**/README.md", "**/docs/**"]'
+  #       #do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
   filter_images:
     runs-on: ${{ inputs.github-runner }}
     outputs:
       k8s_node: ${{ steps.filter_images.outputs.k8s_node }}
       load_balancer: ${{ steps.filter_images.outputs.load_balancer }}
-      shared_scripts: ${{ steps.filter_images.outputs.shared_scripts }}
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -38,33 +38,33 @@ jobs:
           filters: |
             k8s_node:
               - 'packer/images/k8s-node/**'
+              - 'packer/shared-scripts/**'
             load_balancer:
               - 'packer/images/load-balancer/**'
-            shared_scripts:
               - 'packer/shared-scripts/**'
 
   k8s-node:
     needs: filter_images
-    if: needs.filter_images.outputs.k8s_node == 'true' || needs.filter_images.outputs.shared_scripts == 'true'
+    if: needs.filter_images.outputs.k8s_node == 'true'
     uses: ./.github/workflows/build-image.yml
     with:
-      environment: ${{ inputs.environment }}
-      project: ${{ inputs.project }} 
-      github-runner: ${{ inputs.github-runner }}
-      packer-version: ${{ inputs.packer-version }}
+      environment: testing
+      project: gcloud-infra-testing-aab1735b 
+      github-runner: ubuntu-22.04
+      packer-version: 1.12.0 
       working-directory: packer/images/k8s-node
       build-version: build${{ github.run_number }}
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   load-balancer:
     needs: filter_images
-    if: needs.filter_images.outputs.load_balancer == 'true' || needs.filter_images.outputs.shared_scripts == 'true'
+    if: needs.filter_images.outputs.load_balancer == 'true'
     uses: ./.github/workflows/build-image.yml
     with:
-      environment: ${{ inputs.environment }}
-      project: ${{ inputs.project }} 
-      github-runner: ${{ inputs.github-runner }}
-      packer-version: ${{ inputs.packer-version }}
+      environment: testing
+      project: gcloud-infra-testing-aab1735b 
+      github-runner: ubuntu-22.04
+      packer-version: 1.12.0 
       working-directory: packer/images/load-balancer
       build-version: build${{ github.run_number }}
     secrets:
@@ -75,9 +75,9 @@ jobs:
     if: ${{ ! failure() && ! cancelled()}}
     uses: ./.github/workflows/update-terraform-vars.yml
     with:
-      environment: ${{ inputs.environment }}
-      project: ${{ inputs.project }} 
-      github-runner: ${{ inputs.github-runner }}
+      environment: testing
+      project: gcloud-infra-testing-aab1735b 
+      github-runner: ubuntu-22.04
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
