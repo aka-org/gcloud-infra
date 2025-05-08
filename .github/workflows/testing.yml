@@ -6,6 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  pre_job:
+  # continue-on-error: true # Uncomment once integration is finished
+  runs-on: ubuntu-22.04
+  # Map a step output to a job output
+  outputs:
+    should_skip: ${{ steps.skip_check.outputs.should_skip }}
+  steps:
+    - id: skip_check
+      uses: fkirc/skip-duplicate-actions@v5.3.1
+      with:
+        # All of these options are optional, so you can remove them if you are happy with the defaults
+        #concurrent_skipping: 'never'
+        skip_after_successful_duplicate: 'true'
+        # paths_ignore: '["**/README.md", "**/docs/**"]'
+        #do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
   filter:
     runs-on: ubuntu-22.04
     outputs:
@@ -33,8 +49,8 @@ jobs:
               - 'packer/**'
 
   packer:
-    needs: [filter, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' }} 
+    needs: [filter, pre_job, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter.outputs.packer == 'true' && needs.pre_job.outputs.should_skip != 'true' }} 
     uses: ./.github/workflows/filter-images.yml
     with:
       environment: testing
