@@ -12,6 +12,9 @@ on:
       project:
         required: true
         type: string
+      action:
+        required: true
+        type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
         required: true
@@ -27,6 +30,7 @@ jobs:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ inputs.environment }}
       PROJECT: ${{ inputs.project }}
+      ACTION: ${{ inputs.action }}
 
     steps:
       - name: Checkout repo
