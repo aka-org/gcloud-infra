@@ -23,16 +23,16 @@ jobs:
   #       skip_after_successful_duplicate: 'true'
   #       # paths_ignore: '["**/README.md", "**/docs/**"]'
   #       #do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
-  filter_images:
-    runs-on: ${{ inputs.github-runner }}
+  filter-images:
+    runs-on: ubuntu-22.04 
     outputs:
-      k8s_node: ${{ steps.filter_images.outputs.k8s_node }}
-      load_balancer: ${{ steps.filter_images.outputs.load_balancer }}
+      k8s_node: ${{ steps.filter-images.outputs.k8s_node }}
+      load_balancer: ${{ steps.filter-images.outputs.load_balancer }}
     steps:
       - uses: actions/checkout@v4.2.2
 
       - uses: dorny/paths-filter@v2
-        id: filter_images
+        id: filter-images
         with:
           base: 'HEAD~1'
           filters: |
@@ -44,8 +44,8 @@ jobs:
               - 'packer/shared-scripts/**'
 
   k8s-node:
-    needs: filter_images
-    if: needs.filter_images.outputs.k8s_node == 'true'
+    needs: filter-images
+    if: needs.filter-images.outputs.k8s_node == 'true'
     uses: ./.github/workflows/build-image.yml
     with:
       environment: testing
@@ -57,8 +57,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   load-balancer:
-    needs: filter_images
-    if: needs.filter_images.outputs.load_balancer == 'true'
+    needs: filter-images
+    if: needs.filter-images.outputs.load_balancer == 'true'
     uses: ./.github/workflows/build-image.yml
     with:
       environment: testing
