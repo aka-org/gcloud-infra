@@ -34,6 +34,7 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: filter_images
         with:
+          base: 'HEAD~1'
           filters: |
             k8s_node:
               - 'packer/images/k8s-node/**'
@@ -71,7 +72,7 @@ jobs:
 
   update-infra:
     needs: [k8s-node,load-balancer]
-    if: ${{ ! failure() && ! cancelled() }} 
+    if: ${{ ! failure() && ! cancelled()}}
     uses: ./.github/workflows/update-terraform-vars.yml
     with:
       environment: ${{ inputs.environment }}
