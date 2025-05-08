@@ -13,8 +13,6 @@ GIT_NAME="github-actions[bot]"
 ENVIRONMENT="${ENVIRONMENT:-}"
 PROJECT="${PROJECT:-}"
 GITHUB_RUN_ID="${GITHUB_RUN_ID:-}"
-GITHUB_EVENT_NAME="${GITHUB_EVENT_NAME:-}"
-GITHUB_HEAD_REF="${GITHUB_HEAD_REF:-}"  # for PRs
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-}"  # for merges
 
 
@@ -28,9 +26,9 @@ git clone "https://${CICD_TOKEN}@${REPO_URL#https://}" repo
 cd repo
 
 # Determine context
-if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-  echo "Detected PR event. Branch: $GITHUB_HEAD_REF"
-  git checkout "$GITHUB_HEAD_REF"
+if [[ "$GITHUB_REF_NAME" != "main" ]]; then
+  echo "Detected push to a feature branch: $GITHUB_REF_NAME"
+  git checkout "$GITHUB_REF_NAME"
 else
   echo "Detected merge event. Base branch: $GITHUB_REF_NAME"
   git checkout -b "update-images-$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
