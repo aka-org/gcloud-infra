@@ -66,6 +66,7 @@ jobs:
         run: terraform plan -out=tfplan -var-file="${{ inputs.environment }}/${{ inputs.vars }}"
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
 
       - name: Remove Creds
