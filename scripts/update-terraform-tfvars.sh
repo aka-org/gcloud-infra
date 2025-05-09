@@ -138,7 +138,7 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
 done
 
 # Push commits
-if git log origin/"$BRANCH_NAME"..HEAD --oneline | grep .; then
+if [[ $(git rev-list --count origin/HEAD..HEAD) -gt 0 ]]; then
   echo "New commits found, pushing to remote..."
   git push origin "$BRANCH_NAME"
   echo "✅ Terraform tfvars updated and pushed."
