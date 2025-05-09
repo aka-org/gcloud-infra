@@ -77,21 +77,23 @@ cd repo
 # Determine context
 if [[ "$GITHUB_REF_NAME" != "main" ]]; then
   echo "Detected push to a feature branch: $GITHUB_REF_NAME"
-  git checkout "$GITHUB_REF_NAME"
+  BRANCH_NAME="$GITHUB_REF_NAME"	    
+  git checkout "BRANCH_NAME"
 else
   echo "Detected push to default branch. Base branch: $GITHUB_REF_NAME"
   case "$ACTION" in
     deprovision_infra)
-      git checkout -b "feature/deprovision_infra-$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
+      BRANCH_NAME="auto/deprovision_infra_$GITHUB_RUN_ID"	    
       ;;
     update_os_images)
-      git checkout -b "feature/update_os_images_$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
+      BRANCH_NAME="auto/update_os_images__$GITHUB_RUN_ID"	    
       ;;
     *)
       echo "Unknown action: $ACTION"
       exit 1
       ;;
   esac
+  git checkout -b $BRANCH "origin/$GITHUB_REF_NAME"
 fi
 
 # Load key-value pairs
@@ -136,5 +138,8 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
 done
 
 # Push commits
-git push origin HEAD
-echo "✅ Terraform tfvars updated and pushed."
+if git log origin/"$BRANCH_NAME"..HEAD --oneline | grep .; then
+  echo "New commits found, pushing to remote..."
+  git push origin "$BRANCH_NAME"
+  echo "✅ Terraform tfvars updated and pushed."
+fi
