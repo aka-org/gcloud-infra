@@ -18,15 +18,16 @@ GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"  # for merges
 
 # Define Functions
 promote_infra() {
-  expected_versions=$(jq -n '{'$(IFS=,; for kv in "${image_versions[@]}"; do
-    key="${kv%%=*}"; val="${kv#*=}"
-    echo "\"$key\":\"$val\""
-  done)'}')
+  # Safely build the expected_versions JSON using jq directly
+  expected_versions=$(jq -n 'reduce inputs as $kv ({}; .[$kv.key] = $kv.val)' \
+    --argjson inputs "$(printf '%s\n' "${image_versions[@]}" | jq -R 'split("=") | {key: .[0], val: .[1]}')"
+  )
 
+  # Then run the comparison jq
   jq --argjson expected "$expected_versions" '
     if has("image_versions")
-       and ([.image_versions[] as $val | .image_versions as $img |
-             ($img | to_entries | all(.value == $expected[.key]))] | all)
+       and (.image_versions as $actual
+            | ($actual | to_entries | all(.value == $expected[.key])))
     then
       (if has("is_active") then .is_active = true else . end)
       | (if has("provisioned") then .provisioned = true else . end)
