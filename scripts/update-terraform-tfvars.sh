@@ -79,8 +79,19 @@ if [[ "$GITHUB_REF_NAME" != "main" ]]; then
   echo "Detected push to a feature branch: $GITHUB_REF_NAME"
   git checkout "$GITHUB_REF_NAME"
 else
-  echo "Detected merge event. Base branch: $GITHUB_REF_NAME"
-  git checkout -b "update-images-$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
+  echo "Detected push to default branch. Base branch: $GITHUB_REF_NAME"
+  case "$ACTION" in
+    deprovision_infra)
+      git checkout -b "feature/deprovision_infra-$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
+      ;;
+    update_os_images)
+      git checkout -b "feature/update_os_images_$GITHUB_RUN_ID" "origin/$GITHUB_REF_NAME"
+      ;;
+    *)
+      echo "Unknown action: $ACTION"
+      exit 1
+      ;;
+  esac
 fi
 
 # Load key-value pairs
