@@ -17,28 +17,68 @@ ACTION="${ACTION:-update_os_images}"
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"  # for merges
 
 # Define Functions
-deprovision_infra() {
+promote_infra() {
   for kv in "${image_versions[@]}"; do
     image_family="${kv%%=*}"
     image_version="${kv#*=}"
 
     # Update the value in the tfvars JSON file
     jq --arg key "$image_family" --arg val "$image_version" '
-      if has("image_versions") and (.image_versions[$key] != $val) then
-        (if has("is_active") and .is_active == true then .is_active = false else . end)
-        | (if has("provisioned") then .provisioned = false else . end)
-      elif has("image_versions") and (.image_versions[$key] == $val) then
-        (if has("is_active") and .is_active == false then .is_active = true else . end)
+      if has("image_versions") and (.image_versions[$key] == $val) then
+        (if has("is_active") then .is_active = true else . end)
+        | (if has("provisioned") then .provisioned = true else . end)
       else
         .
       end
     ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
-    if [[ -n $(git status --porcelain) ]]; then
-      # Commit changes
-      git add . 
-      git commit -m "tf:$component:$ENVIRONMENT: Deprovision $deployment deployment"
-    fi
   done
+  if [[ -n $(git status --porcelain) ]]; then
+    # Commit changes
+    git add .
+    git commit -m "tf:$component:$ENVIRONMENT: Promote deployment $deployment"
+  fi
+}
+
+deprovision_infra() {
+  for kv in "${image_versions[@]}"; do
+    image_family="${kv%%=*}"
+    image_version="${kv#*=}"
+
+    jq --arg key "$image_family" --arg val "$image_version" '
+      if has("image_versions") and (.image_versions[$key] != $val) then
+        (if has("is_active") then .is_active = false else . end)
+        | (if has("provisioned") then .provisioned = false else . end)
+      else
+        .
+      end
+    ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+    # Update the value in the tfvars JSON file
+  done
+  if [[ -n $(git status --porcelain) ]]; then
+    # Commit changes
+    git add .
+    git commit -m "tf:$component:$ENVIRONMENT: Deprovision $deployment deployment"
+  fi
+}
+
+provision_infra() {
+  for kv in "${image_versions[@]}"; do
+    image_family="${kv%%=*}"
+    image_version="${kv#*=}"
+    # Update the value in the tfvars JSON file
+    jq --arg key "$image_family" --arg val "$image_version" '
+      if has("image_versions") and (.image_versions[$key] == $val) then
+        (if has("provisioned") then .provisioned = true else . end)
+      else
+        .
+      end
+    ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+  done
+  if [[ -n $(git status --porcelain) ]]; then
+    # Commit changes
+    git add .
+    git commit -m "tf:$component:$ENVIRONMENT: Provision deployment $deployment"
+  fi
 }
 
 update_os_images() {
@@ -54,7 +94,6 @@ update_os_images() {
          then .image_versions[$key] = $val
          else .
          end)
-        | (if has("provisioned") then .provisioned = true else . end)
       end
     ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
     if [[ -n $(git status --porcelain) ]]; then
@@ -124,10 +163,12 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
 
     case "$ACTION" in
       deprovision_infra)
+        promote_infra 
         deprovision_infra
         ;;
       update_os_images)
         update_os_images
+	provision_infra
         ;;
       *)
         echo "Unknown action: $ACTION"
