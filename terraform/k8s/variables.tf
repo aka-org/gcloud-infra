@@ -14,6 +14,11 @@ variable "env" {
   type        = string
 }
 
+variable "is_active" {
+  description = "Indicates whether the cluster is current active one"
+  type        = bool
+}
+
 # Settings specific to provisioned infra
 variable "gcp_zone" {
   description = "The GCP zone to deploy resources in"
