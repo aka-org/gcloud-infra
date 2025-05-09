@@ -16,18 +16,17 @@ GITHUB_RUN_ID="${GITHUB_RUN_ID:-}"
 ACTION="${ACTION:-update_os_images}"
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"  # for merges
 
+
 # Define Functions
 promote_infra() {
-  # Safely build the expected_versions JSON using jq directly
-  expected_versions=$(jq -n 'reduce inputs as $kv ({}; .[$kv.key] = $kv.val)' \
-    --argjson inputs "$(printf '%s\n' "${image_versions[@]}" | jq -R 'split("=") | {key: .[0], val: .[1]}')"
-  )
+  # Convert Bash array of key=value into valid JSON
+  expected_versions=$(printf '%s\n' "${image_versions[@]}" | jq -Rn '
+    [inputs | split("=") | {(.[0]): .[1]}] | add
+  ')
 
-  # Then run the comparison jq
   jq --argjson expected "$expected_versions" '
-    if has("image_versions")
-       and (.image_versions as $actual
-            | ($actual | to_entries | all(.value == $expected[.key])))
+    if has("image_versions") and
+       (.image_versions | to_entries | all(.value == $expected[.key]))
     then
       (if has("is_active") then .is_active = true else . end)
       | (if has("provisioned") then .provisioned = true else . end)
@@ -139,6 +138,8 @@ else
   git checkout -b $BRANCH_NAME "origin/$GITHUB_REF_NAME"
 fi
 
+PROJECT="gcloud-infra-testing-aab1735b"
+ENVIRONMENT="testing"
 # Load key-value pairs
 mapfile -t image_versions < <(
   gcloud compute images list \
