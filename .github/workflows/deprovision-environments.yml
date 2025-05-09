@@ -1,4 +1,4 @@
-name: Manual Workflow for Multiple Environments
+name: Deprovision obsolete infra components
 
 on:
   workflow_dispatch:

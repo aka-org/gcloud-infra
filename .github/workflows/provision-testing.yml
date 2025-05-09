@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'auto/**'
     paths:
       - 'terraform/**'
 
