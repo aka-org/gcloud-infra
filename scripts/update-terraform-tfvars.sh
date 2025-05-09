@@ -78,7 +78,7 @@ cd repo
 if [[ "$GITHUB_REF_NAME" != "main" ]]; then
   echo "Detected push to a feature branch: $GITHUB_REF_NAME"
   BRANCH_NAME="$GITHUB_REF_NAME"	    
-  git checkout "BRANCH_NAME"
+  git checkout $BRANCH_NAME
 else
   echo "Detected push to default branch. Base branch: $GITHUB_REF_NAME"
   case "$ACTION" in
@@ -93,7 +93,7 @@ else
       exit 1
       ;;
   esac
-  git checkout -b $BRANCH "origin/$GITHUB_REF_NAME"
+  git checkout -b $BRANCH_NAME "origin/$GITHUB_REF_NAME"
 fi
 
 # Load key-value pairs
