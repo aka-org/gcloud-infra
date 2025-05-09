@@ -29,6 +29,7 @@ module "load_balancers" {
   vm_defaults     = var.lb_node_defaults
   vms             = local.lb_nodes
   env             = var.env
+  is_active       = var.is_active
   image_project   = var.project_id
   image_versions  = var.image_versions
   admin_ssh_keys  = var.admin_ssh_keys

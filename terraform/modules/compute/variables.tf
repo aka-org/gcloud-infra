@@ -2,6 +2,11 @@ variable "env" {
   description = "Infrastructure environment"
   type        = string
 }
+variable "is_active" {
+  description = "Indicates whether the cluster is current active one"
+  type        = bool
+  default     = true
+}
 variable "service_account" {
   description = "Name of the service account to assign to vm"
   type        = string

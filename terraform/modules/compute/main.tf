@@ -21,9 +21,10 @@ locals {
         subnetwork      = var.subnetwork
         image           = "projects/${var.image_project}/global/images/${vm.image_family}-${var.image_versions[vm.image_family]}"
         labels = {
-          version = replace(var.image_versions[vm.image_family], "-", "_")
-          env           = var.env
-          role          = vm.role
+          version   = replace(var.image_versions[vm.image_family], "-", "_")
+          env       = var.env
+          role      = vm.role
+          is_active = var.is_active    
         }
       }
     )
