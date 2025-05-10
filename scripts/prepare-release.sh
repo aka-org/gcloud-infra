@@ -63,12 +63,12 @@ update_os_images() {
     image_family="${kv%%=*}"
     image_version="${kv#*=}"
     # Update the value in the tfvars JSON file
-    jq --arg key "$image_family" --arg val "$image_version" '
+    jq --arg key "$image_family" --arg val "$image_version" --arg version "$RELEASE_VERSION" '
       if has("is_active") and .is_active == true then
         .
       else
         (if has("images") and (.images | has($key))
-         then .images[$key] = $val
+         then .images[$key] = $val | .release = $version
          else .
          end)
       end
