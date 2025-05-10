@@ -26,10 +26,11 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history and tags
 
+      - name: Read Release version from release manifest
+        run: echo "RELEASE=$(jq -r '.version' "releases/release-manifest.${{ env.ENVIRONMENT  }}.json")" >> $GITHUB_ENV
+
       - name: Tag Release
         run: |
-          echo "RELEASE=$(jq -r '.version' "releases/release-manifest.${{ env.ENVIRONMENT  }}.json")" >> $GITHUB_ENV
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.CICD_TOKEN }}@github.com/${{ github.repository }}
@@ -40,5 +41,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2.2.2
         with:
+          token: ${{ secrets.CICD_TOKEN }}
           tag_name: v${{ env.RELEASE }}
           name: "Release ${{ env.RELEASE }} for ${{ env.ENVIRONMENT }} environment"
