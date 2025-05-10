@@ -35,7 +35,6 @@ jobs:
     env:
       PKR_VAR_project_id: ${{ inputs.project }}
       PKR_VAR_build_version: ${{ inputs.build-version }} 
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
 
     steps:
       - name: Checkout repo

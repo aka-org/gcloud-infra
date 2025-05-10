@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-22.04 
     environment: ${{ inputs.environment }}
     env:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ inputs.environment }}
       RELEASE_VERSION: ${{ inputs.version }}
