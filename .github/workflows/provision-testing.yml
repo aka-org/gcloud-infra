@@ -5,6 +5,7 @@ on:
     branches:
       - 'feature/**'
       - 'auto/**'
+      - 'main'
     paths:
       - 'terraform/**'
 
