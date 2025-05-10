@@ -138,8 +138,6 @@ else
   git checkout -b $BRANCH_NAME "origin/$GITHUB_REF_NAME"
 fi
 
-PROJECT="gcloud-infra-testing-aab1735b"
-ENVIRONMENT="testing"
 # Load key-value pairs
 mapfile -t image_versions < <(
   gcloud compute images list \
