@@ -33,7 +33,7 @@ module "iam" {
   source           = "../modules/iam"
   service_accounts = var.service_accounts
   project_id       = module.project.project_id
-  release                 = var.release
+  release          = var.release
   depends_on       = [module.project]
 
   providers = {
