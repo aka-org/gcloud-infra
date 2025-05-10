@@ -19,6 +19,7 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       ENVIRONMENT: ${{ inputs.environment }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
 
     steps:
       - name: Checkout repo
@@ -30,13 +31,7 @@ jobs:
         run: echo "RELEASE=$(jq -r '.version' "releases/release-manifest.$ENVIRONMENT.json")" >> $GITHUB_ENV
 
       - name: Tag Release
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${{ secrets.CICD_TOKEN }}@github.com/${{ github.repository }}"
-
-          git tag -a "v$RELEASE" -m "Release $RELEASE for $ENVIRONMENT environment"
-          git push origin "v$RELEASE"
+        run: scripts/tag-release.sh 
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.2.2
