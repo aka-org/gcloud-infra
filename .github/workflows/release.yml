@@ -18,7 +18,6 @@ jobs:
     runs-on: ${{ inputs.github-runner }} 
     environment: ${{ inputs.environment }}
     env:
-      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ inputs.environment }}
 
     steps:
@@ -33,6 +32,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.CICD_TOKEN }}@github.com/${{ github.repository }}
 
           git tag -a "v${{ env.RELEASE }}" -m "Release ${{ env.RELEASE }} for ${{ env.ENVIRONMENT }} environment"
           git push origin "v${{ env.RELEASE }}"
