@@ -28,7 +28,7 @@ jobs:
 
       - name: Tag Release
         run: |
-          echo "RELEASE=$(jq -r '.version' "releases/release-manifest.$ENVIRONMENT.json")" >> $GITHUB_ENV
+          echo "RELEASE=$(jq -r '.version' "releases/release-manifest.${{ env.ENVIRONMENT  }}.json")" >> $GITHUB_ENV
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
