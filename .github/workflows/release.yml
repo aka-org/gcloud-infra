@@ -24,8 +24,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 0 # Fetch all history and tags
 
       - name: Read Release version from release manifest
         run: echo "RELEASE=$(jq -r '.version' "releases/release-manifest.$ENVIRONMENT.json")" >> $GITHUB_ENV
