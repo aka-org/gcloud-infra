@@ -43,6 +43,14 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
+      - name: Set RELEASE environment variable
+        run: |
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
+          fi
+
       - name: Update release manifest, terraform tfvars and tag release
         run: scripts/prepare-release.sh
 
