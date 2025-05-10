@@ -140,7 +140,7 @@ if [ -z $DEBUG ]; then
   cd repo
 
   # Create new branch
-  BRANCH_NAME="auto/prepare_release_$RELEASE"
+  BRANCH_NAME="releases/prepare_release_$RELEASE"
   git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
   GIT_COMMIT="$(git rev-parse HEAD)" 
 else
