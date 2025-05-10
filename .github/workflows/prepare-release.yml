@@ -44,5 +44,5 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
-      - name: Update terraform tfvars 
+      - name: Update release manifest and terraform tfvars 
         run: scripts/prepare-release.sh
