@@ -6,11 +6,12 @@ set -euo pipefail
 CICD_TOKEN="${CICD_TOKEN:-}"
 ENVIRONMENT="${ENVIRONMENT:-testing}"
 RELEASE_VERSION="${RELEASE_VERSION:-0.0.1}"
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"
 DEBUG="${1:-${DEBUG:-}}"
 
 # Inputs
-REPO_URL="https://github.com/aka-org/gcloud_infra.git"
+REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
 GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
 RELEASE_MANIFEST="releases/release-manifest.$ENVIRONMENT.json"
