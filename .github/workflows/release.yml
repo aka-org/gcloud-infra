@@ -7,7 +7,7 @@ on:
         required: true
         type: string
       github-runner:
-        requred: true
+        required: true
         type: string
     secrets:
       CICD_TOKEN:
@@ -34,11 +34,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git tag -a "v${{ env.RELEASE }}" -m "Release ${{ env.RELEASE }}"
-          git push origin "v{{ env.$RELEASE }}"
+          git tag -a "v${{ env.RELEASE }}" -m "Release ${{ env.RELEASE }} for ${{ env.ENVIRONMENT }} environment"
+          git push origin "v${{ env.RELEASE }}"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.2.2
         with:
           tag_name: v${{ env.RELEASE }}
-          name: "Release ${{ env.RELEASE }} for ${{ env.ENVIRONMENT }}"
+          name: "Release ${{ env.RELEASE }} for ${{ env.ENVIRONMENT }} environment"
