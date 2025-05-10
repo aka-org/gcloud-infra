@@ -2,10 +2,11 @@ name: Provision Testing Environment
 
 on:
   push:
+    tags:
+      - '*-testing'
     branches:
       - 'feature/**'
       - 'auto/**'
-      - 'main'
     paths:
       - 'terraform/**'
 
