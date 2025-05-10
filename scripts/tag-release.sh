@@ -11,14 +11,14 @@ REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
 WORK_DIR=$(mktemp -d)
 
 cd "$WORK_DIR"
-# Configure git
-git config user.name "github-actions[bot]"
-git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
 # Clone
 git clone "https://${CICD_TOKEN}@${REPO_URL#https://}" repo
 cd repo
-
+# Configure git
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git remote set-url origin "https://x-access-token:$CICD_TOKEN@github.com/$GITHUB_REPOSITORY"
+
+# tag release and push 
 git tag -a "v$RELEASE" -m "Release $RELEASE for $ENVIRONMENT environment"
 git push origin "v$RELEASE"
