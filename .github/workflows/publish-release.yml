@@ -1,0 +1,33 @@
+name: Publish Release  
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'releases/**'
+
+jobs:
+  filter-releases:
+    runs-on: ubuntu-22.04
+    outputs:
+      testing: ${{ steps.filter-releases.outputs.testing }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: dorny/paths-filter@v3.0.2
+        id: filter-releases
+        with:
+          filters: |
+            testing:
+              - 'releases/release-manifest.testing.json'
+
+  testing:
+    needs: filter-releases
+    if: needs.filter-releases.outputs.testing == 'true' 
+    uses: ./.github/workflows/release.yml
+    with:
+      environment: testing
+      github-runner: ubuntu-22.04
+    secrets:
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
