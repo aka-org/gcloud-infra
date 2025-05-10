@@ -14,6 +14,7 @@ REPO_URL="https://github.com/aka-org/gcloud_infra.git"
 GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
 RELEASE_MANIFEST="releases/release-manifest.$ENVIRONMENT.json"
+RELEASE="$RELEASE_VERSION-$ENVIRONMENT"
 
 update_release_manifest() {
   # Load latest os images key-value pairs from gcloud
@@ -32,7 +33,7 @@ update_release_manifest() {
   )
 
   # Update release manifest
-  jq --arg version "$RELEASE_VERSION" \
+  jq --arg version "$RELEASE" \
      --arg git_commit "$GIT_COMMIT" \
      --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
      '
@@ -53,7 +54,7 @@ update_release_manifest() {
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
       git add . 
-      git commit -m "tf:releases: Update release manifest of $ENVIRONMENT based on $GIT_COMMIT"
+      git commit -m "tf:releases: Update release manifest of $ENVIRONMENT for release $RELEASE"
       echo "✅ Release manifest updated."
     fi
   fi
@@ -69,7 +70,7 @@ update_os_images() {
     image_family="${kv%%=*}"
     image_version="${kv#*=}"
     # Update the value in the tfvars JSON file
-    jq --arg key "$image_family" --arg val "$image_version" --arg version "$RELEASE_VERSION" '
+    jq --arg key "$image_family" --arg val "$image_version" --arg version "$RELEASE" '
       if has("is_active") and .is_active == true then
         .
       else
@@ -139,7 +140,7 @@ if [ -z $DEBUG ]; then
   cd repo
 
   # Create new branch
-  BRANCH_NAME="auto/prepare_release_$RELEASE_VERSION"
+  BRANCH_NAME="auto/prepare_release_$RELEASE"
   git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
   GIT_COMMIT="$(git rev-parse HEAD)" 
 else
