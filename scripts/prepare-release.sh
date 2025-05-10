@@ -84,6 +84,27 @@ update_os_images() {
   done
 }
 
+provision_infra() {
+  # Read the release version from the release manifest
+  version=$(jq -r '.version' "$RELEASE_MANIFEST")
+  # Update the value in the tfvars JSON file
+  jq --arg release "$version" '
+    if has("release") and (.release == $release) then
+      (if has("provisioned") then .provisioned = true else . end)
+    else
+      .
+    end
+  ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+
+  if [ -z $DEBUG ]; then
+    if [[ -n $(git status --porcelain) ]]; then
+      # Commit changes
+      git add .
+      git commit -m "tf:$component:$ENVIRONMENT: Provision deployment $deployment"
+    fi
+  fi
+}
+
 if [ -z $DEBUG ]; then
   WORK_DIR=$(mktemp -d)
   cd "$WORK_DIR"
@@ -110,7 +131,7 @@ TFVARS_FILE=$(jq -r '.terraform.tfvars_file' "$RELEASE_MANIFEST")
 # Update release manifest
 update_release_manifest
 
-# Read the updated release manifest
+# Read the images from the updated release manifest
 mapfile -t images < <(
   jq -r '.images | to_entries[] | "\(.key)=\(.value)"' $RELEASE_MANIFEST
 )
@@ -127,6 +148,8 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
     echo "Updating file: $tfvars_json"
     # Update image versions of components and deployments
     update_os_images
+    # Provision infra for new release
+    provision_infra
   done
 done
 
