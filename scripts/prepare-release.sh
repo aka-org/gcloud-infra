@@ -54,6 +54,7 @@ update_release_manifest() {
       # Commit changes
       git add . 
       git commit -m "tf:releases: Update release manifest of $ENVIRONMENT based on $GIT_COMMIT"
+      echo "✅ Release manifest updated."
     fi
   fi
 }
@@ -109,6 +110,11 @@ TFVARS_FILE=$(jq -r '.terraform.tfvars_file' "$RELEASE_MANIFEST")
 # Update release manifest
 update_release_manifest
 
+# Read the updated release manifest
+mapfile -t images < <(
+  jq -r '.images | to_entries[] | "\(.key)=\(.value)"' $RELEASE_MANIFEST
+)
+
 # Loop through all directories matching ENV name under the root
 find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
   echo "Processing directory: $vars_dir"
@@ -119,15 +125,16 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
     component=$(basename "$(dirname "$parent_dir")")
     deployment=$(basename "$tfvars_json" | cut -d\. -f1)
     echo "Updating file: $tfvars_json"
+    # Update image versions of components and deployments
     update_os_images
   done
 done
 
-: '
-# Push commits
-if [[ $(git rev-list --count origin/HEAD..HEAD) -gt 0 ]]; then
-  echo "New commits found, pushing to remote..."
-  git push origin "$BRANCH_NAME"
-  echo "✅ Terraform tfvars updated and pushed."
+if [ -z $DEBUG ]; then
+  # Push commits
+  if [[ $(git rev-list --count origin/HEAD..HEAD) -gt 0 ]]; then
+    echo "New commits found, pushing to remote..."
+    git push origin "$BRANCH_NAME"
+    echo "✅ Terraform tfvars updated and pushed."
+  fi
 fi
-'
