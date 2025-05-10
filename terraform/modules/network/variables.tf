@@ -1,3 +1,8 @@
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
+
 variable "vpc_name" {
   description = "Name of the vpc to be created"
   type        = string

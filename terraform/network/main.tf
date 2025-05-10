@@ -17,4 +17,5 @@ module "network" {
   vpc_name       = var.vpc_name
   subnetworks    = var.subnetworks
   firewall_rules = var.firewall_rules
+  release        = var.release
 }

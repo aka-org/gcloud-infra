@@ -21,6 +21,11 @@ variable "billing_account_id" {
   default     = ""
 }
 
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
+
 # Google APIs
 variable "enable_apis" {
   description = "Lists of Google APIs to be enabled"

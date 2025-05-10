@@ -60,6 +60,11 @@ update_release_manifest() {
 }
 
 update_os_images() {
+  # Read the images from the updated release manifest
+  mapfile -t images < <(
+    jq -r '.images | to_entries[] | "\(.key)=\(.value)"' $RELEASE_MANIFEST
+  )
+
   for kv in "${images[@]}"; do
     image_family="${kv%%=*}"
     image_version="${kv#*=}"
@@ -69,9 +74,7 @@ update_os_images() {
         .
       else
         (if has("images") and (.images | has($key))
-         then .images[$key] = $val | .release = $version
-         else .
-         end)
+         then .images[$key] = $val else . end)
       end
     ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
     if [ -z $DEBUG ]; then
@@ -82,6 +85,25 @@ update_os_images() {
       fi
     fi
   done
+
+  # Read the release version from the release manifest
+  version=$(jq -r '.version' "$RELEASE_MANIFEST")
+  # Update the value in the tfvars JSON file
+  jq --arg release "$version" '
+    if has("is_active") and .is_active == true then
+      .
+    else
+      .release = $release
+    end
+  ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+
+  if [ -z $DEBUG ]; then
+    if [[ -n $(git status --porcelain) ]]; then
+      # Commit changes
+      git add .
+      git commit -m "tf:$component:$ENVIRONMENT: Update release version of deployment $deployment to $version"
+    fi
+  fi
 }
 
 provision_infra() {
@@ -131,11 +153,6 @@ TFVARS_FILE=$(jq -r '.terraform.tfvars_file' "$RELEASE_MANIFEST")
 
 # Update release manifest
 update_release_manifest
-
-# Read the images from the updated release manifest
-mapfile -t images < <(
-  jq -r '.images | to_entries[] | "\(.key)=\(.value)"' $RELEASE_MANIFEST
-)
 
 # Loop through all directories matching ENV name under the root
 find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do

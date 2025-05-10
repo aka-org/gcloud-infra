@@ -26,12 +26,14 @@ module "project" {
   enable_apis             = var.enable_apis
   buckets                 = var.buckets
   gcs_backend             = var.gcs_backend
+  release                 = var.release
 }
 
 module "iam" {
   source           = "../modules/iam"
   service_accounts = var.service_accounts
   project_id       = module.project.project_id
+  release          = var.release
   depends_on       = [module.project]
 
   providers = {

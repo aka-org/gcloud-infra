@@ -25,7 +25,7 @@ locals {
           image     = replace(var.images[vm.image_family], "-", "_")
           env       = var.env
           role      = vm.role
-          is_active = var.is_active    
+          is_active = var.is_active
         }
       }
     )
