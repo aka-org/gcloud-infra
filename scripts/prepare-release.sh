@@ -5,7 +5,7 @@ set -euo pipefail
 # GitHub environment variables (in GitHub Actions)
 CICD_TOKEN="${CICD_TOKEN:-}"
 ENVIRONMENT="${ENVIRONMENT:-testing}"
-RELEASE_VERSION="${RELEASE_VERSION:-0.0.1}"
+RELEASE="${RELEASE:-0.0.1-testing}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"
 DEBUG="${1:-${DEBUG:-}}"
@@ -15,7 +15,6 @@ REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
 GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
 RELEASE_MANIFEST="releases/release-manifest.$ENVIRONMENT.json"
-RELEASE="$RELEASE_VERSION-$ENVIRONMENT"
 
 update_release_manifest() {
   # Load latest os images key-value pairs from gcloud
@@ -180,4 +179,8 @@ if [ -z $DEBUG ]; then
     git push origin "$BRANCH_NAME"
     echo "✅ Terraform tfvars updated and pushed."
   fi
+  # Add and put tag
+  # tag release and push
+  git tag -a "v$RELEASE" -m "Release $RELEASE for $ENVIRONMENT environment"
+  git push origin "v$RELEASE"
 fi
