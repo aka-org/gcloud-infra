@@ -34,7 +34,7 @@ locals {
           {
             env     = var.env
             role    = node.role
-            version  = replace(replace(var.release, ".", "_"), "-", "_")
+            version = replace(replace(var.release, ".", "_"), "-", "_")
           }
         )
       }
