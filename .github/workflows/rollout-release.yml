@@ -1,4 +1,4 @@
-name: Prepare Release
+name: Rollout Release
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
     env:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE: ${{ inputs.version }}-${{ inputs.environment }}
 
     steps:
       - name: Checkout repo
@@ -43,5 +43,12 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
-      - name: Update release manifest and terraform tfvars 
+      - name: Update release manifest, terraform tfvars and tag release
         run: scripts/prepare-release.sh
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          token: ${{ secrets.CICD_TOKEN }}
+          tag_name: v${{ env.RELEASE }}
+          name: "v${{ env.RELEASE }}"
