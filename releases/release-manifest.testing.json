@@ -5,8 +5,8 @@
     "tfvars_file": "*.tfvars.json"
   },
   "version": "0.0.4-testing",
-  "git_commit": "d8dbcad775e7406b9a63ed27972a58bfb6516942",
-  "timestamp": "2025-05-10T15:53:31Z",
+  "git_commit": "c91809c54cbfeca0bdb8ce6b1719303c8f90ce1a",
+  "timestamp": "2025-05-10T16:02:18Z",
   "images": {
     "k8s-node": "1-0-0-build102",
     "load-balancer": "1-0-0-build6"
