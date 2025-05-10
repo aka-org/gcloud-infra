@@ -8,21 +8,6 @@ on:
       - 'packer/**'
 
 jobs:
-  #pre_job:
-  # continue-on-error: true # Uncomment once integration is finished
-  # runs-on: ubuntu-22.04
-  # Map a step output to a job output
-  # outputs:
-  #   should_skip: ${{ steps.skip_check.outputs.should_skip }}
-  # steps:
-  #   - id: skip_check
-  #     uses: fkirc/skip-duplicate-actions@v5.3.1
-  #     with:
-  #       # All of these options are optional, so you can remove them if you are happy with the defaults
-  #       #concurrent_skipping: 'never'
-  #       skip_after_successful_duplicate: 'true'
-  #       # paths_ignore: '["**/README.md", "**/docs/**"]'
-  #       #do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
   filter-images:
     runs-on: ubuntu-22.04 
     outputs:
@@ -68,16 +53,3 @@ jobs:
       build-version: build${{ github.run_number }}
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-
-  update_os_images:
-    needs: [k8s-node,load-balancer]
-    if: ${{ ! failure() && ! cancelled()}}
-    uses: ./.github/workflows/update-terraform-vars.yml
-    with:
-      environment: testing
-      project: gcloud-infra-testing-aab1735b 
-      github-runner: ubuntu-22.04
-      action: update_os_images
-    secrets:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}

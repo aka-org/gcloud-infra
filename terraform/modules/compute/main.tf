@@ -19,9 +19,10 @@ locals {
       {
         service_account = data.google_service_account.sa.email
         subnetwork      = var.subnetwork
-        image           = "projects/${var.image_project}/global/images/${vm.image_family}-${var.image_versions[vm.image_family]}"
+        image           = "projects/${var.image_project}/global/images/${vm.image_family}-${var.images[vm.image_family]}"
         labels = {
-          version   = replace(var.image_versions[vm.image_family], "-", "_")
+          version   = replace(var.release, ".", "_")
+          image     = replace(var.images[vm.image_family], "-", "_")
           env       = var.env
           role      = vm.role
           is_active = var.is_active    

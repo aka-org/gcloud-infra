@@ -14,6 +14,11 @@ variable "env" {
   type        = string
 }
 
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
+
 variable "is_active" {
   description = "Indicates whether the cluster is current active one"
   type        = bool
@@ -39,7 +44,7 @@ variable "subnetwork" {
   description = "Name of subnetwork"
   type        = string
 }
-variable "image_versions" {
+variable "images" {
   description = "Mapping of image families to image versions used for provisioning"
   type        = map(string)
 }

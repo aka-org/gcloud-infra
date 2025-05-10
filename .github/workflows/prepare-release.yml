@@ -1,19 +1,20 @@
-name: Update Terraform tfvars 
+name: Prepare Release
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       environment:
+        description: 'Select the environment'
         required: true
-        type: string
-      github-runner:
+        default: 'testing'
+        type: choice
+        options:
+          - prod
+          - testing
+      version:
+        description: 'Enter the version for the release'
         required: true
-        type: string
-      project:
-        required: true
-        type: string
-      action:
-        required: true
+        default: '0.0.1'
         type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
@@ -22,15 +23,14 @@ on:
         required: false
 
 jobs:
-  update_tfvars:
-    runs-on: ${{ inputs.github-runner }}
+  prepare_release:
+    runs-on: ubuntu-22.04 
     environment: ${{ inputs.environment }}
     env:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ inputs.environment }}
-      PROJECT: ${{ inputs.project }}
-      ACTION: ${{ inputs.action }}
+      RELEASE_VERSION: ${{ inputs.version }}
 
     steps:
       - name: Checkout repo
@@ -45,4 +45,4 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
       - name: Update terraform tfvars 
-        run: scripts/update-terraform-tfvars.sh
+        run: scripts/prepare-release.sh

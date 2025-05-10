@@ -2,6 +2,10 @@ variable "env" {
   description = "Infrastructure environment"
   type        = string
 }
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
 variable "is_active" {
   description = "Indicates whether the cluster is current active one"
   type        = bool
@@ -25,7 +29,7 @@ variable "image_project" {
   description = "The project id of the project where the OS Image is stored"
   type        = string
 }
-variable "image_versions" {
+variable "images" {
   description = "Mapping of image families to image versions used for provisioning"
   type        = map(string)
 }

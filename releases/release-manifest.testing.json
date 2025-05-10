@@ -1,0 +1,14 @@
+{
+  "terraform": {
+    "environment": "testing",
+    "project": "gcloud-infra-testing-aab1735b",
+    "tfvars_file": "*.tfvars.json"
+  },
+  "version": "0.0.1",
+  "git_commit": "no_commit",
+  "timestamp": "2025-05-10T09:52:52Z",
+  "images": {
+    "k8s-node": "1-0-0-build102",
+    "load-balancer": "1-0-0-build6"
+  }
+}
