@@ -4,6 +4,10 @@ variable "project_id" {
   type        = string
   default     = ""
 }
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
 
 # Service Account
 variable "service_accounts" {

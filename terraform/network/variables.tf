@@ -4,6 +4,12 @@ variable "project_id" {
   type        = string
   default     = "us-east1"
 }
+
+variable "release" {
+  description = "SemVer compliant version used to identify different releases of infra"
+  type        = string
+}
+
 variable "gcp_region" {
   description = "The GCP region to deploy resources in"
   type        = string
