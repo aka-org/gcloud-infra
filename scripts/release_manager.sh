@@ -64,7 +64,7 @@ update_release_manifest() {
 }
 
 git_commit() {
-  commit_message = "$1"
+  commit_message="$1"
   if [ -z $DEBUG ]; then
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
@@ -75,6 +75,12 @@ git_commit() {
         git commit -m "tf:$component:$ENVIRONMENT:$deployment: $commit_message"
       fi	
     fi
+  else
+    if [ $ENVIRONMENT == $deployment ];then
+      echo "tf:$component:$ENVIRONMENT: $commit_message"
+    else
+      echo "tf:$component:$ENVIRONMENT:$deployment: $commit_message"
+    fi
   fi
 }
 
@@ -82,7 +88,7 @@ promote_component() {
   # Read the release version from the release manifest
   version=$(jq -r '.version' "$RELEASE_MANIFEST")
   # Ensure that component is active and provisioned 
-  jq --argjson release "$version" '
+  jq --arg release "$version" '
     if has("release") and (.release == $release) then
       (if has("is_active") then .is_active = true else . end)
       | (if has("provisioned") then .provisioned = true else . end)
@@ -99,7 +105,8 @@ deprovision_component() {
   # Update the value in the tfvars JSON file
   jq --arg release "$version" '
     if has("release") and (.release != $release) then
-      (if has("provisioned") then .provisioned = false else . end)
+      (if has("is_active") then .is_active = false else . end)
+      | (if has("provisioned") then .provisioned = false else . end)
     else
       .
     end
@@ -178,8 +185,6 @@ if [ -z $DEBUG ]; then
       BRANCH_NAME="releases/prepare_release_$RELEASE"
       git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       GIT_COMMIT="$(git rev-parse HEAD)" 
-      PROJECT=$(jq -r '.terraform.project' "$RELEASE_MANIFEST")
-      update_release_manifest
       ;;
     ROLLOUT)
       BRANCH_NAME="releases/rollout_release_$RELEASE"
@@ -196,6 +201,12 @@ if [ -z $DEBUG ]; then
 else
   WORK_DIR=$(pwd)
   GIT_COMMIT="no_commit" 
+fi
+
+# If action is PREPARE update the release manifest
+if [ $ACTION == "PREPARE" ]; then
+  PROJECT=$(jq -r '.terraform.project' "$RELEASE_MANIFEST")
+  update_release_manifest
 fi
 
 # Read the suffic of tfvars files we need to read through
