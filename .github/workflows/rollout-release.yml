@@ -37,13 +37,7 @@ jobs:
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
             MATRIX+=('{"env":"prod")
           fi
-          # Join the array safely
-          JSON_MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -s '.')
-
-          # Set the output properly
-          cat <<EOF >> "$GITHUB_OUTPUT"
-          matrix=$JSON_MATRIX
-          EOF
+          echo "matrix=$(echo "${MATRIX[@]}" | jq -s .)" >> "$GITHUB_OUTPUT"
 
   rollout_release:
     needs: filter_envs
