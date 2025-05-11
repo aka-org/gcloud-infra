@@ -6,16 +6,19 @@ set -euo pipefail
 CICD_TOKEN="${CICD_TOKEN:-}"
 ENVIRONMENT="${ENVIRONMENT:-testing}"
 RELEASE="${RELEASE:-0.0.1-testing}"
+RELEASE_MANIFEST="${RELEASE_MANIFEST:-releases/release-manifest.testing.json}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 GITHUB_REF_NAME="${GITHUB_REF_NAME:-main}"
+TAG_REF="${TAG_REF:-}"
+ACTION="${ACTION:-ROLLOUT}"
 DEBUG="${1:-${DEBUG:-}}"
 
 # Inputs
 REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
 GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
-RELEASE_MANIFEST="releases/release-manifest.$ENVIRONMENT.json"
 
+# Define Functions
 update_release_manifest() {
   # Load latest os images key-value pairs from gcloud
   mapfile -t images < <(
@@ -54,10 +57,62 @@ update_release_manifest() {
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
       git add . 
-      git commit -m "tf:releases: Update release manifest of $ENVIRONMENT for release $RELEASE"
+      git commit -m "tf:releases:$ENVIRONMENT: Update release manifest for release $RELEASE"
       echo "✅ Release manifest updated."
     fi
   fi
+}
+
+git_commit() {
+  commit_message="$1"
+  if [ -z $DEBUG ]; then
+    if [[ -n $(git status --porcelain) ]]; then
+      # Commit changes
+      git add .
+      if [ $ENVIRONMENT == $deployment ];then
+        git commit -m "tf:$component:$ENVIRONMENT: $commit_message"
+      else
+        git commit -m "tf:$component:$ENVIRONMENT:$deployment: $commit_message"
+      fi	
+    fi
+  else
+    if [ $ENVIRONMENT == $deployment ];then
+      echo "tf:$component:$ENVIRONMENT: $commit_message"
+    else
+      echo "tf:$component:$ENVIRONMENT:$deployment: $commit_message"
+    fi
+  fi
+}
+
+promote_component() {
+  # Read the release version from the release manifest
+  version=$(jq -r '.version' "$RELEASE_MANIFEST")
+  # Ensure that component is active and provisioned 
+  jq --arg release "$version" '
+    if has("release") and (.release == $release) then
+      (if has("is_active") then .is_active = true else . end)
+      | (if has("provisioned") then .provisioned = true else . end)
+    else
+      .
+    end
+  ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+  git_commit "Promote componet"
+}
+
+deprovision_component() {
+  # Read the release version from the release manifest
+  version=$(jq -r '.version' "$RELEASE_MANIFEST")
+  # Update the value in the tfvars JSON file
+  jq --arg release "$version" '
+    if has("release") and (.release != $release) then
+      (if has("is_active") then .is_active = false else . end)
+      | (if has("provisioned") then .provisioned = false else . end)
+    else
+      .
+    end
+  ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
+
+  git_commit "Deprovision component"
 }
 
 update_os_images() {
@@ -70,7 +125,7 @@ update_os_images() {
     image_family="${kv%%=*}"
     image_version="${kv#*=}"
     # Update the value in the tfvars JSON file
-    jq --arg key "$image_family" --arg val "$image_version" --arg version "$RELEASE" '
+    jq --arg key "$image_family" --arg val "$image_version" '
       if has("is_active") and .is_active == true then
         .
       else
@@ -78,15 +133,12 @@ update_os_images() {
          then .images[$key] = $val else . end)
       end
     ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
-    if [ -z $DEBUG ]; then
-      if [[ -n $(git status --porcelain) ]]; then
-        # Commit changes
-        git add . 
-        git commit -m "tf:$component:$ENVIRONMENT: Update image $image_family of $deployment deployment to version $image_version"
-      fi
-    fi
+     
+    git_commit "Update image $image_family to version $image_version"
   done
+}
 
+update_release_versions() {
   # Read the release version from the release manifest
   version=$(jq -r '.version' "$RELEASE_MANIFEST")
   # Update the value in the tfvars JSON file
@@ -98,16 +150,10 @@ update_os_images() {
     end
   ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
 
-  if [ -z $DEBUG ]; then
-    if [[ -n $(git status --porcelain) ]]; then
-      # Commit changes
-      git add .
-      git commit -m "tf:$component:$ENVIRONMENT: Update release version of deployment $deployment to $version"
-    fi
-  fi
+  git_commit "Update release version of component to $version"
 }
 
-provision_infra() {
+provision_component() {
   # Read the release version from the release manifest
   version=$(jq -r '.version' "$RELEASE_MANIFEST")
   # Update the value in the tfvars JSON file
@@ -119,15 +165,10 @@ provision_infra() {
     end
   ' "$tfvars_json" > tmp.json && mv tmp.json "$tfvars_json"
 
-  if [ -z $DEBUG ]; then
-    if [[ -n $(git status --porcelain) ]]; then
-      # Commit changes
-      git add .
-      git commit -m "tf:$component:$ENVIRONMENT: Provision deployment $deployment"
-    fi
-  fi
+  git_commit "Provision component"
 }
 
+# Main Prep per case of ACTION
 if [ -z $DEBUG ]; then
   WORK_DIR=$(mktemp -d)
   cd "$WORK_DIR"
@@ -139,22 +180,37 @@ if [ -z $DEBUG ]; then
   git clone "https://${CICD_TOKEN}@${REPO_URL#https://}" repo
   cd repo
 
-  # Create new branch
-  BRANCH_NAME="releases/prepare_release_$RELEASE"
-  git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
-  GIT_COMMIT="$(git rev-parse HEAD)" 
+  case $ACTION in
+    PREPARE)
+      BRANCH_NAME="releases/prepare_release_$RELEASE"
+      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
+      GIT_COMMIT="$(git rev-parse HEAD)" 
+      ;;
+    ROLLOUT)
+      BRANCH_NAME="releases/rollout_release_$RELEASE"
+      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
+      ;;
+    ROLLBACK)
+      echo "Not implemented"
+      ;;
+    *)
+      echo "Unknown action $ACTION specified"	    
+      exit 1
+      ;;
+  esac
 else
   WORK_DIR=$(pwd)
   GIT_COMMIT="no_commit" 
 fi
 
-# Read some values from the release manifest
-PROJECT=$(jq -r '.terraform.project' "$RELEASE_MANIFEST")
+# If action is PREPARE update the release manifest
+if [ $ACTION == "PREPARE" ]; then
+  PROJECT=$(jq -r '.terraform.project' "$RELEASE_MANIFEST")
+  update_release_manifest
+fi
+
+# Read the suffic of tfvars files we need to read through
 TFVARS_FILE=$(jq -r '.terraform.tfvars_file' "$RELEASE_MANIFEST")
-
-# Update release manifest
-update_release_manifest
-
 # Loop through all directories matching ENV name under the root
 find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
   echo "Processing directory: $vars_dir"
@@ -165,10 +221,25 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
     component=$(basename "$(dirname "$parent_dir")")
     deployment=$(basename "$tfvars_json" | cut -d\. -f1)
     echo "Updating file: $tfvars_json"
-    # Update image versions of components and deployments
-    update_os_images
-    # Provision infra for new release
-    provision_infra
+    case $ACTION in
+      PREPARE)
+        # Update image versions of components and deployments
+        update_os_images
+        # Update image versions of components and deployments
+        update_release_versions 
+        # Provision infra for new release
+        provision_component
+        ;;
+      ROLLOUT)
+        # Promote component with matching release version to current active
+        promote_component
+        # Deprovisioning component with old release version
+        deprovision_component
+        ;;
+      ROLLBACK)
+        echo "Not implemented"
+        ;;
+    esac
   done
 done
 
@@ -179,8 +250,9 @@ if [ -z $DEBUG ]; then
     git push origin "$BRANCH_NAME"
     echo "✅ Terraform tfvars updated and pushed."
   fi
-  # Add and put tag
-  # tag release and push
-  git tag -a "v$RELEASE" -m "Release $RELEASE for $ENVIRONMENT environment"
-  git push origin "v$RELEASE"
+  if [ $ACTION == "ROLLOUT"]; then
+    # And release tag and push
+    git tag -a "v$RELEASE" -m "Release v$RELEASE for $ENVIRONMENT environment"
+    git push origin "v$RELEASE"
+  fi
 fi
