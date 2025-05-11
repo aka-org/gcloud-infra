@@ -22,13 +22,13 @@ on:
         required: true
 
 jobs:
-  filter_infra:
+  filter_component:
     runs-on: ${{ inputs.github-runner }} 
     outputs:
-      project: ${{ steps.filter_infra.outputs.project }}
-      network: ${{ steps.filter_infra.outputs.network }}
-      k8s_blue: ${{ steps.filter_infra.outputs.k8s_blue }}
-      k8s_green: ${{ steps.filter_infra.outputs.k8s_green }}
+      project: ${{ steps.filter_component.outputs.project }}
+      network: ${{ steps.filter_component.outputs.network }}
+      k8s_blue: ${{ steps.filter_component.outputs.k8s_blue }}
+      k8s_green: ${{ steps.filter_component.outputs.k8s_green }}
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -46,8 +46,8 @@ jobs:
               - 'terraform/k8s/**/blue.tfvars.json'
 
   project:
-    needs: filter_infra
-    if: needs.filter_infra.outputs.project == 'true' 
+    needs: filter_component
+    if: needs.filter_component.outputs.project == 'true' 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
@@ -60,8 +60,8 @@ jobs:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
       BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   network:
-    needs: [filter_infra, project]
-    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.network == 'true' }} 
+    needs: [filter_component, project]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_component.outputs.network == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
@@ -73,8 +73,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_blue:
-    needs: [filter_infra, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.k8s_blue == 'true' }} 
+    needs: [filter_component, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_component.outputs.k8s_blue == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
@@ -86,8 +86,8 @@ jobs:
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
   k8s_green:
-    needs: [filter_infra, project, network]
-    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.k8s_green == 'true' }} 
+    needs: [filter_component, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_component.outputs.k8s_green == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
