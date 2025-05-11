@@ -44,7 +44,7 @@ jobs:
             MATRIX+=('{"env":"prod","project":"prod-project"}')
           fi
           # Join the array safely
-          JSON_MATRIX=$(jq -n --argjson m "$(printf '%s\n' "${MATRIX[@]}" | jq -s .)" '$m')
+          JSON_MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -s '.')
 
           # Set the output properly
           echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
