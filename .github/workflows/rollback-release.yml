@@ -23,7 +23,7 @@ on:
         required: false
 
 jobs:
-  prepare_release:
+  rollback_release:
     runs-on: ubuntu-22.04 
     environment: ${{ inputs.environment }}
     env:

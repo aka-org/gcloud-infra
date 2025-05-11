@@ -27,7 +27,7 @@ jobs:
               - 'packer/images/load-balancer/**'
               - 'packer/shared-scripts/**'
 
-  k8s-node:
+  k8s_node:
     needs: filter-images
     if: needs.filter-images.outputs.k8s_node == 'true'
     uses: ./.github/workflows/build-image.yml
@@ -40,7 +40,7 @@ jobs:
       build-version: build${{ github.run_number }}
     secrets:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-  load-balancer:
+  load_balancer:
     needs: filter-images
     if: needs.filter-images.outputs.load_balancer == 'true'
     uses: ./.github/workflows/build-image.yml
