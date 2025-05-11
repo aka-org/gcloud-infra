@@ -37,10 +37,10 @@ jobs:
         id: set-matrix
         run: |
           MATRIX=()
-          if [[ "${{ steps.filter-envs.outputs.testing }}" == "true" ]]; then
+          if [[ "${{ steps.filter_envs.outputs.testing }}" == "true" ]]; then
             MATRIX+=('{"env":"testing","project":"gcloud-infra-testing-aab1735b"}')
           fi
-          if [[ "${{ steps.filter-envs.outputs.prod }}" == "true" ]]; then
+          if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
             MATRIX+=('{"env":"prod","tfvars":"prod.tfvars.json","project":"prod-project"}')
           fi
           echo "matrix=$(jq -n --argjson m "[${MATRIX[*]}]" '$m')" >> $GITHUB_OUTPUT
