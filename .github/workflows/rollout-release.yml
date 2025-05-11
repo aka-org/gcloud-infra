@@ -32,12 +32,12 @@ jobs:
         run: |
           MATRIX=()
           if [[ "${{ steps.filter_envs.outputs.testing }}" == "true" ]]; then
-            MATRIX+=('{"env":"testing")
+            MATRIX+=('{"env":"testing"}')
           fi
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
-            MATRIX+=('{"env":"prod")
+            MATRIX+=('{"env":"prod"}')
           fi
-          echo "matrix=$(echo "${MATRIX[@]}" | jq -s .)" >> "$GITHUB_OUTPUT"
+          echo "matrix=${{ toJSON($MATRIX[@]) }}" >> "$GITHUB_OUTPUT"
 
   rollout_release:
     needs: filter_envs
