@@ -1,15 +1,19 @@
 name: Sync Infra 
 on:
-  push:
-    tags:
-      - '**'
+  pull_request:
+    types: [closed]
     branches:
+      - main
+  push:
+    branches:
+      - 'releases/**'
       - 'feature/**'
     paths:
       - 'terraform/**'
 
 jobs:
   filter_envs:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
