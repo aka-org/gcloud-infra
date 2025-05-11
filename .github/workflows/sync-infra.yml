@@ -13,7 +13,10 @@ on:
 
 jobs:
   filter_envs:
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
+    if: >
+      github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
+      || startswith(github.ref, 'refs/heads/releases')
+      || startswith(github.ref, 'refs/heads/feature')
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
