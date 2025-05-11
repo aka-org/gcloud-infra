@@ -41,7 +41,7 @@ jobs:
             MATRIX+=('{"env":"testing","project":"gcloud-infra-testing-aab1735b"}')
           fi
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
-            MATRIX+=('{"env":"prod","tfvars":"prod.tfvars.json","project":"prod-project"}')
+            MATRIX+=('{"env":"prod","project":"prod-project"}')
           fi
           # Join the array safely
           JSON_MATRIX=$(jq -n --argjson m "$(printf '%s\n' "${MATRIX[@]}" | jq -s .)" '$m')
@@ -53,6 +53,8 @@ jobs:
     needs: filter_envs
     if: needs.filter_envs.outputs.matrix != '[]' 
     uses: ./.github/workflows/update-terraform-state.yml
+    strategy:
+      matrix: ${{ fromJson(needs.filter_envs.outputs.matrix) }}
     with:
       project: ${{ matrix.project }}
       environment: ${{ matrix.env }}
