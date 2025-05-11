@@ -43,7 +43,11 @@ jobs:
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
             MATRIX+=('{"env":"prod","tfvars":"prod.tfvars.json","project":"prod-project"}')
           fi
-          echo "matrix=$(jq -n --argjson m "[${MATRIX[*]}]" '$m')" >> $GITHUB_OUTPUT
+          # Join the array safely
+          JSON_MATRIX=$(jq -n --argjson m "$(printf '%s\n' "${MATRIX[@]}" | jq -s .)" '$m')
+
+          # Set the output properly
+          echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
 
   update_tf_state:
     needs: filter_envs
