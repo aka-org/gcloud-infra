@@ -49,10 +49,10 @@ jobs:
           # Set the output properly
           echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
 
-  update_tf_state:
+  provision:
     needs: filter_envs
     if: needs.filter_envs.outputs.matrix != '[]' 
-    uses: ./.github/workflows/update-terraform-state.yml
+    uses: ./.github/workflows/provision-components.yml
     strategy:
       matrix: ${{ fromJson(needs.filter_envs.outputs.matrix) }}
     with:
