@@ -1,0 +1,56 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the environment'
+        required: true
+        default: 'testing'
+        type: choice
+        options:
+          - prod
+          - testing
+      version:
+        description: 'Enter the version for the release'
+        required: true
+        default: '0.0.1'
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+      CICD_TOKEN:
+        required: false
+
+jobs:
+  prepare_release:
+    runs-on: ubuntu-22.04 
+    environment: ${{ inputs.environment }}
+    env:
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
+      ENVIRONMENT: ${{ inputs.environment }}
+      RELEASE_MANIFEST: releases/release-manifest.${{ inputs.environment }}.json
+      ACTION: PREPARE
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2.0.0'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS_B64 }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2.0.0'
+
+      - name: Set RELEASE environment variable
+        run: |
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
+          fi
+
+      - name: Update release manifest, terraform tfvars and provision components
+        run: scripts/release_manager.sh
