@@ -37,16 +37,6 @@ jobs:
           fi
           echo "matrix=$(jq -n --argjson m "[${MATRIX[*]}]" '$m')" >> $GITHUB_OUTPUT
 
-    runs-on: ubuntu-22.04
-    environment: ${{ inputs.environment }}
-    env:
-      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
-      ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE: ${{ inputs.version }}-${{ inputs.environment }}
-      ACTION: ROLLOUT 
-    steps:
-      - uses: actions/checkout@v4.2.2
-
   rollout_release:
     needs: filter_envs
     if: needs.filter_envs.outputs.matrix != '[]' 
@@ -55,7 +45,7 @@ jobs:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ matrix.env }}
       RELEASE_MANIFEST: releases/release-manifest.${{ matrix.env }}.json
-
+      ACTION: ROLLOUT 
 
     steps:
       - name: Checkout repo
