@@ -41,7 +41,9 @@ jobs:
           JSON_MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -s '.')
 
           # Set the output properly
-          echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
+          cat <<EOF >> "$GITHUB_OUTPUT"
+          matrix=$JSON_MATRIX
+          EOF
 
   rollout_release:
     needs: filter_envs
