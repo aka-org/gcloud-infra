@@ -1,0 +1,52 @@
+name: Sync Infra 
+on:
+  push:
+    tags:
+      - '**'
+    branches:
+      - 'feature/**'
+    paths:
+      - 'terraform/**'
+
+jobs:
+  filter_envs:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Filter envs with changes
+        id: filter_envs
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            testing:
+              - 'terraform/**/testing/**'
+            prod:
+              - 'terraform/**/prod/**'
+
+      - name: Build matrix based on changed envs
+        id: set-matrix
+        run: |
+          MATRIX=()
+          if [[ "${{ steps.filter-envs.outputs.testing }}" == "true" ]]; then
+            MATRIX+=('{"env":"testing","project":"gcloud-infra-testing-aab1735b"}')
+          fi
+          if [[ "${{ steps.filter-envs.outputs.prod }}" == "true" ]]; then
+            MATRIX+=('{"env":"prod","tfvars":"prod.tfvars.json","project":"prod-project"}')
+          fi
+          echo "matrix=$(jq -n --argjson m "[${MATRIX[*]}]" '$m')" >> $GITHUB_OUTPUT
+
+  update_tf_state:
+    needs: filter_envs
+    if: needs.filter_envs.outputs.matrix != '[]' 
+    uses: ./.github/workflows/update-terraform-state.yml
+    with:
+      project: ${{ matrix.project }}
+      environment: ${{ matrix.env }}
+      terraform-version: 1.11.4
+      github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}

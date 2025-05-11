@@ -1,0 +1,100 @@
+name: Update Terraform State 
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+      terraform-version:
+        required: true
+        type: string
+      project:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: true
+      BILLING_ACCOUNT_ID:
+        required: true
+
+jobs:
+  filter_infra:
+    runs-on: ${{ inputs.github-runner }} 
+    outputs:
+      project: ${{ steps.filter_infra.outputs.project }}
+      network: ${{ steps.filter_infra.outputs.network }}
+      k8s_blue: ${{ steps.filter_infra.outputs.k8s_blue }}
+      k8s_green: ${{ steps.filter_infra.outputs.k8s_green }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: dorny/paths-filter@v3.0.2
+        id: filter-components
+        with:
+          filters: |
+            project:
+              - 'terraform/project/**'
+            network:
+              - 'terraform/network/**'
+            k8s_green:
+              - 'terraform/k8s/**/green.tfvars.json'
+            k8s_blue:
+              - 'terraform/k8s/**/blue.tfvars.json'
+
+  project:
+    needs: filter_infra
+    if: needs.filter_infra.outputs.project == 'true' 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: ${{ inputs.environment }}
+      terraform-version: ${{ inputs.terraform-version }} 
+      github-runner: ${{ inputs.github-runner }} 
+      tf-state: ${{ inputs.project }}-project-tf-state
+      working-directory: terraform/project
+      vars: testing.tfvars.json
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
+  network:
+    needs: [filter_infra, project]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.network == 'true' }} 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: ${{ inputs.environment }}
+      terraform-version: ${{ inputs.terraform-version }} 
+      github-runner: ${{ inputs.github-runner }} 
+      tf-state: ${{ inputs.project }}-network-tf-state
+      working-directory: terraform/network
+      vars: testing.tfvars.json
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+  k8s_blue:
+    needs: [filter_infra, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.k8s_blue == 'true' }} 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: ${{ inputs.environment }}
+      terraform-version: ${{ inputs.terraform-version }} 
+      github-runner: ${{ inputs.github-runner }} 
+      tf-state: ${{ inputs.project }}-k8s-blue-tf-state
+      working-directory: terraform/k8s
+      vars: blue.tfvars.json
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+  k8s_green:
+    needs: [filter_infra, project, network]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_infra.outputs.k8s_green == 'true' }} 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: ${{ inputs.environment }}
+      terraform-version: ${{ inputs.terraform-version }} 
+      github-runner: ${{ inputs.github-runner }} 
+      tf-state: ${{ inputs.project }}-k8s-green-tf-state
+      working-directory: terraform/k8s
+      vars: green.tfvars.json
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
