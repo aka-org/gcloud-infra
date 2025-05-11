@@ -37,7 +37,7 @@ jobs:
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
             MATRIX+=('{"env":"prod")
           fi
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(echo "${MATRIX[@]}" | jq -s .)" >> "$GITHUB_OUTPUT"
 
   rollout_release:
     needs: filter_envs
