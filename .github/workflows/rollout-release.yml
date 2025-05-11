@@ -8,7 +8,9 @@ on:
 
 jobs:
   filter_envs:
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/pred')
+    if: > 
+      github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'releases/prep')
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
