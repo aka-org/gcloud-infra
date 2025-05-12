@@ -35,6 +35,9 @@ jobs:
     needs: filter_envs
     if: needs.filter_envs.outputs.testing == 'true' 
     uses: ./.github/workflows/provision-components.yml
+    concurrency:
+      group: sync_testing
+      cancel-in-progress: false
     with:
       project: gcloud-infra-testing-aab1735b
       environment: testing 
