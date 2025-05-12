@@ -29,7 +29,7 @@ jobs:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ACTION: ${{ inputs.action }} 
       ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE_MANIFEST: release/release-manifest.${{ inputs.environment }}.json
+      RELEASE_MANIFEST: releases/release-manifest.${{ inputs.environment }}.json
 
     steps:
       - name: Checkout repo
