@@ -182,15 +182,17 @@ if [ -z $DEBUG ]; then
 
   case $ACTION in
     PREPARE)
-      git checkout -b "releases/prepare_release_$RELEASE" "origin/$GITHUB_REF_NAME"
+      BRANCH_NAME="releases/prepare_release_$RELEASE" 
       GIT_COMMIT="$(git rev-parse HEAD)" 
+      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       ;;
     ROLLOUT)
+      BRANCH_NAME="releases/rollout_release_$RELEASE" 
       # And release tag for pre and push
       git tag -a "v$RELEASE-pre" -m "Release v$RELEASE-pre for $ENVIRONMENT environment"
       git push origin "v$RELEASE-pre"
       echo "✅ Tagged release v$RELEASE-pre for $ENVIRONMENT environment"
-      git checkout -b "releases/rollout_release_$RELEASE" "origin/$GITHUB_REF_NAME"
+      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       ;;
     POST)
       # And release tag for pre and push
