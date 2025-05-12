@@ -29,7 +29,7 @@ on:
 
 jobs:
   apply:
-    envrironment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.github-runner }}
     defaults:
       run:
