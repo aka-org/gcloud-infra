@@ -24,6 +24,7 @@ on:
 jobs:
   release:
     runs-on: ${{ inputs.github-runner }}
+    environment: ${{ inputs.environment }}
     env:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ACTION: ${{ inputs.action }} 
