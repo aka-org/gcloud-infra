@@ -47,7 +47,7 @@ jobs:
 
       - name: Set environmental variables
         run: |
-          if [ "${{ inputs.action }}" == "PREPARE" || "${{ inputs.action }}" == "ROLLBACK" ]; then
+          if [[ "${{ inputs.action }}" == "PREPARE" || "${{ inputs.action }}" == "ROLLBACK" ]]; then
             if [ "${{ inputs.environment }}" == "prod" ]; then
               echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
             else
