@@ -255,8 +255,6 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
         provision_component
         ;;
       ROLLOUT)
-	# Add the commit sha of the pre release
-        update_release_manifest_commit
         # Promote component with matching release version to current active
         promote_component
         # Deprovisioning component with old release version
