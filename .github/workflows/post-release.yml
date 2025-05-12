@@ -30,7 +30,7 @@ jobs:
 
   testing:
     needs: filter_envs
-    if: needs.filter_envs.output.testing == 'true'
+    if: needs.filter_envs.outputs.testing == 'true'
     uses: ./.github/workflows/release.yml
     with:
       action: POST
