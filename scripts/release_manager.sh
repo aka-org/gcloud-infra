@@ -19,23 +19,37 @@ GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
 
 # Define Functions
-update_release_manifest_commit() {
-  GIT_COMMIT="$(git rev-parse HEAD)" 
+update_release_manifest_checksum() {
   # Update release manifest
-  jq --arg git_commit "$GIT_COMMIT" \
+  jq --arg checksum "$(tar -cf - terraform/ | sha256sum | awk '{print $1}')" \
      --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
      '
-       .git_commit = $git_commit |
+       .checksum = $checksum |
        .timestamp = $timestamp
      ' "$RELEASE_MANIFEST" > tmp.json && mv tmp.json "$RELEASE_MANIFEST"
   if [ -z $DEBUG ]; then
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
       git add . 
-      git commit -m "tf:releases:$ENVIRONMENT: Update commit sha in release manifest for release $RELEASE"
+      git commit -m "tf:releases:$ENVIRONMENT: Update checksum"
       echo "✅ Release manifest updated."
     fi
   fi
+}
+
+open_pr() {
+  title="Release $RELEASE"
+  # Create the PR
+  curl -s -L -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls" \
+    -H "Authorization: Bearer $CICD_TOKEN" \
+    -H "Accept: application/vnd.github+json" \
+    -d @- <<EOF | jq .
+{
+  "title": "$title",
+  "head": "$BRANCH_NAME",
+  "base": "main"
+}
+EOF
 }
 
 update_release_manifest_versions() {
@@ -71,7 +85,7 @@ update_release_manifest_versions() {
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
       git add . 
-      git commit -m "tf:releases:$ENVIRONMENT: Update versions in release manifest for release $RELEASE"
+      git commit -m "tf:releases:$ENVIRONMENT: Update release version and image versions"
       echo "✅ Release manifest updated."
     fi
   fi
@@ -212,13 +226,6 @@ if [ -z $DEBUG ]; then
       BRANCH_NAME="releases/rollout_release_$RELEASE" 
       git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       ;;
-    POST)
-      # And release tag for pre and push
-      git tag -a "v$RELEASE" -m "Release v$RELEASE-pre for $ENVIRONMENT environment"
-      git push origin "v$RELEASE"
-      echo "✅ Tagged release v$RELEASE for $ENVIRONMENT environment"
-      exit 0
-      ;;
     ROLLBACK)
       echo "Not implemented"
       ;;
@@ -229,7 +236,6 @@ if [ -z $DEBUG ]; then
   esac
 else
   WORK_DIR=$(pwd)
-  GIT_COMMIT="no_commit" 
 fi
 
 # If action is PREPARE update the release manifest
@@ -274,12 +280,12 @@ done
 
 if [ "$ACTION" == "PREPARE" ]; then
   # Add the commit sha of the pre release
-  update_release_manifest_commit
+  update_release_manifest_checksum
   git_tag "v$RELEASE-pre"
 fi
 if [ "$ACTION" == "ROLLOUT" ]; then
   # Add the commit sha of the pre release
-  update_release_manifest_commit
+  update_release_manifest_checksum
   git_tag "v$RELEASE"
 fi
 if [ -z $DEBUG ]; then
@@ -287,6 +293,10 @@ if [ -z $DEBUG ]; then
   if [[ $(git rev-list --count origin/HEAD..HEAD) -gt 0 ]]; then
     echo "New commits found, pushing to remote..."
     git push origin "$BRANCH_NAME"
-    echo "✅ Terraform tfvars updated and pushed."
+    echo "✅ Release manifest and tfvars updated and pushed."
+    if [ "$ACTION" != "ROLLBACK" ]; then
+      open_pr
+      echo "✅ Pull request opened for release $RELEASE."
+    fi
   fi
 fi
