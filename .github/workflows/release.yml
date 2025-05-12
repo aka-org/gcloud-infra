@@ -61,7 +61,7 @@ jobs:
         run: scripts/release_manager.sh
           
       - name: Create Release
-        if: inputs.action == 'POST'
+        if: inputs.action == 'ROLLOUT'
         uses: softprops/action-gh-release@v2.2.2
         with:
           token: ${{ secrets.CICD_TOKEN }}

@@ -77,6 +77,15 @@ update_release_manifest_versions() {
   fi
 }
 
+git_tag() {
+  RELEASE_TAG="$1"
+  if [ -z $DEBUG ]; then
+    git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG for $ENVIRONMENT environment"
+    git push origin "$RELEASE_TAG"
+  fi
+  echo "✅ Tagged release $RELEASE_TAG for $ENVIRONMENT environment"
+}
+
 git_commit() {
   commit_message="$1"
   if [ -z $DEBUG ]; then
@@ -201,10 +210,6 @@ if [ -z $DEBUG ]; then
       ;;
     ROLLOUT)
       BRANCH_NAME="releases/rollout_release_$RELEASE" 
-      # And release tag for pre and push
-      git tag -a "v$RELEASE-pre" -m "Release v$RELEASE-pre for $ENVIRONMENT environment"
-      git push origin "v$RELEASE-pre"
-      echo "✅ Tagged release v$RELEASE-pre for $ENVIRONMENT environment"
       git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       ;;
     POST)
@@ -267,9 +272,15 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
   done
 done
 
-if [[ $ACTION == "PREPARE" || $ACTION == "ROLLOUT" ]]; then
+if [ "$ACTION" == "PREPARE" ]; then
   # Add the commit sha of the pre release
   update_release_manifest_commit
+  git_tag "v$RELEASE-pre"
+fi
+if [ "$ACTION" == "ROLLOUT" ]; then
+  # Add the commit sha of the pre release
+  update_release_manifest_commit
+  git_tag "v$RELEASE"
 fi
 if [ -z $DEBUG ]; then
   # Push commits
