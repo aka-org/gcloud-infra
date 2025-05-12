@@ -42,10 +42,10 @@ jobs:
 
       - name: Set ENVIRONMET and RELEASE_MANIFEST environment variables
         run: |
-          if [[ "${{ steps.filter_envs.outputs.testing }}" == "true" ]]; then
+          if [[ "${{ needs.filter_envs.outputs.testing }}" == "true" ]]; then
             echo "ENVIRONMENT=testing" >> $GITHUB_ENV
             echo "RELEASE_MANIFEST=release/release-manifest.testing.json" >> $GITHUB_ENV
-          elif [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
+          elif [[ "${{ needs.filter_envs.outputs.prod }}" == "true" ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
             echo "RELEASE_MANIFEST=release/release-manifest.prod.json" >> $GITHUB_ENV
           fi
@@ -54,4 +54,4 @@ jobs:
         run: echo "RELEASE=$(jq -r '.version' $RELEASE_MANIFEST)" >> $GITHUB_ENV
 
       - name: Add prerelease tag and push, prep components promotion and deprovision
-        run: scripts/release-manager.sh
+        run: scripts/release_manager.sh
