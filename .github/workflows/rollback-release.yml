@@ -23,28 +23,12 @@ on:
         required: false
 
 jobs:
-  rollback_release:
-    runs-on: ubuntu-22.04 
-    environment: ${{ inputs.environment }}
-    env:
+  rollback:
+    uses: ./.github/workflows/release.yml
+    with:
+      action: ROLLBACK
+      environment: ${{ inputs.environment }}
+      version: ${{ inputs.version }}
+      github-runner: ubuntu-22.04
+    secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
-      ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE_MANIFEST: releases/release-manifest.${{ inputs.environment }}.json
-      ACTION: ROLLBACK
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4.2.2
-
-      - name: Set RELEASE environment variable
-        run: |
-          if [ "${{ inputs.environment }}" = "prod" ]; then
-            echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
-            echo "TAG_REF=tags/v${{ inputs.version }}" >> $GITHUB_ENV
-          else
-            echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
-            echo "TAG_REF=tags/v${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
-          fi
-
-      - name: Update release manifest, terraform tfvars and provision components
-        run: scripts/release_manager.sh

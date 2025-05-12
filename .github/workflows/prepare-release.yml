@@ -23,34 +23,13 @@ on:
         required: false
 
 jobs:
-  prepare_release:
-    runs-on: ubuntu-22.04 
-    environment: ${{ inputs.environment }}
-    env:
+  prepare:
+    uses: ./.github/workflows/release.yml
+    with:
+      action: PREPARE 
+      environment: ${{ inputs.environment }}
+      version: ${{ inputs.version }}
+      github-runner: ubuntu-22.04
+    secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
-      ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE_MANIFEST: releases/release-manifest.${{ inputs.environment }}.json
-      ACTION: PREPARE
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4.2.2
-
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2.0.0'
-        with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS_B64 }}'
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2.0.0'
-
-      - name: Set RELEASE environment variable
-        run: |
-          if [ "${{ inputs.environment }}" = "prod" ]; then
-            echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
-          else
-            echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
-          fi
-
-      - name: Update release manifest, terraform tfvars and provision components
-        run: scripts/release_manager.sh
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}

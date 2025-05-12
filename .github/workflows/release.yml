@@ -1,0 +1,69 @@
+name: Release 
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      action:
+        required: true
+        type: string
+      github-runner:
+        required: true
+        type: string
+      version:
+        required: false 
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS_B64:
+        required: false 
+      CICD_TOKEN:
+        required: true
+
+jobs:
+  release:
+    runs-on: ${{ inputs.github-runner }}
+    environment: ${{ inputs.environment }}
+    env:
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
+      ACTION: ${{ inputs.action }} 
+      ENVIRONMENT: ${{ inputs.environment }}
+      RELEASE_MANIFEST: release/release-manifest.${{ inputs.environment }}.json
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
+
+      - id: 'auth'
+        if: inputs.caller == 'prepare_release'
+        uses: 'google-github-actions/auth@v2.0.0'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS_B64 }}'
+
+      - name: 'Set up Cloud SDK'
+        if: inputs.caller == 'prepare_release'
+        uses: 'google-github-actions/setup-gcloud@v2.0.0'
+
+      - name: Set environmental variables
+        run: |
+          if [ "${{ inputs.action }}" == "PREPARE" || "${{ inputs.action }}" == "ROLLBACK" ]; then
+            if [ "${{ inputs.environment }}" == "prod" ]; then
+              echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
+            else
+              echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
+            fi
+          else
+            echo "RELEASE=$(jq -r '.version' $RELEASE_MANIFEST)" >> $GITHUB_ENV
+          fi
+
+      - name: Run release manager 
+        run: scripts/release_manager.sh
+          
+      - name: Create Release
+        if: inputs.action == 'POST'
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          token: ${{ secrets.CICD_TOKEN }}
+          tag_name: v${{ env.RELEASE }}
+          name: "v${{ env.RELEASE }}"

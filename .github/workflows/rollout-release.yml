@@ -28,30 +28,13 @@ jobs:
             prod:
               - 'releases/release-manifest.prod.json'
 
-
-  rollout_release:
+  testing:
     needs: filter_envs
-    runs-on: ubuntu-22.04
-    env:
+    if: needs.filter_envs.output.testing == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      action: ROLLOUT 
+      environment: testing
+      github-runner: ubuntu-22.04
+    secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
-      ACTION: ROLLOUT 
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4.2.2
-
-      - name: Set ENVIRONMET and RELEASE_MANIFEST environment variables
-        run: |
-          if [[ "${{ needs.filter_envs.outputs.testing }}" == "true" ]]; then
-            echo "ENVIRONMENT=testing" >> $GITHUB_ENV
-            echo "RELEASE_MANIFEST=release/release-manifest.testing.json" >> $GITHUB_ENV
-          elif [[ "${{ needs.filter_envs.outputs.prod }}" == "true" ]]; then
-            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-            echo "RELEASE_MANIFEST=release/release-manifest.prod.json" >> $GITHUB_ENV
-          fi
-
-      - name: Set RELEASE environment variable
-        run: echo "RELEASE=$(jq -r '.version' $RELEASE_MANIFEST)" >> $GITHUB_ENV
-
-      - name: Add prerelease tag and push, prep components promotion and deprovision
-        run: scripts/release_manager.sh
