@@ -14,12 +14,13 @@ jobs:
   filter_envs:
     runs-on: ubuntu-22.04
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      testing: ${{ steps.filter.outputs.testing }}
+      prod: ${{ steps.filter.outputs.prod }}
     steps:
       - uses: actions/checkout@v4.2.2
 
       - name: Filter envs with changes
-        id: filter_envs
+        id: filter
         uses: dorny/paths-filter@v3.0.2
         with:
           filters: |
@@ -28,34 +29,15 @@ jobs:
             prod:
               - 'terraform/**/prod/**'
 
-      - name: Build matrix based on changed envs
-        id: set-matrix
-        run: |
-          MATRIX=()
-          if [[ "${{ steps.filter_envs.outputs.testing }}" == "true" ]]; then
-            MATRIX+=('{"env":"testing","project":"gcloud-infra-testing-aab1735b"}')
-          fi
-          if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
-            MATRIX+=('{"env":"prod","project":"prod-project"}')
-          fi
-          JSON_MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -sc '.')
-          echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
-
-  provision:
+  testing:
     needs: filter_envs
-    if: needs.filter_envs.outputs.matrix != '[]' 
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix: ${{ fromJson(needs.filter_envs.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v4.2.2
-      - name: Call provision job
-        uses: ./.github/workflows/provision-components.yml
-        with:
-          project: ${{ matrix.project }}
-          environment: ${{ matrix.env }}
-          terraform-version: 1.11.4
-          github-runner: ubuntu-22.04
-        secrets:
-          GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-          BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
+    if: needs.filter_envs.outputs.testing == 'true' 
+    uses: ./.github/workflows/provision-components.yml
+    with:
+      project: gcloud-infra-testing-aab1735b
+      environment: testing 
+      terraform-version: 1.11.4
+      github-runner: ubuntu-22.04
+    secrets:
+      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
