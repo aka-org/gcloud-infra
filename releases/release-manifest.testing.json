@@ -4,9 +4,9 @@
     "project": "gcloud-infra-testing-aab1735b",
     "tfvars_file": "*.tfvars.json"
   },
-  "version": "0.0.26-testing",
-  "git_commit": "97a2b5add01933f8a62d5bd5e29800a0e6d794a8",
-  "timestamp": "2025-05-12T10:13:43Z",
+  "version": "0.0.27-testing",
+  "git_commit": "9cdec638796160ce32ce50e9ab1ab962e2ac9bd5",
+  "timestamp": "2025-05-12T10:23:18Z",
   "images": {
     "k8s-node": "1-0-0-build102",
     "load-balancer": "1-0-0-build6"
