@@ -44,14 +44,18 @@ jobs:
   provision:
     needs: filter_envs
     if: needs.filter_envs.outputs.matrix != '[]' 
-    uses: ./.github/workflows/provision-components.yml
+    runs-on: ubuntu-22.04
     strategy:
       matrix: ${{ fromJson(needs.filter_envs.outputs.matrix) }}
-    with:
-      project: ${{ matrix.project }}
-      environment: ${{ matrix.env }}
-      terraform-version: 1.11.4
-      github-runner: ubuntu-22.04
-    secrets:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
-      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Call provision job
+        uses: ./.github/workflows/provision-components.yml
+        with:
+          project: ${{ matrix.project }}
+          environment: ${{ matrix.env }}
+          terraform-version: 1.11.4
+          github-runner: ubuntu-22.04
+        secrets:
+          GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+          BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
