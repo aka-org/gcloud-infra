@@ -19,7 +19,26 @@ GIT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 GIT_NAME="github-actions[bot]"
 
 # Define Functions
-update_release_manifest() {
+update_release_manifest_commit() {
+  GIT_COMMIT="$(git rev-parse HEAD)" 
+  # Update release manifest
+  jq --arg git_commit "$GIT_COMMIT" \
+     --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+     '
+       .git_commit = $git_commit |
+       .timestamp = $timestamp
+     ' "$RELEASE_MANIFEST" > tmp.json && mv tmp.json "$RELEASE_MANIFEST"
+  if [ -z $DEBUG ]; then
+    if [[ -n $(git status --porcelain) ]]; then
+      # Commit changes
+      git add . 
+      git commit -m "tf:releases:$ENVIRONMENT: Update commit sha in release manifest for release $RELEASE"
+      echo "✅ Release manifest updated."
+    fi
+  fi
+}
+
+update_release_manifest_versions() {
   # Load latest os images key-value pairs from gcloud
   mapfile -t images < <(
     gcloud compute images list \
@@ -36,13 +55,8 @@ update_release_manifest() {
   )
 
   # Update release manifest
-  jq --arg version "$RELEASE" \
-     --arg git_commit "$GIT_COMMIT" \
-     --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-     '
-       .version = $version |
-       .git_commit = $git_commit |
-       .timestamp = $timestamp
+  jq --arg version "$RELEASE" '
+       .version = $version
      ' "$RELEASE_MANIFEST" > tmp.json && mv tmp.json "$RELEASE_MANIFEST"
 
   for kv in "${images[@]}"; do
@@ -57,7 +71,7 @@ update_release_manifest() {
     if [[ -n $(git status --porcelain) ]]; then
       # Commit changes
       git add . 
-      git commit -m "tf:releases:$ENVIRONMENT: Update release manifest for release $RELEASE"
+      git commit -m "tf:releases:$ENVIRONMENT: Update versions in release manifest for release $RELEASE"
       echo "✅ Release manifest updated."
     fi
   fi
@@ -183,7 +197,6 @@ if [ -z $DEBUG ]; then
   case $ACTION in
     PREPARE)
       BRANCH_NAME="releases/prepare_release_$RELEASE" 
-      GIT_COMMIT="$(git rev-parse HEAD)" 
       git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
       ;;
     ROLLOUT)
@@ -217,7 +230,7 @@ fi
 # If action is PREPARE update the release manifest
 if [ $ACTION == "PREPARE" ]; then
   PROJECT=$(jq -r '.terraform.project' "$RELEASE_MANIFEST")
-  update_release_manifest
+  update_release_manifest_versions
 fi
 
 # Read the suffic of tfvars files we need to read through
@@ -242,6 +255,8 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
         provision_component
         ;;
       ROLLOUT)
+	# Add the commit sha of the pre release
+        update_release_manifest_commit
         # Promote component with matching release version to current active
         promote_component
         # Deprovisioning component with old release version
@@ -254,6 +269,10 @@ find "$WORK_DIR" -type d -name "$ENVIRONMENT" | while read -r vars_dir; do
   done
 done
 
+if [[ $ACTION == "PREPARE" || $ACTION == "ROLLOUT" ]]; then
+  # Add the commit sha of the pre release
+  update_release_manifest_commit
+fi
 if [ -z $DEBUG ]; then
   # Push commits
   if [[ $(git rev-list --count origin/HEAD..HEAD) -gt 0 ]]; then
