@@ -4,7 +4,7 @@
     "project": "gcloud-infra-testing-aab1735b",
     "tfvars_file": "*.tfvars.json"
   },
-  "version": "0.0.27-testing",
+  "version": "0.0.28-testing",
   "git_commit": "9cdec638796160ce32ce50e9ab1ab962e2ac9bd5",
   "timestamp": "2025-05-12T10:23:18Z",
   "images": {
