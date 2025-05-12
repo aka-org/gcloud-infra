@@ -65,9 +65,7 @@ jobs:
         run: terraform plan -out=tfplan -var-file="${{ inputs.environment }}/${{ inputs.vars }}"
 
       - name: Terraform Apply
-        if: >
-          github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
-          || startswith(github.ref, 'refs/heads/releases/prep')
+        if: startswith(github.ref, 'refs/tags/')
         run: terraform apply -auto-approve tfplan
 
       - name: Remove Creds

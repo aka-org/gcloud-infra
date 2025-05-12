@@ -182,13 +182,22 @@ if [ -z $DEBUG ]; then
 
   case $ACTION in
     PREPARE)
-      BRANCH_NAME="releases/prepare_release_$RELEASE"
-      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
+      git checkout -b "releases/prepare_release_$RELEASE" "origin/$GITHUB_REF_NAME"
       GIT_COMMIT="$(git rev-parse HEAD)" 
       ;;
     ROLLOUT)
-      BRANCH_NAME="releases/rollout_release_$RELEASE"
-      git checkout -b "$BRANCH_NAME" "origin/$GITHUB_REF_NAME"
+      # And release tag for pre and push
+      git tag -a "v$RELEASE-pre" -m "Release v$RELEASE-pre for $ENVIRONMENT environment"
+      git push origin "v$RELEASE-pre"
+      echo "✅ Tagged release v$RELEASE-pre for $ENVIRONMENT environment"
+      git checkout -b "releases/rollout_release_$RELEASE" "origin/$GITHUB_REF_NAME"
+      ;;
+    POST)
+      # And release tag for pre and push
+      git tag -a "v$RELEASE" -m "Release v$RELEASE-pre for $ENVIRONMENT environment"
+      git push origin "v$RELEASE"
+      echo "✅ Tagged release v$RELEASE for $ENVIRONMENT environment"
+      exit 0
       ;;
     ROLLBACK)
       echo "Not implemented"
@@ -249,10 +258,5 @@ if [ -z $DEBUG ]; then
     echo "New commits found, pushing to remote..."
     git push origin "$BRANCH_NAME"
     echo "✅ Terraform tfvars updated and pushed."
-  fi
-  if [ $ACTION == "ROLLOUT"]; then
-    # And release tag and push
-    git tag -a "v$RELEASE" -m "Release v$RELEASE for $ENVIRONMENT environment"
-    git push origin "v$RELEASE"
   fi
 fi

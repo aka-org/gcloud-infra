@@ -1,4 +1,4 @@
-name: Rollout Release 
+name: Post Release 
 on:
   pull_request:
     branches:
@@ -10,7 +10,7 @@ jobs:
   filter_envs:
     if: > 
       github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'releases/prep')
+      && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -50,7 +50,7 @@ jobs:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ENVIRONMENT: ${{ matrix.env }}
       RELEASE_MANIFEST: releases/release-manifest.${{ matrix.env }}.json
-      ACTION: ROLLOUT 
+      ACTION: POST 
 
     steps:
       - name: Checkout repo
@@ -59,5 +59,12 @@ jobs:
       - name: Set RELEASE environment variable
         run: echo "RELEASE=$(jq -r '.version' $RELEASE_MANIFEST)" >> $GITHUB_ENV
 
-      - name: Add prerelease tag and push, prep components promotion and deprovision
+      - name: Add and push post release tag 
         run: scripts/release-manager.sh
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          token: ${{ secrets.CICD_TOKEN }}
+          tag_name: v${{ env.RELEASE }}
+          name: "v${{ env.RELEASE }}"

@@ -1,22 +1,16 @@
 name: Sync Infra 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  push:
+    tags:
+      - '**'
   push:
     branches:
-      - 'releases/**'
       - 'feature/**'
     paths:
       - 'terraform/**'
 
 jobs:
   filter_envs:
-    if: >
-      github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'releases/rollout')
-      || startswith(github.ref, 'refs/heads/releases')
-      || startswith(github.ref, 'refs/heads/feature')
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -43,8 +37,8 @@ jobs:
           if [[ "${{ steps.filter_envs.outputs.prod }}" == "true" ]]; then
             MATRIX+=('{"env":"prod","project":"prod-project"}')
           fi
-
-          echo "matrix=${{ toJSON($MATRIX[@]) }}" >> "$GITHUB_OUTPUT"
+          JSON_MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -sc '.')
+          echo "matrix=$JSON_MATRIX" >> "$GITHUB_OUTPUT"
 
   provision:
     needs: filter_envs
