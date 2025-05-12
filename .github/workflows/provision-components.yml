@@ -25,15 +25,15 @@ jobs:
   filter_components:
     runs-on: ${{ inputs.github-runner }} 
     outputs:
-      project: ${{ steps.filter_components.outputs.project }}
-      network: ${{ steps.filter_components.outputs.network }}
-      k8s_blue: ${{ steps.filter_components.outputs.k8s_blue }}
-      k8s_green: ${{ steps.filter_components.outputs.k8s_green }}
+      project: ${{ steps.filter.outputs.project }}
+      network: ${{ steps.filter.outputs.network }}
+      k8s_blue: ${{ steps.filter.outputs.k8s_blue }}
+      k8s_green: ${{ steps.filter.outputs.k8s_green }}
     steps:
       - uses: actions/checkout@v4.2.2
 
       - uses: dorny/paths-filter@v3.0.2
-        id: filter-components
+        id: filter
         with:
           filters: |
             project:
