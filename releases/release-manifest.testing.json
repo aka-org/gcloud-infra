@@ -5,7 +5,8 @@
     "tfvars_file": "*.tfvars.json"
   },
   "version": "0.0.34-testing",
-  "git_commit": "c78a90ee92b05d8077b97a0abefb4e043ba5d38d",
+  "checksum": "c78a90ee92b05d8077b97a0abefb4e043ba5d38d",
+  "method": "sha256",
   "timestamp": "2025-05-12T14:54:50Z",
   "images": {
     "k8s-node": "1-0-0-build102",
