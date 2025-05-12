@@ -26,12 +26,15 @@ jobs:
           filters: |
             testing:
               - 'terraform/**/testing/**'
+              - 'releases/release-manifest.testing.json'
             prod:
               - 'terraform/**/prod/**'
+              - 'releases/release-manifest.prod.json'
 
   testing:
     needs: filter_envs
     if: needs.filter_envs.outputs.testing == 'true' 
+    environment: testing
     uses: ./.github/workflows/provision-components.yml
     with:
       project: gcloud-infra-testing-aab1735b

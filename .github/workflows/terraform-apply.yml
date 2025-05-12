@@ -33,7 +33,6 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
-    environment: ${{ inputs.environment }}
     env:
       TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
 
