@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           repository: aka-org/release_manager
-          ref: v1.0.1
+          ref: v1.0.2
 
       - id: 'auth'
         if: inputs.action == 'PREPARE'
