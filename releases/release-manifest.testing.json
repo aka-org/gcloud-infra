@@ -1,8 +1,8 @@
 {
-  "version": "0.0.8-testing",
-  "checksum": "b357a2506df6df4348a866ba806ff81f7081dab14577de02b4e97597d5b1652b",
+  "version": "0.0.36-testing",
+  "checksum": "5bae0ed2275b3b5d6f0a19687dc61dd6a93d2dd6be981e2fc60b9094c37c666d",
   "method": "sha256",
-  "timestamp": "2025-05-13T09:48:55Z",
+  "timestamp": "2025-05-13T10:44:47Z",
   "terraform": {
     "environment": "testing",
     "project": "gcloud-infra-testing-aab1735b",
