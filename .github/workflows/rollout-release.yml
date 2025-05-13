@@ -35,8 +35,8 @@ jobs:
         run: |
           testing=$(jq -r '.version' "releases/release-manifest.testing.json")
           echo "testing=$testing" >> "$GITHUB_OUTPUT"
-          prod=$(jq -r '.version' "releases/release-manifest.prod.json")
-          echo "prod=$prod" >> "$GITHUB_OUTPUT"
+          #prod=$(jq -r '.version' "releases/release-manifest.prod.json")
+          #echo "prod=$prod" >> "$GITHUB_OUTPUT"
 
   testing:
     needs: filter_envs
