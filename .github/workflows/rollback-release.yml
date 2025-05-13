@@ -27,8 +27,9 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       action: ROLLBACK
-      environment: ${{ inputs.environment }}
-      version: ${{ inputs.version }}
       github-runner: ubuntu-22.04
+      environment: ${{ inputs.environment }}
+      release: ${{ inputs.environment == 'prod' && inputs.version || inputs.version-inputs.environment }}
+      release_manifest: releases/release-manifest.${{ inputs.environment }}.json
     secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}

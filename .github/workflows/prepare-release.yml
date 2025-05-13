@@ -28,8 +28,9 @@ jobs:
     with:
       action: PREPARE 
       environment: ${{ inputs.environment }}
-      version: ${{ inputs.version }}
+      release: ${{ inputs.environment == 'prod' && inputs.version || inputs.version-inputs.environment }} 
       github-runner: ubuntu-22.04
+      release_manifest: releases/release-manifest.${{ inputs.environment }}.json
     secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
