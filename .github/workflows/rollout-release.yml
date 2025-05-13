@@ -16,7 +16,7 @@ jobs:
       testing: ${{ steps.filter.outputs.testing }}
       prod: ${{ steps.filter.outputs.prod }}
       testing_release: ${{ steps.releases.outputs.testing }}
-      prod_release: ${{ steps.releases.outputs.prod }}
+      #prod_release: ${{ steps.releases.outputs.prod }}
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -47,6 +47,6 @@ jobs:
       environment: testing
       github-runner: ubuntu-22.04
       release_manifest: releases/release-manifest.testing.json
-      release: ${{ needs.filter_env.outputs.testing_release }}
+      release: ${{ needs.filter_envs.outputs.testing_release }}
     secrets:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
