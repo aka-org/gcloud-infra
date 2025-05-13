@@ -28,9 +28,7 @@ jobs:
     with:
       action: PREPARE 
       environment: ${{ inputs.environment }}
-      release: >-
-        ${{ inputs.environment == 'prod' && inputs.version || format('{0}-{1}', inputs.version, inputs.environment) }}
-      release: ${{ inputs.environment == 'prod' && inputs.version || inputs.version-inputs.environment }} 
+      release: ${{ inputs.environment == 'prod' && inputs.version || format('{0}-{1}', inputs.version, inputs.environment) }}
       github-runner: ubuntu-22.04
       release_manifest: releases/release-manifest.${{ inputs.environment }}.json
     secrets:
