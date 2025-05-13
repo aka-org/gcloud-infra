@@ -58,7 +58,7 @@ jobs:
           fi
 
       - name: Run release manager 
-        run: scripts/release_manager.sh
+        run: scripts/release_manager/release_manager.sh
           
       - name: Create Release
         if: inputs.action == 'ROLLOUT'

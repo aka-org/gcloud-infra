@@ -1,15 +1,21 @@
 {
+  "version": "0.0.8-testing",
+  "checksum": "b357a2506df6df4348a866ba806ff81f7081dab14577de02b4e97597d5b1652b",
+  "method": "sha256",
+  "timestamp": "2025-05-13T09:48:55Z",
   "terraform": {
     "environment": "testing",
     "project": "gcloud-infra-testing-aab1735b",
-    "tfvars_file": "*.tfvars.json"
-  },
-  "version": "0.0.35-testing",
-  "checksum": "295a67601525272c21bcb424f5cdbb6d12c0560e8dadfd4656665e7b6b8c965f",
-  "method": "sha256",
-  "timestamp": "2025-05-12T15:45:35Z",
-  "images": {
-    "k8s-node": "1-0-0-build102",
-    "load-balancer": "1-0-0-build6"
+    "tfvars_file": "*.tfvars.json",
+    "components": {
+      "project": {},
+      "network": {},
+      "k8s": {
+        "images": {
+          "k8s-node": "1-0-0-build102",
+          "load-balancer": "1-0-0-build6"
+        }
+      }
+    }
   }
 }
