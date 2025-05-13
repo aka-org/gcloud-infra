@@ -12,8 +12,11 @@ on:
       github-runner:
         required: true
         type: string
-      version:
-        required: false 
+      release:
+        required: true 
+        type: string
+      release_manifest:
+        required: true 
         type: string
     secrets:
       GOOGLE_CREDENTIALS_B64:
@@ -29,11 +32,15 @@ jobs:
       CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
       ACTION: ${{ inputs.action }} 
       ENVIRONMENT: ${{ inputs.environment }}
-      RELEASE_MANIFEST: releases/release-manifest.${{ inputs.environment }}.json
+      RELEASE_MANIFEST: ${{ inputs.release_manifest }}
+      RELEASE: ${{ inputs.release }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.2.2
+        with:
+          repository: aka-org/release_manager
+          ref: v1.0.0
 
       - id: 'auth'
         if: inputs.action == 'PREPARE'
@@ -45,20 +52,8 @@ jobs:
         if: inputs.action == 'PREPARE'
         uses: 'google-github-actions/setup-gcloud@v2.0.0'
 
-      - name: Set environmental variables
-        run: |
-          if [[ "${{ inputs.action }}" == "PREPARE" || "${{ inputs.action }}" == "ROLLBACK" ]]; then
-            if [ "${{ inputs.environment }}" == "prod" ]; then
-              echo "RELEASE=${{ inputs.version }}" >> $GITHUB_ENV
-            else
-              echo "RELEASE=${{ inputs.version }}-${{ inputs.environment }}" >> $GITHUB_ENV
-            fi
-          else
-            echo "RELEASE=$(jq -r '.version' $RELEASE_MANIFEST)" >> $GITHUB_ENV
-          fi
-
       - name: Run release manager 
-        run: scripts/release_manager/release_manager.sh
+        run: ./infra.sh
           
       - name: Create Release
         if: inputs.action == 'ROLLOUT'
