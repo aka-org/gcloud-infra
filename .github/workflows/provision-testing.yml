@@ -1,0 +1,16 @@
+name: Provision Testing Environment 
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+    paths:
+      - 'testing/**'
+
+jobs:
+  testing:
+    uses: ./.github/workflows/provision-components.yml
+    with:
+      environment: testing 
+      terraform-version: 1.11.4
+      github-runner: ubuntu-22.04
