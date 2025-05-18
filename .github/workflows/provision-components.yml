@@ -9,7 +9,7 @@ on:
 
 jobs:
   filter_components:
-    runs-on: ${{ inputs.github-runner }} 
+    runs-on: ubuntu-22.04
     outputs:
       project: ${{ steps.filter.outputs.project }}
       kubernetes: ${{ steps.filter.outputs.kubernetes }}
