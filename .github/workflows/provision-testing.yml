@@ -1,4 +1,4 @@
-name: Provision Testing Environment 
+name: Provision Testing Environment
 
 on:
   push:
@@ -7,8 +7,43 @@ on:
     paths:
       - 'testing/**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  testing:
-    uses: ./.github/workflows/provision-components.yml
+  filter_components:
+    runs-on: ubuntu-22.04
+    outputs:
+      project: ${{ steps.filter.outputs.project }}
+      kubernetes: ${{ steps.filter.outputs.kubernetes }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: dorny/paths-filter@v3.0.2
+        id: filter
+        with:
+          filters: |
+            project:
+              - 'testing/project/**'
+            kubernetes:
+              - 'testing/kubernetes/**'
+
+  project:
+    needs: filter_components
+    if: ${{ needs.filter_components.outputs.project == 'true' }} 
+    uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: testing 
+      working-directory: testing/project
+      tf-state-prefix: project
+    secrets:
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
+  kubernetes:
+    needs: [filter_components, project]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.kubernetes == 'true' }} 
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: testing 
+      working-directory: testing/kubernetes
+      tf-state-prefix: kubernetes 
