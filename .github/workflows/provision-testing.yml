@@ -26,7 +26,6 @@ jobs:
               - 'testing/kubernetes/**'
 
   project:
-    environment: testing
     needs: filter_components
     if: ${{ needs.filter_components.outputs.project == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
@@ -34,12 +33,7 @@ jobs:
       environment: testing 
       working-directory: testing/project
       tf-state-prefix: project
-      wif-provider: ${{ env.WIF_PROVIDER }}
-      wif-sa: ${{ env.WIF_SA }}
-    secrets:
-      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   kubernetes:
-    environment: testing
     needs: [filter_components, project]
     if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.kubernetes == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
@@ -47,5 +41,3 @@ jobs:
       environment: testing 
       working-directory: testing/kubernetes
       tf-state-prefix: kubernetes 
-      wif-provider: ${{ env.WIF_PROVIDER }}
-      wif-sa: ${{ env.WIF_SA }}
