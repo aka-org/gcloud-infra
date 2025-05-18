@@ -24,12 +24,12 @@ compute resources for each environment that we want to provision.
 
 Clone the repo
 ```bash
-git clone https://github.com/akatsantonis/gcloud_infra.git
+git clone https://github.com/akatsantonis/gcloud-infra.git
 ```
 
 Change directory to environments/bootstrap
 ```bash
-cd gcloud_infra/environments/bootstrap
+cd gcloud-infra/environments/bootstrap
 ```
 
 Export the following terraform variables
@@ -81,13 +81,13 @@ will be stored remotely.
 
 ### Provisioning resources to environments:
 
-Environments should be placed under gcloud_infra/environments/
+Environments should be placed under gcloud-infra/environments/
 
 For reference implementation and configuration check environments/testing/
 
 Move to the environment directory, for example
 ```bash
-cd gcloud_infra/environments/testing
+cd gcloud-infra/environments/testing
 ```
 
 If you created a bucket for remote terraform state storage make sure

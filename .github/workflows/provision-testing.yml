@@ -1,0 +1,14 @@
+name: Provision Testing Environment 
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+    paths:
+      - 'testing/**'
+
+jobs:
+  testing:
+    uses: ./.github/workflows/provision-components.yml
+    with:
+      environment: testing 

@@ -9,28 +9,14 @@ on:
       working-directory:
         required: true
         type: string
-      terraform-version:
+      tf-state-prefix:
         required: true
         type: string
-      github-runner:
-        required: true
-        type: string
-      tf-state:
-        required: true
-        type: string
-      vars:
-        required: true
-        type: string
-    secrets:
-      GOOGLE_CREDENTIALS_B64:
-        required: true
-      BILLING_ACCOUNT_ID:
-        required: false
 
 jobs:
   apply:
     environment: ${{ inputs.environment }}
-    runs-on: ${{ inputs.github-runner }}
+    runs-on: ubuntu-22.04   
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
@@ -44,16 +30,17 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3.1.2
         with:
-          terraform_version: "${{ inputs.terraform-version }}"
+          terraform_version: 1.11.4 
 
-      - name: Authenticate to Google Cloud
-        run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS_B64 }}" | base64 -d > $HOME/gcloud.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json" >> $GITHUB_ENV
-        shell: bash
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@2.1.10
+        with:
+          token_format: "id_token"
+          workload_identity_provider: ${{ env.WIF_PROVIDER }} 
+          service_account: ${{ env.WIF_SA }}
 
       - name: Terraform Init
-        run: terraform init -backend-config="bucket=${{ inputs.tf-state }}" 
+        run: terraform init -upgrade -backend-config="prefix=${{ inputs.tf-state-prefix }}"
 
       - name: Check Terraform Formatting
         run: terraform fmt -check -recursive
@@ -62,11 +49,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var-file="${{ inputs.environment }}/${{ inputs.vars }}"
+        run: terraform plan -out=tfplan 
 
       - name: Terraform Apply
-        if: startswith(github.ref, 'refs/tags/')
         run: terraform apply -auto-approve tfplan
-
-      - name: Remove Creds
-        run: rm $HOME/gcloud.json
