@@ -40,7 +40,6 @@ jobs:
         with:
           workload_identity_provider: ${{ vars.WIF_PROVIDER }}
           service_account: ${{ vars.WIF_SA }}
-            #audience: "https://iam.googleapis.com/${{ vars.WIF_PROVIDER }}" 
 
       - name: Terraform Init
         run: terraform init -upgrade -backend-config="prefix=${{ inputs.tf-state-prefix }}"
