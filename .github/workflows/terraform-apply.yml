@@ -12,6 +12,14 @@ on:
       tf-state-prefix:
         required: true
         type: string
+    secrets:
+      BILLING_ACCOUNT_ID:
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   apply:

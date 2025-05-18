@@ -33,6 +33,8 @@ jobs:
       environment: testing 
       working-directory: testing/project
       tf-state-prefix: project
+    secrets:
+      BILLING_ACCOUNT_ID: ${{ secrets.BILLING_ACCOUNT_ID }}
   kubernetes:
     needs: [filter_components, project]
     if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.kubernetes == 'true' }} 
