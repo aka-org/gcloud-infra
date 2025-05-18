@@ -7,6 +7,10 @@ on:
     paths:
       - 'testing/**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   filter_components:
     runs-on: ubuntu-22.04

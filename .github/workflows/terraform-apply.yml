@@ -16,10 +16,6 @@ on:
       BILLING_ACCOUNT_ID:
         required: false
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   apply:
     environment: ${{ inputs.environment }}
