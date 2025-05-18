@@ -15,7 +15,6 @@ on:
     secrets:
       BILLING_ACCOUNT_ID:
         required: false
-        type: string
 
 permissions:
   id-token: write
