@@ -12,9 +12,6 @@ on:
       tf-state-prefix:
         required: true
         type: string
-    secrets:
-      BILLING_ACCOUNT_ID:
-        required: false
 
 jobs:
   apply:
@@ -38,8 +35,8 @@ jobs:
       - name: Authenticate to GCP
         uses: google-github-actions/auth@2.1.10
         with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.WIF_SA }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SA }}
 
       - name: Terraform Init
         run: terraform init -upgrade -backend-config="prefix=${{ inputs.tf-state-prefix }}"
