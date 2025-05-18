@@ -12,30 +12,33 @@ jobs:
     runs-on: ${{ inputs.github-runner }} 
     outputs:
       project: ${{ steps.filter.outputs.project }}
+      kubernetes: ${{ steps.filter.outputs.kubernetes }}
     steps:
       - uses: actions/checkout@v4.2.2
 
       - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
+          working-directory: ${{ inputs.environment }}
           filters: |
+            project:
+              - 'project/**'
             kubernetes:
-              - 'testing/kubernetes/**'
+              - 'kubernetes/**'
 
   project:
+    needs: filter_components
+    if: ${{ needs.filter_components.outputs.project == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
-      working-directory: testing/project
+      working-directory: ${{ inputs.environment }}/project
       tf-state-prefix: project
   kubernetes:
     needs: [filter_components, project]
-    if: ${{ needs.filter_components.outputs.kubernetes == 'true' }} 
+    if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.kubernetes == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
       environment: ${{ inputs.environment }}
-      tf-state: ${{ inputs.project }}-k8s-green-tf-state
-      working-directory: terraform/k8s
-      vars: green.tfvars.json
-    secrets:
-      GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+      working-directory: ${{ inputs.environment }}/kubernetes
+      tf-state-prefix: kubernetes 

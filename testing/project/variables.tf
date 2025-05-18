@@ -6,7 +6,6 @@ variable "project_name" {
 variable "project_labels" {
   description = "Labels to add to project"
   type        = map(string)
-  default     = {}
 }
 
 variable "billing_account_id" {
@@ -15,10 +14,15 @@ variable "billing_account_id" {
   sensitive   = true
 }
 
-variable "enable_apis" {
-  description = "Lists of Google APIs to be enabled"
-  type        = list(string)
-  default     = []
+variable "bucket_name_prefix" {
+  description = "The prefix of the name of the bucket that will store the tf states"
+  type        = string
+  default     = "tf-states"
+}
+
+variable "bucket_labels" {
+  description = "Labels to add to the created bucket"
+  type        = map(string)
 }
 
 variable "gcs_backend" {
@@ -27,56 +31,28 @@ variable "gcs_backend" {
   default     = true
 }
 
-variable "bucket" {
-  description = "Object describing a bucket for project tf states"
-  type = object({
-    location           = string
-    force_destroy      = bool
-    versioning_enabled = bool
-    labels             = map(string)
-  })
-}
-
-variable "service_accounts" {
-  description = "List of service accounts with role bindings"
-  type = list(object({
-    id          = string
-    roles       = list(string)
-    description = string
-  }))
-}
-
 variable "gha_wif_enabled" {
   description = "Set to true to setup Workload Identity Federation for Github Actions"
   type        = bool
   default     = true
 }
 
-variable "project_deletion_policy" {
-  description = " Project deletion policy (e.g. PREVENT or DELETE)"
+variable "gha_owner_id" {
+  description = "ID of the owner of the github repos allowed to authenticate via identity provider"
   type        = string
-  default     = "PREVENT"
+  default     = "208289232"
 }
 
-variable "gha_wif_sa" {
-  description = "Service account to be associated with Github identity pool, must be defined in service accounts"
-  type        = string
-  default     = "gha-sa"
+variable "gha_allowed_repos" {
+  description = "List of repos allowed to authenticate via identity provider"
+  type        = list(string)
+  default = [
+    "aka-org/gcloud-infra",
+    "aka-org/gcloud-os-images"
+  ]
 }
 
-variable "gha_wif_org" {
-  description = "Github org or user from which actions are allowed to authenticate via WIF"
-  type        = string
-  default     = "aka-org"
-}
-
-variable "gha_wif_repo" {
-  description = "Github repo from which actions are allowed to authenticate via WIF"
-  type        = string
-  default     = ""
-}
-
-variable "create_vpc" {
+variable "vpc_create" {
   description = "Set to true to create a default project vpc"
   type        = bool
   default     = true

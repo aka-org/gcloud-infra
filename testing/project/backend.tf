@@ -1,6 +1,5 @@
 terraform {
   backend "gcs" {
-    bucket = "aka-org-testing-636c5fa4-tf-states"
-    prefix = "project"
+    bucket = "tf-states-0f14e778"
   }
 }
