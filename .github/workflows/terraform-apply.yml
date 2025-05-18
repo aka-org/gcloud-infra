@@ -12,6 +12,16 @@ on:
       tf-state-prefix:
         required: true
         type: string
+      wif-provider:
+        required: true
+        type: string
+      wif-sa:
+        required: true
+        type: string
+    secrets:
+      BILLING_ACCOUNT_ID:
+        required: false
+        type: string
 
 jobs:
   apply:
@@ -36,8 +46,8 @@ jobs:
         uses: google-github-actions/auth@2.1.10
         with:
           token_format: "id_token"
-          workload_identity_provider: ${{ env.WIF_PROVIDER }} 
-          service_account: ${{ env.WIF_SA }}
+          workload_identity_provider: ${{ inputs.wif-provider }}
+          service_account: ${{ inputs.wif-sa }}
 
       - name: Terraform Init
         run: terraform init -upgrade -backend-config="prefix=${{ inputs.tf-state-prefix }}"
