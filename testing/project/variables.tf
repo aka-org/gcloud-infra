@@ -14,6 +14,23 @@ variable "billing_account_id" {
   sensitive   = true
 }
 
+variable "enable_apis" {
+  description = "Lists of additional Google APIs to be enabled"
+  type        = list(string)
+  default = [
+    "compute.googleapis.com"
+  ]
+}
+
+variable "sa_roles" {
+  description = "List of roles to be assigned to the default service account"
+  type        = list(string)
+  default = [
+    "roles/compute.admin",
+    "roles/compute.networkAdmin"
+  ]
+}
+
 variable "bucket_name_prefix" {
   description = "The prefix of the name of the bucket that will store the tf states"
   type        = string
@@ -50,16 +67,4 @@ variable "gha_allowed_repos" {
     "aka-org/gcloud-infra",
     "aka-org/gcloud-os-images"
   ]
-}
-
-variable "vpc_create" {
-  description = "Set to true to create a default project vpc"
-  type        = bool
-  default     = true
-}
-
-variable "vpc_name" {
-  description = "Name of the project vpc"
-  type        = string
-  default     = "main"
 }
