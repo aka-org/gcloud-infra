@@ -27,7 +27,8 @@ variable "sa_roles" {
   type        = list(string)
   default = [
     "roles/compute.admin",
-    "roles/compute.networkAdmin"
+    "roles/compute.networkAdmin",
+    "roles/serviceusage.admin"
   ]
 }
 
