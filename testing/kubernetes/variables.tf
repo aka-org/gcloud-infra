@@ -30,7 +30,7 @@ variable "ha_enabled" {
 
 variable "images" {
   description = "Map of image families to image versions"
-  type = map(string)
+  type        = map(string)
 }
 
 variable "subnetwork" {

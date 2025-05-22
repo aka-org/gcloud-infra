@@ -1,8 +1,8 @@
 data "google_compute_subnetwork" "this" {
-  count = var.ha_enabled ? 1 : 0
-  name = var.subnetwork
+  count   = var.ha_enabled ? 1 : 0
+  name    = var.subnetwork
   project = var.project_id
-  region = var.region
+  region  = var.region
 }
 
 locals {
