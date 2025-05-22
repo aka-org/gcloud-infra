@@ -1,6 +1,6 @@
 module "project" {
   source  = "aka-org/project/google"
-  version = "1.1.0"
+  version = "1.2.0"
 
   project_name       = var.project_name
   project_labels     = var.project_labels
