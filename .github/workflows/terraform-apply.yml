@@ -12,6 +12,9 @@ on:
       tf-state-prefix:
         required: true
         type: string
+      release:
+        required: false
+        type: string
 
 jobs:
   apply:
@@ -23,6 +26,8 @@ jobs:
     env:
       TF_VAR_billing_account_id: ${{ secrets.BILLING_ACCOUNT_ID }}
       TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
+      TF_VAR_release: ${{ inputs.release }}
+      TF_VAR_env: ${{ inputs.environment }}
 
     steps:
       - name: Checkout repo

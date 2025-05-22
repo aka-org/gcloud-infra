@@ -3,9 +3,9 @@ variable "project_name" {
   type        = string
 }
 
-variable "project_labels" {
-  description = "Labels to add to project"
-  type        = map(string)
+variable "env" {
+  description = "Provisioned environment name (e.g., testing, prod)"
+  type        = string
 }
 
 variable "billing_account_id" {
@@ -37,13 +37,8 @@ variable "bucket_name_prefix" {
   default     = "tf-states"
 }
 
-variable "bucket_labels" {
-  description = "Labels to add to the created bucket"
-  type        = map(string)
-}
-
 variable "gcs_backend" {
-  description = "If true creates bucket named after project id to store tf states and a local backend.tf"
+  description = "If true, creates backend config for GCS state"
   type        = bool
   default     = true
 }
