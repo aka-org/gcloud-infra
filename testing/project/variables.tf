@@ -8,11 +8,6 @@ variable "env" {
   type        = string
 }
 
-variable "project_labels" {
-  description = "Labels to add to project"
-  type        = map(string)
-}
-
 variable "billing_account_id" {
   description = "Billing account ID to associate with the project"
   type        = string
@@ -40,11 +35,6 @@ variable "bucket_name_prefix" {
   description = "The prefix of the name of the bucket that will store the tf states"
   type        = string
   default     = "tf-states"
-}
-
-variable "bucket_labels" {
-  description = "Labels to add to the created bucket"
-  type        = map(string)
 }
 
 variable "gcs_backend" {
