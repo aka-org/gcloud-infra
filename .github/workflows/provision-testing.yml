@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       project: ${{ steps.filter.outputs.project }}
+      network: ${{ steps.filter.outputs.network }}
       kubernetes: ${{ steps.filter.outputs.kubernetes }}
     steps:
       - uses: actions/checkout@v4.2.2
@@ -26,6 +27,8 @@ jobs:
           filters: |
             project:
               - 'testing/project/**'
+            network:
+              - 'testing/network/**'
             kubernetes:
               - 'testing/kubernetes/**'
 
@@ -38,8 +41,17 @@ jobs:
       working-directory: testing/project
       tf-state-prefix: project
     secrets: inherit
-  kubernetes:
+  network:
     needs: [filter_components, project]
+    if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.network == 'true' }}
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      environment: testing
+      working-directory: testing/network
+      tf-state-prefix: network
+    secrets: inherit
+  kubernetes:
+    needs: [filter_components, project, network]
     if: ${{ ! failure() && ! cancelled() && needs.filter_components.outputs.kubernetes == 'true' }} 
     uses: ./.github/workflows/terraform-apply.yml
     with:
