@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v4.2.2
 
       - id: read_release
+        name: Read release version from release manifest
         run: |
           VERSION=$(jq -r '.version' releases/release-manifest.testing.json)
           echo "Release version: $VERSION"
