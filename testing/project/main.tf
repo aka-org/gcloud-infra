@@ -1,5 +1,5 @@
 locals {
-  buket_labels = {
+  bucket_labels = {
     env = var.env
   }
   project_labels = {
