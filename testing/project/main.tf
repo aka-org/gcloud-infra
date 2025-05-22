@@ -1,3 +1,12 @@
+locals {
+  buket_labels = {
+    env = var.env
+  }
+  project_labels = {
+    env = var.env
+  }
+}
+
 module "project" {
   source  = "aka-org/project/google"
   version = "1.2.0"

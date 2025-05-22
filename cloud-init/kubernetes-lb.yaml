@@ -25,7 +25,7 @@ write_files:
               ${lb_vip}
           }
           
-          notify_master "/usr/local/bin/takeover.sh {{PEER_NAME}} ${gcp_zone} ${lb_vip}"
+          notify_master "/usr/local/bin/takeover.sh {{PEER_NAME}} ${zone} ${lb_vip}"
       }
   - path: /etc/haproxy/haproxy.cfg
     append: true
@@ -42,4 +42,4 @@ write_files:
         option tcp-check
 runcmd:
   - systemctl enable --now haproxy
-  - /usr/local/bin/init_keepalived.sh ${role} ${version}
+  - /usr/local/bin/init-keepalived.sh ${role} ${version}

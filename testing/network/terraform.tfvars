@@ -12,6 +12,20 @@ firewall_rules = [
     ports         = []
     source_ranges = ["0.0.0.0/0"]
     tags          = ["icmp"]
+  },
+  {
+    name          = "kubernetes-haproxy"
+    protocol      = "tcp"
+    ports         = ["6443", "8081"]
+    source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
+    tags          = ["kubernetes-lb"]
+  },
+  {
+    name          = "kubernetes-keepalived"
+    protocol      = "112"
+    ports         = []
+    source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
+    tags          = ["kubernetes-lb"]
   }
 ]
 subnetworks = [
