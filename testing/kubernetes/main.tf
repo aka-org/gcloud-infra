@@ -45,6 +45,19 @@ locals {
       )
     }
   ]
+  kubernetes_image = "projects/${var.project_id}/global/images/kubernetes-node-${var.images["kubernetes-node"]}"
+  lb_master_labels = {
+    env     = var.env
+    role    = "kubernetes-master"
+    version = replace(var.release, ".", "-")
+  }
+  kubernetes_nodes = [
+    {
+      name   = "kubernetes-master-1"
+      labels = local.lb_master_labels
+      tags   = ["ssh", "icmp", "kubernetes-master", "calico-vxlan"]
+    }
+  ]
 }
 
 module "load_balancers" {
@@ -74,4 +87,31 @@ module "load_balancers" {
   }
 
   count = var.ha_enabled ? 1 : 0
+}
+
+module "kubernetes_nodes" {
+  source  = "aka-org/compute/google"
+  version = "0.2.0"
+
+  project_id     = var.project_id
+  sa_id          = ""
+  sa_description = ""
+  sa_roles       = []
+  vms            = local.kubernetes_nodes
+  vm_defaults = {
+    zone                = var.zone
+    subnetwork          = var.subnetwork
+    image               = local.kubernetes_image
+    labels              = []
+    cloud_init_data     = {}
+    cloud_init          = ""
+    network             = "main"
+    machine_type        = "e2-medium"
+    disk_size           = 10
+    disk_type           = "pd-standard"
+    startup_script      = ""
+    startup_script_data = {}
+    admin_ssh_keys      = var.admin_ssh_keys
+    tags                = []
+  }
 }
