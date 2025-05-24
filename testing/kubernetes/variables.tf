@@ -23,6 +23,16 @@ variable "zone" {
   type        = string
 }
 
+variable "cluster_name" {
+  description = "Name of the Kubernetes cluster"
+  type        = string
+}
+
+variable "kubernetes_secret" {
+  description = "Name of the gcloud secret that will store the token and hash of the cluster"
+  type        = string
+}
+
 variable "ha_enabled" {
   description = "Whether high availability mode is enabled for the cluster"
   type        = bool

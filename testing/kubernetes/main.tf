@@ -17,13 +17,12 @@ locals {
     version = replace(var.release, ".", "-")
   }
 
-  lb_cloud_init_data = {
-    env     = var.env
-    role    = "kubernetes-lb"
-    version = replace(var.release, ".", "-")
-    zone    = var.zone
-    lb_vip  = local.lb_vip
-  }
+  lb_cloud_init_data = merge(
+    local.lb_labels, {
+      zone    = var.zone
+      lb_vip  = local.lb_vip
+    }
+  )
 
   lb_nodes = [
     {
@@ -46,16 +45,42 @@ locals {
     }
   ]
   kubernetes_image = "projects/${var.project_id}/global/images/kubernetes-node-${var.images["kubernetes-node"]}"
-  lb_master_labels = {
+  kubernetes_master_labels = {
     env     = var.env
     role    = "kubernetes-master"
     version = replace(var.release, ".", "-")
   }
-  kubernetes_nodes = [
+  kubernetes_worker_labels = {
+    env     = var.env
+    role    = "kubernetes-worker"
+    version = replace(var.release, ".", "-")
+  }
+  kubernetes_common_cloud_init_data = {
+      lb_vip = local.lb_vip
+      cluster_name = var.cluster_name
+      kubernetes_secret = var.kubernetes_secret
+  }
+  kubernetes_master_cloud_init_data = merge(
+    local.kubernetes_master_labels, 
+    local.kubernetes_common_cloud_init_data, {
+      init_cluster = false
+    }
+  )
+  kubernetes_worker_cloud_init_data = merge(
+    local.kubernetes_worker_labels, 
+    local.kubernetes_common_cloud_init_data, {
+      init_cluster = false
+    }
+  )
+  kubernetes_master_nodes = [
     {
       name   = "kubernetes-master-1"
-      labels = local.lb_master_labels
-      tags   = ["ssh", "icmp", "kubernetes-master", "calico-vxlan"]
+      cloud_init_data = merge(
+        local.kubernetes_master_labels, 
+        local.kubernetes_common_cloud_init_data, {
+          init_cluster = true
+        }
+      )
     }
   ]
 }
@@ -89,7 +114,7 @@ module "load_balancers" {
   count = var.ha_enabled ? 1 : 0
 }
 
-module "kubernetes_nodes" {
+module "kubernetes_master_nodes" {
   source  = "aka-org/compute/google"
   version = "0.3.0"
 
@@ -97,13 +122,13 @@ module "kubernetes_nodes" {
   sa_id          = ""
   sa_description = ""
   sa_roles       = []
-  vms            = local.kubernetes_nodes
+  vms            = local.kubernetes_master_nodes
   vm_defaults = {
     zone                = var.zone
     subnetwork          = var.subnetwork
     image               = local.kubernetes_image
-    labels              = {}
-    cloud_init_data     = {}
+    labels              = local.kubernetes_master_labels
+    cloud_init_data     = local.kubernetes_master_cloud_init_data
     cloud_init          = ""
     network             = "main"
     machine_type        = "e2-medium"
@@ -112,6 +137,6 @@ module "kubernetes_nodes" {
     startup_script      = ""
     startup_script_data = {}
     admin_ssh_keys      = var.admin_ssh_keys
-    tags                = []
+    tags                = ["ssh", "icmp", "kubernetes-master", "calico-vxlan"]
   }
 }
