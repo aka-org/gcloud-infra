@@ -19,8 +19,8 @@ locals {
 
   lb_cloud_init_data = merge(
     local.lb_labels, {
-      zone    = var.zone
-      lb_vip  = local.lb_vip
+      zone   = var.zone
+      lb_vip = local.lb_vip
     }
   )
 
@@ -56,38 +56,43 @@ locals {
     version = replace(var.release, ".", "-")
   }
   kubernetes_common_cloud_init_data = {
-      lb_vip = local.lb_vip
-      cluster_name = var.cluster_name
-      kubernetes_secret = var.kubernetes_secret
+    lb_vip            = local.lb_vip
+    cluster_name      = var.cluster_name
+    kubernetes_secret = var.kubernetes_secret
   }
   kubernetes_master_cloud_init_data = merge(
-    local.kubernetes_master_labels, 
+    local.kubernetes_master_labels,
     local.kubernetes_common_cloud_init_data, {
       init_cluster = false
     }
   )
   kubernetes_worker_cloud_init_data = merge(
-    local.kubernetes_worker_labels, 
+    local.kubernetes_worker_labels,
     local.kubernetes_common_cloud_init_data, {
       init_cluster = false
     }
   )
   kubernetes_master_nodes = [
     {
-      name   = "kubernetes-master-1"
+      name = "kubernetes-master-1"
       cloud_init_data = merge(
-        local.kubernetes_master_labels, 
+        local.kubernetes_master_labels,
         local.kubernetes_common_cloud_init_data, {
           init_cluster = true
         }
       )
     }
   ]
+  kubernetes_worker_nodes = [
+    {
+      name = "kubernetes-worker-1"
+    }
+  ]
 }
 
 module "load_balancers" {
   source  = "aka-org/compute/google"
-  version = "0.3.0"
+  version = "0.4.0"
 
   project_id     = var.project_id
   sa_id          = "load-balancer-sa"
@@ -116,20 +121,30 @@ module "load_balancers" {
 
 module "kubernetes_master_nodes" {
   source  = "aka-org/compute/google"
-  version = "0.3.0"
+  version = "0.4.0"
 
-  project_id     = var.project_id
-  sa_id          = ""
-  sa_description = ""
-  sa_roles       = []
-  vms            = local.kubernetes_master_nodes
+  project_id = var.project_id
+  secrets = [
+    {
+      id          = var.kubernetes_secret
+      add_version = false
+    }
+  ]
+  sa_id          = "kubernetes-master-sa"
+  sa_description = "Service account used by Kubernetes Master Nodes"
+  sa_roles = [
+    "roles/secretmanager.secretAccessor",
+    "roles/secretmanager.secretVersionAdder",
+    "roles/compute.viewer"
+  ]
+  vms = local.kubernetes_master_nodes
   vm_defaults = {
     zone                = var.zone
     subnetwork          = var.subnetwork
     image               = local.kubernetes_image
     labels              = local.kubernetes_master_labels
     cloud_init_data     = local.kubernetes_master_cloud_init_data
-    cloud_init          = ""
+    cloud_init          = "../cloud-init/kubernetes-node.yaml"
     network             = "main"
     machine_type        = "e2-medium"
     disk_size           = 10
@@ -139,4 +154,42 @@ module "kubernetes_master_nodes" {
     admin_ssh_keys      = var.admin_ssh_keys
     tags                = ["ssh", "icmp", "kubernetes-master", "calico-vxlan"]
   }
+  depends_on = [
+    module.load_balancers
+  ]
+}
+
+module "kubernetes_worker_nodes" {
+  source  = "aka-org/compute/google"
+  version = "0.4.0"
+
+  project_id     = var.project_id
+  sa_id          = "kubernetes-worker-sa"
+  sa_description = "Service account used by Kubernetes Worker Nodes"
+  sa_roles = [
+    "roles/secretmanager.secretAccessor",
+    "roles/compute.viewer"
+  ]
+  vms = local.kubernetes_worker_nodes
+  vm_defaults = {
+    zone                = var.zone
+    subnetwork          = var.subnetwork
+    image               = local.kubernetes_image
+    labels              = local.kubernetes_worker_labels
+    cloud_init_data     = local.kubernetes_worker_cloud_init_data
+    cloud_init          = "../cloud-init/kubernetes-node.yaml"
+    network             = "main"
+    machine_type        = "e2-medium"
+    disk_size           = 10
+    disk_type           = "pd-standard"
+    startup_script      = ""
+    startup_script_data = {}
+    admin_ssh_keys      = var.admin_ssh_keys
+    tags                = ["ssh", "icmp", "kubernetes-worker", "calico-vxlan"]
+  }
+
+  depends_on = [
+    module.kubernetes_master_nodes,
+    module.load_balancers
+  ]
 }

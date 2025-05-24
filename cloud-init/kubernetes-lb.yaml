@@ -1,18 +1,4 @@
 #cloud-config
-write_files:
-  - path: /etc/haproxy/haproxy.cfg
-    append: true
-    content: |
-      frontend kube-apiserver
-        bind *:6443     # BIND to any address so it is accessible via VIP
-        mode tcp
-        option tcplog
-        default_backend kube-apiserver
-
-      backend kube-apiserver
-        balance roundrobin
-        mode tcp
-        option tcp-check
 runcmd:
-  - systemctl enable --now haproxy
+  - /usr/local/bin/init-haproxy.sh ${version} ${env}
   - /usr/local/bin/init-keepalived.sh ${role} ${version} ${env} ${lb_vip} ${zone} ${lb_prio} ${lb_state}
