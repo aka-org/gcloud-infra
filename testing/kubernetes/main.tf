@@ -62,7 +62,7 @@ locals {
 
 module "load_balancers" {
   source  = "aka-org/compute/google"
-  version = "0.2.0"
+  version = "0.3.0"
 
   project_id     = var.project_id
   sa_id          = "load-balancer-sa"
@@ -91,7 +91,7 @@ module "load_balancers" {
 
 module "kubernetes_nodes" {
   source  = "aka-org/compute/google"
-  version = "0.2.0"
+  version = "0.3.0"
 
   project_id     = var.project_id
   sa_id          = ""
