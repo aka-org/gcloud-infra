@@ -102,7 +102,7 @@ module "kubernetes_nodes" {
     zone                = var.zone
     subnetwork          = var.subnetwork
     image               = local.kubernetes_image
-    labels              = []
+    labels              = {} 
     cloud_init_data     = {}
     cloud_init          = ""
     network             = "main"
