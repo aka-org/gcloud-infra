@@ -18,7 +18,8 @@ variable "enable_apis" {
   description = "Lists of additional Google APIs to be enabled"
   type        = list(string)
   default = [
-    "compute.googleapis.com"
+    "compute.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 }
 
@@ -27,7 +28,8 @@ variable "sa_roles" {
   type        = list(string)
   default = [
     "roles/compute.admin",
-    "roles/compute.networkAdmin"
+    "roles/compute.networkAdmin",
+    "roles/secretmanager.admin"
   ]
 }
 
