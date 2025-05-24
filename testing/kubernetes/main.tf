@@ -95,6 +95,7 @@ module "load_balancers" {
   version = "0.4.0"
 
   project_id     = var.project_id
+  secrets        = []
   sa_id          = "load-balancer-sa"
   sa_description = "Service account used by load-balancers"
   sa_roles       = ["roles/compute.instanceAdmin"]
@@ -144,7 +145,7 @@ module "kubernetes_master_nodes" {
     image               = local.kubernetes_image
     labels              = local.kubernetes_master_labels
     cloud_init_data     = local.kubernetes_master_cloud_init_data
-    cloud_init          = "../cloud-init/kubernetes-node.yaml"
+    cloud_init          = "../../cloud-init/kubernetes-node.yaml"
     network             = "main"
     machine_type        = "e2-medium"
     disk_size           = 10
@@ -164,6 +165,7 @@ module "kubernetes_worker_nodes" {
   version = "0.4.0"
 
   project_id     = var.project_id
+  secrets        = []
   sa_id          = "kubernetes-worker-sa"
   sa_description = "Service account used by Kubernetes Worker Nodes"
   sa_roles = [
@@ -177,7 +179,7 @@ module "kubernetes_worker_nodes" {
     image               = local.kubernetes_image
     labels              = local.kubernetes_worker_labels
     cloud_init_data     = local.kubernetes_worker_cloud_init_data
-    cloud_init          = "../cloud-init/kubernetes-node.yaml"
+    cloud_init          = "../../cloud-init/kubernetes-node.yaml"
     network             = "main"
     machine_type        = "e2-medium"
     disk_size           = 10
