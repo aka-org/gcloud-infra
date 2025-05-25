@@ -56,8 +56,8 @@ locals {
     version = replace(var.release, ".", "-")
   }
   kubernetes_common_cloud_init_data = {
-    lb_vip                      = local.lb_vip
-    cluster_name                = var.cluster_name
+    lb_vip           = local.lb_vip
+    cluster_name     = var.cluster_name
     discovery_secret = "testing-kubernetes-discovery-secret"
     cert_key_secret  = "testing-kubernetes-cert-key-secret"
   }
