@@ -26,7 +26,29 @@ firewall_rules = [
     ports         = []
     source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
     tags          = ["kubernetes-lb"]
+  },
+  {
+    name          = "kubernetes-master"
+    protocol      = "tcp"
+    ports         = ["6443", "2379", "10259", "10257", "2380", "10251", "10252", "443"]
+    source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
+    tags          = ["kubernetes-master"]
+  },
+  {
+    name          = "kubernetes-worker"
+    protocol      = "tcp"
+    ports         = ["10250"]
+    source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
+    tags          = ["kubernetes-worker"]
+  },
+  {
+    name          = "calico-vxlan"
+    protocol      = "udp"
+    ports         = ["4789", "10256"]
+    source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
+    tags          = ["calico"]
   }
+
 ]
 subnetworks = [
   {

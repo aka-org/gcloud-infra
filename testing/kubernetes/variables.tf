@@ -23,6 +23,19 @@ variable "zone" {
   type        = string
 }
 
+variable "cluster_name" {
+  description = "Name of the Kubernetes cluster"
+  type        = string
+}
+
+variable "secrets" {
+  description = "List of secret objects to be created"
+  type = list(object({
+    id          = string
+    add_version = bool
+  }))
+}
+
 variable "ha_enabled" {
   description = "Whether high availability mode is enabled for the cluster"
   type        = bool

@@ -1,0 +1,3 @@
+#cloud-config
+runcmd:
+  - /usr/local/bin/init-kubernetes.sh ${lb_vip} ${version} ${env} ${role} ${cluster_name} ${init_cluster} ${discovery_secret} ${cert_key_secret}
