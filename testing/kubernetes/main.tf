@@ -56,9 +56,10 @@ locals {
     version = replace(var.release, ".", "-")
   }
   kubernetes_common_cloud_init_data = {
-    lb_vip            = local.lb_vip
-    cluster_name      = var.cluster_name
-    kubernetes_secret = var.kubernetes_secret
+    lb_vip                      = local.lb_vip
+    cluster_name                = var.cluster_name
+    discovery_secret = "testing-kubernetes-discovery-secret"
+    cert_key_secret  = "testing-kubernetes-cert-key-secret"
   }
   kubernetes_master_cloud_init_data = merge(
     local.kubernetes_master_labels,
@@ -126,13 +127,8 @@ module "kubernetes_master_nodes" {
   source  = "aka-org/compute/google"
   version = "0.4.0"
 
-  project_id = var.project_id
-  secrets = [
-    {
-      id          = var.kubernetes_secret
-      add_version = false
-    }
-  ]
+  project_id     = var.project_id
+  secrets        = var.secrets
   sa_id          = "kubernetes-master-sa"
   sa_description = "Service account used by Kubernetes Master Nodes"
   sa_roles = [

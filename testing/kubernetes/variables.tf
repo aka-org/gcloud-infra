@@ -28,9 +28,12 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "kubernetes_secret" {
-  description = "Name of the gcloud secret that will store the token and hash of the cluster"
-  type        = string
+variable "secrets" {
+  description = "List of secret objects to be created"
+  type = list(object({
+    id          = string
+    add_version = bool
+  }))
 }
 
 variable "ha_enabled" {
