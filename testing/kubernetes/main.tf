@@ -82,13 +82,13 @@ locals {
         }
       )
     },
-    {name = "kubernetes-master-2"},
-    {name = "kubernetes-master-3"}
+    { name = "kubernetes-master-2" },
+    { name = "kubernetes-master-3" }
   ]
   kubernetes_worker_nodes = [
-    {name = "kubernetes-worker-1"},
-    {name = "kubernetes-worker-2"},
-    {name = "kubernetes-worker-3"}
+    { name = "kubernetes-worker-1" },
+    { name = "kubernetes-worker-2" },
+    { name = "kubernetes-worker-3" }
   ]
 }
 
