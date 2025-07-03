@@ -49,7 +49,7 @@ firewall_rules = [
     tags          = ["calico"]
   },
   {
-    name          = "calico-vxlan-udp"
+    name          = "calico-vxlan-tcp"
     protocol      = "tcp"
     ports         = ["5473"]
     source_ranges = ["10.0.82.0/24", "10.0.81.0/24"]
