@@ -42,6 +42,13 @@ firewall_rules = [
     tags          = ["kubernetes-worker"]
   },
   {
+    name          = "gcloud-app-load-balancer"
+    protocol      = "tcp"
+    ports         = ["30080"]
+    source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
+    tags          = ["kubernetes-worker"]
+  },
+  {
     name          = "calico-vxlan-udp"
     protocol      = "udp"
     ports         = ["4789", "10256"]
